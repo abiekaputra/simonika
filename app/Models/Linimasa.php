@@ -12,37 +12,15 @@ use Illuminate\Database\Eloquent\Model;
 class Linimasa extends Model
 {
     use HasFactory;
-    protected $table = 'Linimasa';
-    protected $fillabel = [
+
+    protected $table = 'linimasa';
+
+    protected $fillable = [
         'tanggal',
         'nama_proyek',
         'nama_pegawai',
         'status_proyek',
-        'tenggat_waktu'
+        'tenggat_waktu',
     ];
-
-    //
-    public function pegawai(){
-        return $this->belongsTo(Pegawai::class);
-    }
-    // relasi ke model proyek 
-    public function proyek(){
-        return $this->belongsTo(Proyek::class);
-    }
-    public function scopeByStatus($query, $status){
-        return $query-.where ('status_proyek', $status);
-    }
-    public function scopeToday($wuerry){
-        return $query->whereDate('tenggat_waktu', now()->tooDateString());
-    }
-    //accsesor untuk status projek 
-    public function getStatusProyekAttribute($value)
-    {
-        return ucfirst($value);
-    }
-    //mutator format tanngal 
-    public function setTanggalAttribute($value){
-        $this->attributes['tanggal'] = \Carbon\Carbon::parse($value)->format('Y-m-d');
-        
-    }
 }
+
