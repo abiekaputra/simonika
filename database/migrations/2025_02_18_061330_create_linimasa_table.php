@@ -26,7 +26,7 @@ return new class extends Migration
             $table->date('tanggal');
             $table->string('nama_proyek');
             $table->string('nama_pegawai');
-            $table->string('satus_proyek');
+            $table->string('status_proyek');
             $table->date('tenggat_waktu');
             $table->timestamps();
         });
