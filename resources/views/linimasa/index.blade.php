@@ -10,15 +10,19 @@
         </div>
     @endif
 
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ route('linimasa.create') }}" class="btn btn-primary">Tambah Data</a>
+    </div>
+
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>No</th>
-                <th>Nama Proyek</th>
                 <th>Nama Pegawai</th>
-                <th>Status</th>
+                <th>Nama Proyek</th>
                 <th>Tanggal</th>
                 <th>Tenggat Waktu</th>
+                <th>Status</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -26,11 +30,11 @@
             @foreach ($linimasa as $index => $item)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->nama_proyek }}</td>
                     <td>{{ $item->nama_pegawai }}</td>
-                    <td>{{ $item->status_proyek }}</td>
+                    <td>{{ $item->nama_proyek }}</td>
                     <td>{{ $item->tanggal }}</td>
                     <td>{{ $item->tenggat_waktu }}</td>
+                    <td>{{ $item->status_proyek }}</td>
                     <td>
                         <!-- Tombol Edit -->
                         <a href="{{ route('linimasa.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
