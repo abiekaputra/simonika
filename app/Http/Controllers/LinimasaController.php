@@ -80,4 +80,16 @@ class LinimasaController extends Controller
 
         return redirect()->route('linimasa.index')->with('success', 'Data linimasa berhasil diperbarui.');
     }
+    public function destroy($id)
+{
+    // Cari data berdasarkan ID
+    $linimasa = Linimasa::findOrFail($id);
+
+    // Hapus data
+    $linimasa->delete();
+
+    // Redirect dengan pesan sukses
+    return redirect()->route('linimasa.index')->with('success', 'Data linimasa berhasil dihapus.');
+}
+
 }

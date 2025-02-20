@@ -1,40 +1,48 @@
-<!-- resources/views/linimasa/index.blade.php -->
-
-@extends('layouts.app') <!-- Pastikan ada layout utama -->
+@extends('layouts.app')
 
 @section('content')
 <div class="container">
-    <h1>Linimasa Proyek</h1>
-    <a href="{{ route('linimasa.create') }}" class="btn btn-primary">Tambah Linimasa</a>
+    <h1>Daftar Linimasa</h1>
 
-    <table class="table mt-3">
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <table class="table table-striped">
         <thead>
             <tr>
-                <th>Tanggal</th>
+                <th>No</th>
                 <th>Nama Proyek</th>
                 <th>Nama Pegawai</th>
                 <th>Status</th>
+                <th>Tanggal</th>
                 <th>Tenggat Waktu</th>
                 <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($linimasa as $linimasa)
-            <tr>
-                <td>{{ $linimasa->tanggal }}</td>
-                <td>{{ $linimasa->nama_proyek }}</td>
-                <td>{{ $linimasa->nama_pegawai }}</td>
-                <td>{{ $linimasa->status_proyek }}</td>
-                <td>{{ $linimasa->tenggat_waktu }}</td>
-                <td>
-                    <a href="{{ route('linimasa.edit', $linimasa->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                    <form action="{{ route('linimasa.destroy', $linimasa->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
-                    </form>
-                </td>
-            </tr>
+            @foreach ($linimasa as $index => $item)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $item->nama_proyek }}</td>
+                    <td>{{ $item->nama_pegawai }}</td>
+                    <td>{{ $item->status_proyek }}</td>
+                    <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->tenggat_waktu }}</td>
+                    <td>
+                        <!-- Tombol Edit -->
+                        <a href="{{ route('linimasa.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        
+                        <!-- Formulir Hapus -->
+                        <form action="{{ route('linimasa.destroy', $item->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
             @endforeach
         </tbody>
     </table>
