@@ -47,30 +47,19 @@ class LinimasaController extends Controller
     }
 
     /**
-     * Menampilkan halaman form untuk mengedit linimasa yang dipilih.
-     */
-    public function edit($id)
-    {
-        $linimasa = Linimasa::findOrFail($id);
-        return view('linimasa.edit', compact('linimasa'));
-    }
-
-    /**
      * Memperbarui data linimasa di database.
      */
     public function update(Request $request, $id)
     {
         $request->validate([
-            'tanggal' => 'required|date',
-            'nama_proyek' => 'required|string|max:255',
-            'nama_pegawai' => 'required|string|max:255',
-            'tenggat_waktu' => 'required|date|after_or_equal:tanggal',
+            'tenggat_waktu' => 'required|date',
         ]);
 
         $linimasa = Linimasa::findOrFail($id);
-        $linimasa->update($request->except(['_token', '_method']));
+        $linimasa->tenggat_waktu = $request->tenggat_waktu;
+        $linimasa->save();
 
-        return redirect()->route('linimasa.index')->with('success', 'Data linimasa berhasil diperbarui.');
+        return redirect()->route('linimasa.index')->with('success', 'Linimasa berhasil diperbarui.');
     }
 
     /**
@@ -90,9 +79,10 @@ class LinimasaController extends Controller
     public function complete($id)
     {
         $linimasa = Linimasa::findOrFail($id);
-        $linimasa->tanggal_selesai = now(); // Tandai proyek selesai dengan tanggal sekarang
+        $linimasa->tanggal_selesai = now();
+        $linimasa->status_proyek = 'Selesai';
         $linimasa->save();
 
-        return redirect()->route('linimasa.index')->with('success', 'Proyek berhasil diselesaikan.');
+        return redirect()->route('linimasa.index')->with('success', 'Proyek telah ditandai selesai.');
     }
 }

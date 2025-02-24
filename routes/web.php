@@ -10,6 +10,7 @@ use App\Http\Controllers\AtributController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
 use App\Http\Controllers\AtributTambahanController;
 use App\Http\Controllers\LinimasaController;
+
 // Route untuk guest (belum login)
 Route::middleware(['guest', 'throttle:6,1'])->group(function () {
     // Redirect root URL ke halaman login
@@ -30,6 +31,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/aplikasi/export', [AplikasiController::class, 'export'])->name('aplikasi.export');
     // Route::resource('aplikasi', AplikasiController::class);  // Comment atau hapus ini untuk sementara
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::prefix('linimasa')->group(function () {
+        Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
+        Route::get('/create', [LinimasaController::class, 'create'])->name('linimasa.create');
+        Route::post('/', [LinimasaController::class, 'store'])->name('linimasa.store');
+        Route::get('/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
+        Route::put('/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
+        Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
+    });
+
     Route::middleware(['auth'])->group(function () {
         Route::prefix('linimasa')->group(function () {
             Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
@@ -38,7 +49,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
             Route::put('/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
             Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
-            Route::post('/linimasa/{id}/complete', [LinimasaController::class, 'complete'])->name('linimasa.complete');
         });
     });        
 
@@ -169,4 +179,3 @@ Route::middleware(['auth'])->group(function () {
 // Pastikan route untuk update atribut sudah terdaftar
 Route::post('/aplikasi/{id}/atribut', [AtributTambahanController::class, 'update'])
     ->name('aplikasi.atribut.update');
-
