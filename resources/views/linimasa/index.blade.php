@@ -216,7 +216,7 @@
                 document.getElementById("editTenggatWaktu").value = tenggatWaktu;
                 document.getElementById("editStatusProyek").value = statusProyek;
 
-                document.getElementById("editLinimasaForm").action = `/linimasa/${id}`;
+                document.getElementById("editLinimasaForm").action = "{{ url('/linimasa') }}/" + id;
 
                 let completeForm = document.getElementById("completeLinimasaForm");
                 if (tanggalSelesai === "null" || tanggalSelesai === "") {

@@ -47,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/create', [LinimasaController::class, 'create'])->name('linimasa.create');
             Route::post('/', [LinimasaController::class, 'store'])->name('linimasa.store');
             Route::get('/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
-            Route::put('/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
+            Route::put('/linimasa/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
             Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
         });
     });        
