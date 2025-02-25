@@ -8,6 +8,7 @@
     <button id="btnTambahLinimasa" class="btn btn-primary">
         Tambah Linimasa
     </button>
+    
 
     @if ($linimasa->isNotEmpty()) 
         <!-- Tombol untuk Mengubah Tampilan -->
@@ -125,6 +126,12 @@
                         <label for="tenggat_waktu" class="form-label">Tenggat Waktu</label>
                         <input type="date" class="form-control" id="tenggat_waktu" name="tenggat_waktu" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="deskripsi" class="form-label">Deskripsi</label>
+                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Tambahkan deskripsi singkat tentang proyek"></textarea>
+                    </div>
+
+
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </form>
             </div>
@@ -318,6 +325,9 @@
         timeline.setGroups(new vis.DataSet(groups));
         timeline.setItems(new vis.DataSet(items));
         timeline.setOptions(options);
+
+        
     </script>
+    
 @endif
 @endsection
