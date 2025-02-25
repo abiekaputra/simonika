@@ -38,7 +38,7 @@
                         $sisaHari = $today->diffInDays($tenggat, false);
                         $keterangan = $sisaHari >= 0 ? "Sisa $sisaHari hari" : "Terlambat " . abs($sisaHari) . " hari";
 
-                        $status = $item->status_proyek;
+                        $status = $item->status_manual;
                         $warna = match ($status) {
                             'Selesai Cepat' => 'success-light', // Hijau Muda
                             'Tepat Waktu' => 'success',        // Hijau
@@ -46,7 +46,7 @@
                             'Revisi' => 'warning',             // Orange
                             'Proses' => 'primary',             // Biru
                             'Todo Next' => 'secondary',        // Abu-abu
-                            default => 'secondary'             // Default (Abu-abu)
+                            default => 'success'             // Default (Abu-abu)
                         };
                     @endphp
 
@@ -67,14 +67,14 @@
         </td>
         <td>
             <!-- Tombol Edit hanya muncul jika proyek belum selesai -->
-            @if (!in_array($item->status_proyek, ['Selesai', 'Selesai (Terlambat)']))
+            @if (!in_array($item->status_manual, ['Selesai', 'Selesai (Terlambat)']))
                 <button class="btn btn-warning btn-sm edit-btn" 
                         data-id="{{ $item->id }}" 
                         data-nama-pegawai="{{ $item->nama_pegawai }}"
                         data-nama-proyek="{{ $item->nama_proyek }}"
                         data-tanggal="{{ $item->tanggal }}"
                         data-tenggat-waktu="{{ $item->tenggat_waktu }}"
-                        data-status-proyek="{{ $item->status_proyek }}"
+                        data-status-proyek="{{ $item->status_manual }}"
                         data-tanggal-selesai="{{ $item->tanggal_selesai }}"
                         data-bs-toggle="modal" 
                         data-bs-target="#editModal">
@@ -130,14 +130,13 @@
                         <input type="text" class="form-control" id="nama_pegawai" name="nama_pegawai" required>
                     </div>
                     <div class="mb-3">
-                        <label for="status_proyek" class="form-label">Status Proyek</label>
-                        <select class="form-select" id="status_proyek" name="status_proyek" required>
-                            <option value="" disabled selected>Pilih Status</option>
-                            <option value="Selesai lebih cepat"Selesai lebih cepat></option>
+                        <label for="status_manual" class="form-label">Status manual</label>
+                        <select class="form-select" id="status_manual" name="status_manual" required>
+                            <option value="Proses">Proses </option>
                             <option value="Tepat waktu">Tepat waktu</option>
                             <option value="Terlambat">Terlambat</option>
                             <option value="Revisi">Revisi (Terlambat)</option>
-                            <option value="Proses">Proses </option>
+                            <option value="Selesai lebih cepat">Selesai lebih cepat</option>
                             <option value="Todo next">Todo next</option>
                         </select>
                     </div>
@@ -158,6 +157,7 @@
                         <label for="deskripsi" class="form-label">Deskripsi</label>
                         <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Tambahkan deskripsi singkat tentang proyek"></textarea>
                     </div>
+                    
 
 
                     <button type="submit" class="btn btn-primary">Simpan</button>
@@ -185,21 +185,30 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+            <form action="{{ route('linimasa.update', $item->id) }}" method="POST">
+                @csrf
+                @method('PUT') <!-- Untuk mensimulasikan metode PUT -->
+                <!-- Input lain -->
+                <div class="mb-3">
+                        <label for="status_manual" class="form-label">Status manual</label>
+                        <select class="form-select" id="editStatusProyek" name="status_manual" required>
+                            <option value="Proses">Proses </option>
+                            <option value="Selesai lebih cepat">Selesai lebih cepat</option>
+                            <option value="Tepat waktu">Tepat waktu</option>
+                            <option value="Terlambat">Terlambat</option>
+                            <option value="Revisi">Revisi (Terlambat)</option>
+                            <option value="Selesai lebih cepat">Selesai lebih cepat</option>
+                            <option value="Todo next">Todo next</option>
+                        </select>
+                    </div>
+
                 <form id="editLinimasaForm" action="" method="POST">
                     @csrf
                     @method('PUT')
 
                     <input type="hidden" id="editId" name="id">
                     <div class="mb-3">
-                        <label for="status_proyek" class="form-label">Status Proyek</label>
-                        <select class="form-select" id="editStatusProyek" name="status_proyek" required>
-                            <option value="Selesai lebih cepat"Selesai lebih cepat></option>
-                            <option value="Tepat waktu">Tepat waktu</option>
-                            <option value="Terlambat">Terlambat</option>
-                            <option value="Revisi">Revisi (Terlambat)</option>
-                            <option value="Proses">Proses </option>
-                            <option value="Todo next">Todo next</option>
-                        </select>
+
                     </div>
 
 
@@ -249,7 +258,7 @@
                 let namaProyek = this.getAttribute("data-nama-proyek");
                 let tanggalMulai = this.getAttribute("data-tanggal");
                 let tenggatWaktu = this.getAttribute("data-tenggat-waktu");
-                let statusProyek = this.getAttribute("data-status-proyek");
+                let statusManual = this.getAttribute("data-status-manual");
                 let tanggalSelesai = this.getAttribute("data-tanggal-selesai");
 
                 document.getElementById("editId").value = id;
@@ -257,9 +266,9 @@
                 document.getElementById("editNamaProyek").value = namaProyek;
                 document.getElementById("editTanggalMulai").value = tanggalMulai;
                 document.getElementById("editTenggatWaktu").value = tenggatWaktu;
-                document.getElementById("editStatusProyek").value = statusProyek;
-                let statusSelect = document.getElementById("editStatusProyek");
-                statusSelect.value = statusProyek;
+                document.getElementById("editStatusManual").value = statusManual;
+                let statusSelect = document.getElementById("editStatusManual");
+                statusSelect.value = statusManual;
 
                 document.getElementById("editLinimasaForm").action = "{{ url('/linimasa') }}/" + id;
 
@@ -309,6 +318,7 @@
                 }
             });
         });
+        
     </script>
 
     <!-- Skrip Vis.js -->
@@ -328,7 +338,7 @@
     'content' => $item->nama_proyek,
     'start' => $item->tanggal,
     'end' => $item->tenggat_waktu,
-    'className' => match ($item->status_proyek) {
+    'className' => match ($item->status_manual) {
         'Selesai Cepat' => 'light-green',
         'Tepat Waktu' => 'green',
         'Terlambat' => 'red',
@@ -337,7 +347,7 @@
         'Todo Next' => 'gray',
         default => 'gray'
     },
-    'style' => match ($item->status_proyek) {
+    'style' => match ($item->status_manual) {
         'Selesai Cepat' => 'background-color: #90ee90; color: black;', // Hijau Muda
         'Tepat Waktu' => 'background-color: #28a745; color: white;',  // Hijau
         'Terlambat' => 'background-color: #dc3545; color: white;',    // Merah

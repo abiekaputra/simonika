@@ -21,26 +21,5 @@ class Linimasa extends Model
     ];
     
 
-    // Accessor untuk menghitung status proyek secara otomatis
-    public function getStatusProyekAttribute()
-    {
-        if (!empty($this->status_manual)) {
-            return $this->status_manual;
-        }
-        $today = now();
-        $mulai = Carbon::parse($this->tanggal);
-        $tenggat = Carbon::parse($this->tenggat_waktu);
-        $tanggalSelesai = $this->tanggal_selesai ? Carbon::parse($this->tanggal_selesai) : null;
-
-        switch (true) {
-            case $tanggalSelesai !== null:
-                return $tanggalSelesai > $tenggat ? 'Selesai (Terlambat)' : 'Selesai';
-            case $today > $tenggat:
-                return 'Terlambat';
-            case $today >= $mulai:
-                return 'Proses';
-            default:
-                return 'Belum Dimulai';
-        }
-    }
+   
 }

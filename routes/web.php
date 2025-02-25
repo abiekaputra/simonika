@@ -31,13 +31,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/aplikasi/export', [AplikasiController::class, 'export'])->name('aplikasi.export');
     // Route::resource('aplikasi', AplikasiController::class);  // Comment atau hapus ini untuk sementara
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    //Route::resource('linimasa', LinimasaController::class);
+
+
 
     Route::prefix('linimasa')->group(function () {
         Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
         Route::get('/create', [LinimasaController::class, 'create'])->name('linimasa.create');
         Route::post('/', [LinimasaController::class, 'store'])->name('linimasa.store');
-        Route::get('/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
-        Route::put('/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
+        Route::get('/linimasa/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
+        Route::put('/linimasa/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
+
         Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
     });
 
@@ -46,8 +50,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
             Route::get('/create', [LinimasaController::class, 'create'])->name('linimasa.create');
             Route::post('/', [LinimasaController::class, 'store'])->name('linimasa.store');
-            Route::get('/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
+            Route::get('/linimasa/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
             Route::put('/linimasa/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
+            
             Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
         });
     });        
