@@ -36,6 +36,7 @@ class LinimasaController extends Controller
             'nama_proyek' => 'required|string|max:255',
             'nama_pegawai' => 'required|string|max:255',
             'tenggat_waktu' => 'required|date|after_or_equal:tanggal',
+            'status_manual' => 'nullable|string',
         ], [
             'tenggat_waktu.after_or_equal' => 'Tanggal tenggat harus sama atau setelah tanggal pembuatan.',
         ]);
@@ -50,17 +51,20 @@ class LinimasaController extends Controller
      * Memperbarui data linimasa di database.
      */
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'tenggat_waktu' => 'required|date',
-        ]);
+{
+    $linimasa = Linimasa::findOrFail($id);
 
-        $linimasa = Linimasa::findOrFail($id);
-        $linimasa->tenggat_waktu = $request->tenggat_waktu;
-        $linimasa->save();
-
-        return redirect()->route('linimasa.index')->with('success', 'Linimasa berhasil diperbarui.');
+    // Simpan status manual jika ada
+    if ($request->has('status_manual')) {
+        $linimasa->status_manual = $request->input('status_manual');
     }
+
+    // Simpan perubahan lain
+    $linimasa->update($request->except(['status_manual'])); // Abaikan status_manual dalam update massal
+
+    return redirect()->route('linimasa.index')->with('success', 'Proyek berhasil diperbarui!');
+}
+
 
     /**
      * Menghapus data linimasa dari database.

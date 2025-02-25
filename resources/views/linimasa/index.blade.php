@@ -40,57 +40,72 @@
 
                         $status = $item->status_proyek;
                         $warna = match ($status) {
-                            'Berjalan' => 'primary',
-                            'Selesai' => 'success',
-                            'Terlambat' => 'danger',
-                            'Selesai (Terlambat)' => 'warning',
-                            default => 'secondary'
+                            'Selesai Cepat' => 'success-light', // Hijau Muda
+                            'Tepat Waktu' => 'success',        // Hijau
+                            'Terlambat' => 'danger',           // Merah
+                            'Revisi' => 'warning',             // Orange
+                            'Proses' => 'primary',             // Biru
+                            'Todo Next' => 'secondary',        // Abu-abu
+                            default => 'secondary'             // Default (Abu-abu)
                         };
                     @endphp
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->nama_pegawai }}</td>
-                        <td>
-                            <span class="badge bg-{{ $warna }}" data-bs-toggle="tooltip" title="{{ $keterangan }}">
-                                {{ $item->nama_proyek }}
-                            </span>
-                        </td>
-                        <td>{{ $item->tanggal }}</td>
-                        <td>{{ $item->tenggat_waktu }}</td>
-                        <td>
-                            <span class="badge bg-{{ $warna }}">{{ $status }}</span>
-                        </td>
-                        <td>
-                        <!-- Tombol Edit hanya muncul jika proyek belum selesai -->
-                        @if (!in_array($item->status_proyek, ['Selesai', 'Selesai (Terlambat)']))
-                            <button class="btn btn-warning btn-sm edit-btn" 
-                                    data-id="{{ $item->id }}" 
-                                    data-nama-pegawai="{{ $item->nama_pegawai }}"
-                                    data-nama-proyek="{{ $item->nama_proyek }}"
-                                    data-tanggal="{{ $item->tanggal }}"
-                                    data-tenggat-waktu="{{ $item->tenggat_waktu }}"
-                                    data-status-proyek="{{ $item->status_proyek }}"
-                                    data-tanggal-selesai="{{ $item->tanggal_selesai }}"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#editModal">
-                                Edit
-                            </button>
-                        @endif
 
-                        <form action="{{ route('linimasa.destroy', $item->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                        </form>
-                    </td>
-                    </tr>
-                    @endforeach
+<tr>
+        <td>{{ $index + 1 }}</td>
+        <td>{{ $item->nama_pegawai }}</td>
+        <td>
+            <span class="badge bg-{{ $warna }}" data-bs-toggle="tooltip" title="{{ $keterangan }}">
+                {{ $item->nama_proyek }}
+            </span>
+        </td>
+        <td>{{ $item->tanggal }}</td>
+        <td>{{ $item->tenggat_waktu }}</td>
+        <td>
+            <span class="badge bg-{{ $warna }}" data-bs-toggle="tooltip" title="{{ $keterangan }}">
+                {{ $status }}
+            </span>
+        </td>
+        <td>
+            <!-- Tombol Edit hanya muncul jika proyek belum selesai -->
+            @if (!in_array($item->status_proyek, ['Selesai', 'Selesai (Terlambat)']))
+                <button class="btn btn-warning btn-sm edit-btn" 
+                        data-id="{{ $item->id }}" 
+                        data-nama-pegawai="{{ $item->nama_pegawai }}"
+                        data-nama-proyek="{{ $item->nama_proyek }}"
+                        data-tanggal="{{ $item->tanggal }}"
+                        data-tenggat-waktu="{{ $item->tenggat_waktu }}"
+                        data-status-proyek="{{ $item->status_proyek }}"
+                        data-tanggal-selesai="{{ $item->tanggal_selesai }}"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#editModal">
+                    Edit
+                </button>
+            @endif
+
+            <form action="{{ route('linimasa.destroy', $item->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+            </form>
+        </td>
+    </tr>
+@endforeach
                 </tbody>
             </table>
         </div>
 
         <!-- Timeline Vis.js -->
         <div id="tabelLinimasa">
+            <div class="text-center mb-3">
+                <div class="button-container">
+                    <button id="zoomIn" class="btn btn-primary">
+                        <i class="fas fa-search-plus"></i> Zoom In
+                    </button>
+                    <button id="zoomOut" class="btn btn-secondary">
+                        <i class="fas fa-search-minus"></i> Zoom Out
+                    </button>
+                </div>
+            </div>
             <div id="timeline" style="height: 600px; margin: 20px;"></div>
         </div>
     @else
@@ -114,6 +129,19 @@
                         <label for="nama_pegawai" class="form-label">Nama Pegawai</label>
                         <input type="text" class="form-control" id="nama_pegawai" name="nama_pegawai" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="status_proyek" class="form-label">Status Proyek</label>
+                        <select class="form-select" id="status_proyek" name="status_proyek" required>
+                            <option value="" disabled selected>Pilih Status</option>
+                            <option value="Selesai lebih cepat"Selesai lebih cepat></option>
+                            <option value="Tepat waktu">Tepat waktu</option>
+                            <option value="Terlambat">Terlambat</option>
+                            <option value="Revisi">Revisi (Terlambat)</option>
+                            <option value="Proses">Proses </option>
+                            <option value="Todo next">Todo next</option>
+                        </select>
+                    </div>
+
                     <div class="mb-3">
                         <label for="nama_proyek" class="form-label">Nama Proyek</label>
                         <input type="text" class="form-control" id="nama_proyek" name="nama_proyek" required>
@@ -162,6 +190,18 @@
                     @method('PUT')
 
                     <input type="hidden" id="editId" name="id">
+                    <div class="mb-3">
+                        <label for="status_proyek" class="form-label">Status Proyek</label>
+                        <select class="form-select" id="editStatusProyek" name="status_proyek" required>
+                            <option value="Selesai lebih cepat"Selesai lebih cepat></option>
+                            <option value="Tepat waktu">Tepat waktu</option>
+                            <option value="Terlambat">Terlambat</option>
+                            <option value="Revisi">Revisi (Terlambat)</option>
+                            <option value="Proses">Proses </option>
+                            <option value="Todo next">Todo next</option>
+                        </select>
+                    </div>
+
 
                     <div class="mb-3">
                         <label for="editNamaPegawai" class="form-label">Nama Pegawai</label>
@@ -183,11 +223,7 @@
                         <input type="date" id="editTenggatWaktu" name="tenggat_waktu" class="form-control" required>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="editStatusProyek" class="form-label">Status Proyek</label>
-                        <input type="text" id="editStatusProyek" name="status_proyek" class="form-control" readonly>
-                    </div>
-
+                    
                     <button type="submit" class="btn btn-primary">Update</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 </form>
@@ -222,6 +258,8 @@
                 document.getElementById("editTanggalMulai").value = tanggalMulai;
                 document.getElementById("editTenggatWaktu").value = tenggatWaktu;
                 document.getElementById("editStatusProyek").value = statusProyek;
+                let statusSelect = document.getElementById("editStatusProyek");
+                statusSelect.value = statusProyek;
 
                 document.getElementById("editLinimasaForm").action = "{{ url('/linimasa') }}/" + id;
 
@@ -285,26 +323,31 @@
 
         // Data proyek dengan warna yang sesuai dengan tabel
         const items = {!! json_encode($linimasa->map(fn($item) => [
-            'id' => $item->id,
-            'group' => $item->id,
-            'content' => $item->nama_proyek,
-            'start' => $item->tanggal,
-            'end' => $item->tenggat_waktu,
-            'className' => match ($item->status_proyek) {
-                'Berjalan' => 'blue',
-                'Selesai' => 'green',
-                'Terlambat' => 'red',
-                'Selesai (Terlambat)' => 'orange',
-                default => 'gray'
-            },
-            'style' => match ($item->status_proyek) {
-                'Berjalan' => 'background-color: #007bff; color: white;',
-                'Selesai' => 'background-color: #28a745; color: white;',
-                'Terlambat' => 'background-color: #dc3545; color: white;',
-                'Selesai (Terlambat)' => 'background-color: #ffc107; color: black;',
-                default => 'background-color: #6c757d; color: white;'
-            }
-        ])) !!};
+    'id' => $item->id,
+    'group' => $item->id,
+    'content' => $item->nama_proyek,
+    'start' => $item->tanggal,
+    'end' => $item->tenggat_waktu,
+    'className' => match ($item->status_proyek) {
+        'Selesai Cepat' => 'light-green',
+        'Tepat Waktu' => 'green',
+        'Terlambat' => 'red',
+        'Revisi' => 'orange',
+        'Proses' => 'blue',
+        'Todo Next' => 'gray',
+        default => 'gray'
+    },
+    'style' => match ($item->status_proyek) {
+        'Selesai Cepat' => 'background-color: #90ee90; color: black;', // Hijau Muda
+        'Tepat Waktu' => 'background-color: #28a745; color: white;',  // Hijau
+        'Terlambat' => 'background-color: #dc3545; color: white;',    // Merah
+        'Revisi' => 'background-color: #ffc107; color: black;',      // Orange
+        'Proses' => 'background-color: #007bff; color: white;',      // Biru
+        'Todo Next' => 'background-color: #6c757d; color: white;',   // Abu-abu
+        default => 'background-color: #6c757d; color: white;'        // Default Abu-abu
+    }
+])) !!};
+
 
         // Elemen container timeline
         const container = document.getElementById('timeline');
@@ -325,6 +368,16 @@
         timeline.setGroups(new vis.DataSet(groups));
         timeline.setItems(new vis.DataSet(items));
         timeline.setOptions(options);
+
+        // Event listener untuk tombol Zoom In
+        document.getElementById('zoomIn').addEventListener('click', function () {
+            timeline.zoomIn(0.5); // Zoom in 50%
+        });
+
+        // Event listener untuk tombol Zoom Out
+        document.getElementById('zoomOut').addEventListener('click', function () {
+            timeline.zoomOut(0.5); // Zoom out 50%
+        });
 
         
     </script>
