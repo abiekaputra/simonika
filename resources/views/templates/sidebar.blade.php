@@ -44,6 +44,13 @@
                     <span>Linimasa Proyek</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('pegawai.*') ? 'active' : '' }}" href="{{ route('pegawai.index') }}">
+                    <i class="bi bi-people"></i>
+                    <span>Pendaftaran Pegawai</span>
+                </a>
+            </li>
+            
         </ul>
     </nav>
 

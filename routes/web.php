@@ -10,6 +10,9 @@ use App\Http\Controllers\AtributController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
 use App\Http\Controllers\AtributTambahanController;
 use App\Http\Controllers\LinimasaController;
+use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\ProyekController;
+
 
 // Route untuk guest (belum login)
 Route::middleware(['guest', 'throttle:6,1'])->group(function () {
@@ -54,6 +57,23 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/linimasa/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
             
             Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
+        });
+        Route::prefix('pegawai')->group(function () {
+            Route::get('/', [PegawaiController::class, 'index'])->name('pegawai.index'); // Rute untuk daftar pegawai
+            Route::get('/create', [PegawaiController::class, 'create'])->name('pegawai.create'); // Form tambah pegawai
+            Route::post('/', [PegawaiController::class, 'store'])->name('pegawai.store'); // Proses simpan pegawai baru
+            Route::get('/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit'); // Form edit pegawai
+            Route::put('/{id}', [PegawaiController::class, 'update'])->name('pegawai.update'); // Proses update pegawai
+            Route::delete('/{id}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy'); // Hapus pegawai
+        });
+        Route::prefix('proyek')->group(function () {
+            Route::get('/', [ProyekController::class, 'index'])->name('index'); // Rute proyek.index
+            Route::get('/create', [ProyekController::class, 'create'])->name('create'); // Form tambah proyek
+            Route::post('/', [ProyekController::class, 'store'])->name('store'); // Proses simpan proyek baru
+            Route::get('/{id}/edit', [ProyekController::class, 'edit'])->name('edit'); // Form edit proyek
+            Route::put('/{id}', [ProyekController::class, 'update'])->name('update'); // Proses update proyek
+            Route::delete('/{id}', [ProyekController::class, 'destroy'])->name('destroy'); // Hapus proyek
+            Route::get('/{id}', [ProyekController::class, 'show'])->name('show'); // Detail proyek
         });
     });        
 
@@ -110,6 +130,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::put('/{admin}', [AdminController::class, 'update'])->name('admin.update');
     Route::delete('/{admin}', [AdminController::class, 'destroy'])->name('admin.destroy');
 });
+
 
 // Route untuk login
 Route::get('/login', function () {
