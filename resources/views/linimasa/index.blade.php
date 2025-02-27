@@ -130,8 +130,8 @@
                         <input type="text" class="form-control" id="nama_pegawai" name="nama_pegawai" required>
                     </div>
                     <div class="mb-3">
-                        <label for="status_manual" class="form-label">Status manual</label>
-                        <select class="form-select" id="status_manual" name="status_manual" required>
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status" required>
                             <option value="Proses">Proses </option>
                             <option value="Tepat waktu">Tepat waktu</option>
                             <option value="Terlambat">Terlambat</option>
@@ -196,8 +196,7 @@
                             <option value="Selesai lebih cepat">Selesai lebih cepat</option>
                             <option value="Tepat waktu">Tepat waktu</option>
                             <option value="Terlambat">Terlambat</option>
-                            <option value="Revisi">Revisi (Terlambat)</option>
-                            <option value="Selesai lebih cepat">Selesai lebih cepat</option>
+                            <option value="Revisi">Revisi (Terlambat)</option> 
                             <option value="Todo next">Todo next</option>
                         </select>
                     </div>
