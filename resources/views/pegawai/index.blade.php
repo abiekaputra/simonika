@@ -20,7 +20,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>#</th>
+                <th>No</th>
                 <th>Nama</th>
                 <th>No Telepon</th>
                 <th>Email</th>

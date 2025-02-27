@@ -28,7 +28,7 @@ class PegawaiController extends Controller
         Pegawai::create($validated);
 
         // Kembalikan respons JSON untuk notifikasi berhasil
-        return response()->json(['message' => 'Pegawai berhasil ditambahkan']);
+        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil ditambahkan.');
     }
     public function destroy($id)
     {
