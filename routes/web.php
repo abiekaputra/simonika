@@ -200,6 +200,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/atribut', [AplikasiController::class, 'getAtribut']);
         Route::put('/{id}/atribut', [AplikasiController::class, 'updateAtribut'])->name('aplikasi.updateAtribut');
     });
+    
 });
 
 // Pastikan route untuk update atribut sudah terdaftar
