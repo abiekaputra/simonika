@@ -5,7 +5,7 @@
     <h1 style="text-align: center; margin: 20px;">Linimasa Proyek Pegawai</h1>
 
     <!-- Tombol Tambah Linimasa -->
-    <button id="btnTambahLinimasa" class="btn btn-primary" style="margin: 10px";>
+    <button id="btnTambahLinimasa" class="btn btn-primary">
         Tambah Linimasa
     </button>
     
@@ -76,7 +76,7 @@
                         data-tenggat-waktu="{{ $item->tenggat_waktu }}"
                         data-status-proyek="{{ $item->status_manual }}"
                         data-tanggal-selesai="{{ $item->tanggal_selesai }}"
-                        data-bs-toggle="modal"
+                        data-bs-toggle="modal" 
                         data-bs-target="#editModal">
                     Edit
                 </button>
@@ -185,7 +185,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="editLinimasaForm" action="" method="POST">
+            <form action="{{ route('linimasa.update', $item->id) }}" method="POST">
                 @csrf
                 @method('PUT') <!-- Untuk mensimulasikan metode PUT -->
                 <!-- Input lain -->

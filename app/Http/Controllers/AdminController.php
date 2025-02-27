@@ -66,8 +66,7 @@ class AdminController extends Controller
     }
     public function dashboard()
     {
-        $admins = Pengguna::where('role', 'admin')->get(); // Sesuaikan dengan database Anda
-        return view('admin.index', compact('admins'));
+        return view('admin.index');
     }
 
     public function edit($id)

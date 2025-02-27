@@ -53,8 +53,8 @@
                     </li>
                 @else
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}"
-                            href="{{ route('dashboard') }}">
+                        <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}"
+                            href="{{ route('admin.dashboard') }}">
                             <i class="bi bi-house-door"></i>
                             <span>Dashboard</span>
                         </a>
