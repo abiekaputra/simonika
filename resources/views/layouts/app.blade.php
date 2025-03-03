@@ -103,6 +103,13 @@
                         <span>Pendaftaran Pegawai</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->is('proyek*') ? 'active' : '' }}"
+                        href="{{ route('proyek.index') }}">
+                        <i class="bi bi-people"></i>
+                        <span>Proyek</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 

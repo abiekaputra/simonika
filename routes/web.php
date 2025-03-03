@@ -67,13 +67,14 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{id}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy'); // Hapus pegawai
         });
         Route::prefix('proyek')->group(function () {
-            Route::get('/', [ProyekController::class, 'index'])->name('index'); // Rute proyek.index
-            Route::get('/create', [ProyekController::class, 'create'])->name('create'); // Form tambah proyek
-            Route::post('/', [ProyekController::class, 'store'])->name('store'); // Proses simpan proyek baru
-            Route::get('/{id}/edit', [ProyekController::class, 'edit'])->name('edit'); // Form edit proyek
-            Route::put('/{id}', [ProyekController::class, 'update'])->name('update'); // Proses update proyek
-            Route::delete('/{id}', [ProyekController::class, 'destroy'])->name('destroy'); // Hapus proyek
-            Route::get('/{id}', [ProyekController::class, 'show'])->name('show'); // Detail proyek
+            Route::get('/', [ProyekController::class, 'index'])->name('proyek.index'); // Daftar semua proyek
+            Route::get('/create', [ProyekController::class, 'create'])->name('proyek.create'); // Form tambah proyek
+            Route::post('/', [ProyekController::class, 'store'])->name('proyek.store'); // Proses simpan proyek baru
+            Route::get('/{id}', [ProyekController::class, 'show'])->name('proyek.show'); // Detail proyek
+            Route::get('/{id}/edit', [ProyekController::class, 'edit'])->name('proyek.edit'); // Form edit proyek
+            Route::put('/proyek/{id}', [ProyekController::class, 'update'])->name('proyek.update');
+            Route::delete('/proyek/{id}', [ProyekController::class, 'destroy'])->name('proyek.destroy');
+
         });
     });        
 
