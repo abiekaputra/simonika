@@ -185,56 +185,53 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-            <form action="{{ route('linimasa.update', $item->id) }}" method="POST">
-                @csrf
-                @method('PUT') <!-- Untuk mensimulasikan metode PUT -->
-                <!-- Input lain -->
-                <div class="mb-3">
-                        <label for="status_manual" class="form-label">Status manual</label>
-                        <select class="form-select" id="editStatusProyek" name="status_manual" required>
-                            <option value="Proses">Proses </option>
-                            <option value="Selesai lebih cepat">Selesai lebih cepat</option>
-                            <option value="Tepat waktu">Tepat waktu</option>
-                            <option value="Terlambat">Terlambat</option>
-                            <option value="Revisi">Revisi (Terlambat)</option> 
-                            <option value="Todo next">Todo next</option>
-                        </select>
-                    </div>
-
-                <form id="editLinimasaForm" action="" method="POST">
+                @isset($item)
+                <form action="{{ route('linimasa.update', optional($item)->id) }}" method="POST">
                     @csrf
-                    @method('PUT')
-
-                    <input type="hidden" id="editId" name="id">
+                    @method('PUT') <!-- Untuk mensimulasikan metode PUT -->
+                    <!-- Input lain -->
                     <div class="mb-3">
+                            <label for="status_manual" class="form-label">Status manual</label>
+                            <select class="form-select" id="editStatusProyek" name="status_manual" required>
+                                <option value="Proses">Proses </option>
+                                <option value="Selesai lebih cepat">Selesai lebih cepat</option>
+                                <option value="Tepat waktu">Tepat waktu</option>
+                                <option value="Terlambat">Terlambat</option>
+                                <option value="Revisi">Revisi (Terlambat)</option> 
+                                <option value="Todo next">Todo next</option>
+                            </select>
+                        </div>
 
-                    </div>
+                        <input type="hidden" id="editId" name="id">
+                        <div class="mb-3">
 
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="editNamaPegawai" class="form-label">Nama Pegawai</label>
-                        <input type="text" id="editNamaPegawai" name="nama_pegawai" class="form-control" readonly>
-                    </div>
+                        <div class="mb-3">
+                            <label for="editNamaPegawai" class="form-label">Nama Pegawai</label>
+                            <input type="text" id="editNamaPegawai" name="nama_pegawai" class="form-control" readonly>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="editNamaProyek" class="form-label">Nama Proyek</label>
-                        <input type="text" id="editNamaProyek" name="nama_proyek" class="form-control" readonly>
-                    </div>
+                        <div class="mb-3">
+                            <label for="editNamaProyek" class="form-label">Nama Proyek</label>
+                            <input type="text" id="editNamaProyek" name="nama_proyek" class="form-control" readonly>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="editTanggalMulai" class="form-label">Tanggal Mulai</label>
-                        <input type="date" id="editTanggalMulai" name="tanggal" class="form-control" readonly>
-                    </div>
+                        <div class="mb-3">
+                            <label for="editTanggalMulai" class="form-label">Tanggal Mulai</label>
+                            <input type="date" id="editTanggalMulai" name="tanggal" class="form-control" readonly>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="editTenggatWaktu" class="form-label">Tenggat Waktu</label>
-                        <input type="date" id="editTenggatWaktu" name="tenggat_waktu" class="form-control" required>
-                    </div>
+                        <div class="mb-3">
+                            <label for="editTenggatWaktu" class="form-label">Tenggat Waktu</label>
+                            <input type="date" id="editTenggatWaktu" name="tenggat_waktu" class="form-control" required>
+                        </div>
 
-                    
-                    <button type="submit" class="btn btn-primary">Update</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 </form>
+                @endisset
 
                 <!-- Tombol Tandai Selesai -->
                 <form id="completeLinimasaForm" action="" method="POST" class="mt-3 d-none">
