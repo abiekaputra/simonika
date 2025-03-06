@@ -46,7 +46,7 @@
         </div>
 
         @if ($proyek->isEmpty())
-            <div class="alert alert-warning">Belum ada proyek terdaftar.</div>
+        <div class="alert alert-warning text-center">Belum ada proyek terdaftar.</div>
         @else
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -62,13 +62,13 @@
                         @foreach ($proyek as $p)
                         <tr>
                             <td>{{ $p->nama_proyek}}</td>
-                            <td>{{ $p->jenis_proyek }}</td>
+                            <td>{{ $p->kategori }}</td>
                             <td>{{ $p->deskripsi }}</td>
                             <td>
                                 <button class="btn btn-warning btn-edit" 
                                     data-id="{{ $p->id }}" 
                                     data-nama-proyek="{{ $p->nama_proyek }}" 
-                                    data-jenis-proyek="{{ $p->jenis_proyek }}" 
+                                    data-kategori="{{ $p->kategori }}" 
                                     data-deskripsi="{{ $p->deskripsi }}"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#proyekkEditModal">
@@ -97,6 +97,34 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            
+            // 🔹 Menampilkan Pop Up Error jika ada validasi yang gagal
+            @if ($errors->any())
+            let errorMessage = "";
+            @foreach ($errors->all() as $error)
+                errorMessage += "{{ $error }}\n";
+            @endforeach
+
+            Swal.fire({
+                title: "Terjadi Kesalahan!",
+                icon: "error",
+                confirmButtonText: "Mengerti"
+            });
+        @endif
+            
+            // 🔹 Menampilkan Pop Up Sukses jika ada session success
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses!',
+                    text: "{{ session('success') }}",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    position: 'center'
+                });
+            @endif
+
+            // 🔹 Pop Up Konfirmasi Hapus
             document.querySelectorAll(".btn-delete").forEach(button => {
                 button.addEventListener("click", function () {
                     let id = this.getAttribute("data-id");
@@ -112,29 +140,14 @@
                         cancelButtonText: "Batal"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            document.getElementById(delete-form-${id}).submit();
+                            document.getElementById(`delete-form-${id}`).submit();
                         }
                     });
                 });
             });
+
         });
     </script>
-    
-    @if (session('success'))
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sukses!',
-                    text: "{{ session('success') }}",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    position: 'center'
-                });
-            });
-        </script>
-    @endif
-
 
 </body>
 

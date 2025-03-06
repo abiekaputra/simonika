@@ -25,7 +25,7 @@ class ProyekController extends Controller
     {
         $request->validate([
             'nama_proyek' => 'required|string|max:255',
-            'jenis_proyek' => 'required|string|max:15',
+            'kategori' => 'required|string|max:15',
             'deskripsi' => 'required|string|max:300', // Perbaikan di sini
         ]);
 
@@ -46,7 +46,7 @@ class ProyekController extends Controller
         // Validasi input
         $request->validate([
             'nama_proyek' => 'required|string|max:255',
-            'jenis_proyek' => 'required|string|max:15',
+            'kategori' => 'required|string|max:15',
             'deskripsi' => 'required|string|max:300', // Perbaikan di sini
         ]);
 
@@ -56,7 +56,7 @@ class ProyekController extends Controller
         // Update data pegawai
         $proyek->update([
             'nama_proyek' => $request->nama_proyek,
-            'jenis_proyek' => $request->jenis_proyek,
+            'kategori' => $request->kategori,
             'deskripsi' => $request->deskripsi,
         ]);
 

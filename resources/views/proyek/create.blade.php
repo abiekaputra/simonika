@@ -13,8 +13,8 @@
                         <input type="text" id="nama_proyek" name="nama_proyek" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="jenis_proyek" class="form-label">Kategori:</label>
-                        <input type="text" id="jenis_proyek" name="jenis_proyek" class="form-control" required>
+                        <label for="kategori" class="form-label">Kategori:</label>
+                        <input type="text" id="kategori" name="kategori" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi:</label>

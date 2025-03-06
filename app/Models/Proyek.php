@@ -9,7 +9,7 @@ class Proyek extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_proyek', 'jenis_proyek', 'deskripsi'];
+    protected $fillable = ['nama_proyek', 'kategori', 'deskripsi'];
 
     public function linimasa()
     {

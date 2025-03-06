@@ -15,8 +15,8 @@
                         <input type="text" id="edit_nama_proyek" name="nama_proyek" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="edit_jenis_proyek" class="form-label">Kategori:</label>
-                        <input type="text" id="edit_jenis_proyek" name="jenis_proyek" class="form-control" required>
+                        <label for="edit_kategori" class="form-label">Kategori:</label>
+                        <input type="text" id="edit_kategori" name="kategori" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="edit_deskirpsi" class="form-label">Deskripsi:</label>
@@ -39,10 +39,10 @@
             button.addEventListener("click", function () {
                 let id = this.getAttribute("data-id");
                 let nama_proyek = this.getAttribute("data-nama-proyek");
-                let jenis_proyek = this.getAttribute("data-jenis-proyek");
+                let kategori = this.getAttribute("data-kategori");
                 let deskripsi = this.getAttribute("data-deskripsi");
 
-                editProyek(id, nama_proyek, jenis_proyek, deskripsi);
+                editProyek(id, nama_proyek, kategori, deskripsi);
             });
         });
 
@@ -60,9 +60,9 @@
         });
     });
 
-    function editProyek(id, nama_proyek, jenis_proyek, deskripsi) {
+    function editProyek(id, nama_proyek, kategori, deskripsi) {
         document.getElementById("edit_nama_proyek").value = nama_proyek;
-        document.getElementById("edit_jenis_proyek").value = jenis_proyek;
+        document.getElementById("edit_kategori").value = kategori;
         document.getElementById("edit_deskripsi").value = deskripsi;
 
         let form = document.getElementById("editProyekForm");
