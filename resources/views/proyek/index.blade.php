@@ -53,7 +53,7 @@
                     <thead>
                         <tr>
                             <th>Nama proyek</th>
-                            <th>kategori</th>
+                            
                             <th>Deskripsi</th>
                             <th>Aksi</th>
                         </tr>
@@ -62,13 +62,13 @@
                         @foreach ($proyek as $p)
                         <tr>
                             <td>{{ $p->nama_proyek}}</td>
-                            <td>{{ $p->kategori }}</td>
+
                             <td>{{ $p->deskripsi }}</td>
                             <td>
                                 <button class="btn btn-warning btn-edit" 
                                     data-id="{{ $p->id }}" 
                                     data-nama-proyek="{{ $p->nama_proyek }}" 
-                                    data-kategori="{{ $p->kategori }}" 
+                                    
                                     data-deskripsi="{{ $p->deskripsi }}"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#proyekkEditModal">
