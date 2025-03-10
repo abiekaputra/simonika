@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('proyeks', function (Blueprint $table) {
             $table->id();
             $table->string('nama_proyek');
-            $table->string('kategori');
+
             $table->text('deskripsi')->nullable();
             $table->timestamps();
         });
