@@ -38,9 +38,13 @@
                 <p class="text-muted">Manajemen data proyek dan informasinya</p>
             </div>
             <div class="button-action">
-                <!-- Button Tambah Pegawai -->
-                <button id="btnCreate"class="btn btn-primary" onclick="openCreateModal()">
+                <!-- Button Tambah Proyek -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#proyekCreateModal">
                     <i class="bi bi-plus-lg"></i> Tambah Proyek
+                </button>
+                <!-- Button Tambah Kategori -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kategoriCreateModal">
+                    <i class="bi bi-plus-lg"></i> Tambah Kategori
                 </button>
             </div>
         </div>
@@ -53,7 +57,6 @@
                     <thead>
                         <tr>
                             <th>Nama proyek</th>
-                            
                             <th>Deskripsi</th>
                             <th>Aksi</th>
                         </tr>
@@ -61,17 +64,15 @@
                     <tbody>
                         @foreach ($proyek as $p)
                         <tr>
-                            <td>{{ $p->nama_proyek}}</td>
-
+                            <td>{{ $p->nama_proyek }}</td>
                             <td>{{ $p->deskripsi }}</td>
                             <td>
                                 <button class="btn btn-warning btn-edit" 
                                     data-id="{{ $p->id }}" 
                                     data-nama-proyek="{{ $p->nama_proyek }}" 
-                                    
                                     data-deskripsi="{{ $p->deskripsi }}"
                                     data-bs-toggle="modal" 
-                                    data-bs-target="#proyekkEditModal">
+                                    data-bs-target="#proyekEditModal">
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
 
@@ -92,39 +93,62 @@
         @endif
     </div>
 
+    <!-- Modal Tambah Proyek -->
     @include('proyek/create')
+
+    <!-- Modal Edit Proyek -->
     @include('proyek/edit')
+
+    <!-- Modal Tambah Kategori -->
+    <div class="modal fade" id="kategoriCreateModal" tabindex="-1" aria-labelledby="kategoriCreateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="kategoriForm" method="POST" action="{{ route('kategori.store') }}">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="kategoriCreateModalLabel">Tambah Kategori</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nama_kategori" class="form-label">Nama Kategori</label>
+                            <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" placeholder="Masukkan nama kategori" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            
-            // 🔹 Menampilkan Pop Up Error jika ada validasi yang gagal
+            // Menampilkan Pop Up Error jika ada validasi yang gagal
             @if ($errors->any())
-            let errorMessage = "";
-            @foreach ($errors->all() as $error)
-                errorMessage += "{{ $error }}\n";
-            @endforeach
-
             Swal.fire({
                 title: "Terjadi Kesalahan!",
+                text: "{{ implode('\n', $errors->all()) }}",
                 icon: "error",
                 confirmButtonText: "Mengerti"
             });
-        @endif
-            
-            // 🔹 Menampilkan Pop Up Sukses jika ada session success
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sukses!',
-                    text: "{{ session('success') }}",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    position: 'center'
-                });
             @endif
 
-            // 🔹 Pop Up Konfirmasi Hapus
+            // Menampilkan Pop Up Sukses jika ada session success
+            @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses!',
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 3000,
+                position: 'center'
+            });
+            @endif
+
+            // Pop Up Konfirmasi Hapus
             document.querySelectorAll(".btn-delete").forEach(button => {
                 button.addEventListener("click", function () {
                     let id = this.getAttribute("data-id");
@@ -145,7 +169,6 @@
                     });
                 });
             });
-
         });
     </script>
 
