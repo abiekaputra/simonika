@@ -12,6 +12,7 @@ use App\Http\Controllers\AtributTambahanController;
 use App\Http\Controllers\LinimasaController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\ProyekController;
+use App\Http\Controllers\KategoriController;
 
 
 // Route untuk guest (belum login)
@@ -81,6 +82,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{proyek}/edit', [ProyekController::class, 'edit'])->name('proyek.edit');
         Route::put('/{id}', [ProyekController::class, 'update'])->name('proyek.update');
         Route::delete('/{proyek}', [ProyekController::class, 'destroy'])->name('proyek.destroy');
+    });
+    // Prefix untuk Kategori
+    Route::prefix('kategori')->group(function () {
+        Route::get('/', [KategoriController::class, 'index'])->name('kategori.index');
+        Route::get('/create', [KategoriController::class, 'create'])->name('kategori.create');
+        Route::post('/', [KategoriController::class, 'store'])->name('kategori.store');
+        Route::get('/{kategori}/edit', [KategoriController::class, 'edit'])->name('kategori.edit');
+        Route::put('/{id}', [KategoriController::class, 'update'])->name('kategori.update');
+        Route::delete('/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
     });
 
     Route::get('/chart-data', [AplikasiController::class, 'getChartData']);
