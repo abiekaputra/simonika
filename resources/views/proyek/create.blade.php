@@ -13,6 +13,22 @@
                         <input type="text" id="nama_proyek" name="nama_proyek" class="form-control" required>
                     </div>
                     <div class="mb-3">
+                        <label for="kategori_id" class="form-label">Kategori:</label>
+
+                        @if($kategori->isEmpty())
+                            <div class="alert alert-warning" role="alert">
+                                Belum ada kategori! Silakan tambahkan kategori terlebih dahulu.
+                            </div>
+                        @else
+                            <select id="kategori_id" name="kategori_id" class="form-control" required>
+                                <option value="" selected disabled>Pilih Kategori</option>
+                                @foreach($kategori as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_kategori }}</option>
+                                @endforeach
+                            </select>
+                        @endif
+                    </div>
+                    <div class="mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi:</label>
                         <input type="text" id="deskripsi" name="deskripsi" class="form-control" required>
                     </div>
