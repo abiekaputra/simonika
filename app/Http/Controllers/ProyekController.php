@@ -47,8 +47,6 @@ class ProyekController extends Controller
     {
         $proyek = Proyek::find($id); // Ambil proyek berdasarkan ID
 
-        dd($proyek); // Debugging: lihat hasilnya
-
         $kategori = Kategori::all(); // Ambil semua kategori
 
         return view('proyek.edit', compact('proyek', 'kategori'));
