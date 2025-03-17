@@ -42,13 +42,73 @@
                 <p class="text-muted">Manajemen data linimasa</p>
             </div>
             <div class="button-action">
-                <!-- Button Tambah Proyek -->
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#proyekCreateModal">
+                <!-- Button Tambah Linimasa -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahLinimasaModal">
                     <i class="bi bi-plus-lg"></i> Tambah Linimasa
                 </button>
+            </div>
         </div>
 
-        @if ($proyek->isEmpty())
-        <div class="alert alert-warning text-center">Belum ada proyek terdaftar.</div>
-        @else
+        <!-- Vis.js Timeline -->
+        <div id="linimasaTimeline" style="height: 400px; margin-bottom: 30px;"></div>
 
+        <!-- Script to Initialize Vis.js Timeline -->
+        <script>
+            const container = document.getElementById('linimasaTimeline');
+            const items = new vis.DataSet(@json($linimasas));
+            
+
+            const options = {
+                editable: false,
+                orientation: 'top',
+            };
+
+            const timeline = new vis.Timeline(container, items, options);
+        </script>
+
+        <!-- Tabel Linimasa (Optional Display) -->
+        @if ($linimasas->isEmpty())
+        <div class="alert alert-warning text-center">Belum ada data linimasa.</div>
+        @else
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nama Proyek</th>
+                        <th>Nama Pegawai</th>
+                        <th>Kategori</th>
+                        <th>Tanggal Mulai</th>
+                        <th>Tenggat Waktu</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($linimasas as $linimasa)
+                    <tr>
+                        <td>{{ $linimasa->proyek ? $linimasa->proyek->nama_proyek : '-' }}</td>
+                        <td>{{ $linimasa->pegawai ? $linimasa->pegawai->nama : '-' }}</td>
+                        <td>{{ $linimasa->kategori ? $linimasa->kategori->nama_kategori : '-' }}</td>
+                        <td>{{ $linimasa->tanggal_mulai }}</td>
+                        <td>{{ $linimasa->tanggal_deadline }}</td>
+                        <td>
+                            <button class="btn btn-warning btn-edit" data-id="{{ $linimasa->id }}" data-bs-toggle="modal" data-bs-target="#editLinimasaModal">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-danger btn-delete" data-id="{{ $linimasa->id }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
+    </div>
+
+    <!-- Include Modal -->
+    @include('linimasa/create')
+
+</body>
+
+</html>

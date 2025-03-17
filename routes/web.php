@@ -61,7 +61,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Prefix untuk Linimasa
     Route::prefix('linimasa')->group(function () {
-        Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
+        Route::resource('linimasa', LinimasaController::class)->only(['index', 'store']);
     });
 
     // Prefix untuk Pegawai
