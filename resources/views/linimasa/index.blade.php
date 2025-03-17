@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 
@@ -112,3 +113,10 @@
 </body>
 
 </html>
+=======
+@extends('layouts.app')
+
+@section('content')
+    <h1>Halaman Linimasa</h1>
+@endsection
+>>>>>>> parent of a219e14 (menmabahkan isi dari halaman linimasa)
