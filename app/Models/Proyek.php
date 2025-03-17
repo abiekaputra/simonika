@@ -9,7 +9,9 @@ class Proyek extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_proyek',  'deskripsi'];
+    protected $table = 'proyeks';
+
+    protected $fillable = ['nama_proyek', 'kategori_id', 'deskripsi'];
 
     public function linimasa()
     {
@@ -19,5 +21,10 @@ class Proyek extends Model
     public function pegawai()
     {
         return $this->belongsToMany(Pegawai::class, 'pegawai_proyek');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 }

@@ -4,20 +4,24 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Proyek;
+use App\Models\Kategori; 
 
 class ProyekController extends Controller
 {
     // Menampilkan daftar pegawai
     public function index()
     {
-        $proyek = Proyek::all();
-        return view('proyek.index', compact('proyek'));
+        $proyek = Proyek::all();  
+        $kategori = Kategori::all();
+
+        return view('proyek.index', compact('proyek', 'kategori'));
     }
 
     // Menampilkan form tambah pegawai
     public function create()
     {
-        return view('proyek.create');
+        $kategori = Kategori::all();
+        return view('proyek.create', compact('kategori'));
     }
 
     // Menyimpan pegawai baru
@@ -25,43 +29,48 @@ class ProyekController extends Controller
     {
         $request->validate([
             'nama_proyek' => 'required|string|max:255',
-            
-            'deskripsi' => 'required|string|max:300', // Perbaikan di sini
+            'deskripsi' => 'required|string',
+            'kategori_id' => 'required|exists:kategori,id',
         ]);
 
-        Proyek::create($request->all());
-        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil ditambahkan.');
+        Proyek::create([
+            'nama_proyek' => $request->nama_proyek,
+            'deskripsi' => $request->deskripsi,
+            'kategori_id' => $request->kategori_id,
+        ]);
+
+        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil ditambahkan!');
     }
 
     // Menampilkan form edit pegawai
     public function edit($id)
     {
-        $proyek = Proyek::findOrFail($id);
-        return view('proyek.edit', compact('proyek'));
+        $proyek = Proyek::find($id); // Ambil proyek berdasarkan ID
+
+        dd($proyek); // Debugging: lihat hasilnya
+
+        $kategori = Kategori::all(); // Ambil semua kategori
+
+        return view('proyek.edit', compact('proyek', 'kategori'));
     }
 
     // Menyimpan perubahan pegawai
     public function update(Request $request, $id)
     {
-        // Validasi input
         $request->validate([
             'nama_proyek' => 'required|string|max:255',
-            
-            'deskripsi' => 'required|string|max:300', // Perbaikan di sini
+            'kategori_id' => 'required|integer|exists:kategori,id',
+            'deskripsi' => 'required|string',
         ]);
 
-        // Ambil pegawai berdasarkan ID
         $proyek = Proyek::findOrFail($id);
-
-        // Update data pegawai
         $proyek->update([
             'nama_proyek' => $request->nama_proyek,
-            
+            'kategori_id' => (int) $request->kategori_id,
             'deskripsi' => $request->deskripsi,
         ]);
 
-        // Redirect dengan pesan sukses
-        return redirect()->route('proyek.index')->with('success', 'Data proyek berhasil diperbarui.');
+        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil diperbarui!');
     }
 
     // Menghapus pegawai
