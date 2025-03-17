@@ -43,8 +43,12 @@
                     <i class="bi bi-plus-lg"></i> Tambah Proyek
                 </button>
                 <!-- Button Tambah Kategori -->
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kategoriCreateModal">
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#kategoriCreateModal">
                     <i class="bi bi-plus-lg"></i> Tambah Kategori
+                </button>
+                <!-- Button Lihat Kategori -->
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#kategoriViewModal">
+                    <i class="bi bi-list"></i> Lihat Kategori
                 </button>
             </div>
         </div>
@@ -57,6 +61,7 @@
                     <thead>
                         <tr>
                             <th>Nama proyek</th>
+                            <th>Kategori</th>
                             <th>Deskripsi</th>
                             <th>Aksi</th>
                         </tr>
@@ -65,11 +70,13 @@
                         @foreach ($proyek as $p)
                         <tr>
                             <td>{{ $p->nama_proyek }}</td>
+                            <td>{{ $p->kategori ? $p->kategori->nama_kategori : '-' }}</td>
                             <td>{{ $p->deskripsi }}</td>
                             <td>
                                 <button class="btn btn-warning btn-edit" 
                                     data-id="{{ $p->id }}" 
                                     data-nama-proyek="{{ $p->nama_proyek }}" 
+                                    data-kategori-id="{{ $p->kategori_id }}" 
                                     data-deskripsi="{{ $p->deskripsi }}"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#proyekEditModal">
@@ -94,35 +101,13 @@
     </div>
 
     <!-- Modal Tambah Proyek -->
-    @include('proyek/create')
+    @include('proyek/create', ['kategori' => $kategori])
 
     <!-- Modal Edit Proyek -->
     @include('proyek/edit')
 
-    <!-- Modal Tambah Kategori -->
-    <div class="modal fade" id="kategoriCreateModal" tabindex="-1" aria-labelledby="kategoriCreateModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="kategoriForm" method="POST" action="{{ route('kategori.store') }}">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="kategoriCreateModalLabel">Tambah Kategori</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="nama_kategori" class="form-label">Nama Kategori</label>
-                            <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" placeholder="Masukkan nama kategori" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    @include('proyek/kategori')
+
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
