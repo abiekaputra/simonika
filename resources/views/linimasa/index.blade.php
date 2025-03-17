@@ -1,122 +1,268 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Daftar Proyek - siMonika</title>
+    <title>Linimasa Proyek - siMonika</title>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
-        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- Toastr CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-    <!-- SweetAlert2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
     <!-- Toastr & SweetAlert2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <!-- Skrip Vis.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet">
-    <script></script>
-</head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.js"></script>
 
+    <!-- Vis.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.css" rel="stylesheet">
+</head>
 <body>
-    <!-- Sidebar -->
     @include('templates.sidebar')
 
-    <!-- Main Content -->
     <div class="main-content p-4">
-        <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h2 class="mb-0">Kelola Linimasa</h2>
-                <p class="text-muted">Manajemen data linimasa</p>
+                <h2 class="mb-0">Linimasa Proyek</h2>
+                <p class="text-muted">Menampilkan timeline proyek yang dikerjakan oleh pegawai</p>
             </div>
             <div class="button-action">
-                <!-- Button Tambah Linimasa -->
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahLinimasaModal">
+                @if ($linimasa->isNotEmpty())
+                    <button id="toggleView" class="btn btn-secondary">Tampilkan Tabel</button>
+                @endif
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#linimasaCreateModal">
                     <i class="bi bi-plus-lg"></i> Tambah Linimasa
                 </button>
             </div>
         </div>
 
-        <!-- Vis.js Timeline -->
-        <div id="linimasaTimeline" style="height: 400px; margin-bottom: 30px;"></div>
-
-        <!-- Script to Initialize Vis.js Timeline -->
-        <script>
-            const container = document.getElementById('linimasaTimeline');
-            const items = new vis.DataSet(@json($linimasas));
-            
-
-            const options = {
-                editable: false,
-                orientation: 'top',
-            };
-
-            const timeline = new vis.Timeline(container, items, options);
-        </script>
-
-        <!-- Tabel Linimasa (Optional Display) -->
-        @if ($linimasas->isEmpty())
-        <div class="alert alert-warning text-center">Belum ada data linimasa.</div>
+        @if ($linimasa->isEmpty())
+            <div class="alert alert-warning text-center">
+                <i class="alert alert-warning text-center"></i> Belum ada linimasa terdaftar.
+            </div>
         @else
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Nama Proyek</th>
-                        <th>Nama Pegawai</th>
-                        <th>Kategori</th>
-                        <th>Tanggal Mulai</th>
-                        <th>Tenggat Waktu</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($linimasas as $linimasa)
-                    <tr>
-                        <td>{{ $linimasa->proyek ? $linimasa->proyek->nama_proyek : '-' }}</td>
-                        <td>{{ $linimasa->pegawai ? $linimasa->pegawai->nama : '-' }}</td>
-                        <td>{{ $linimasa->kategori ? $linimasa->kategori->nama_kategori : '-' }}</td>
-                        <td>{{ $linimasa->tanggal_mulai }}</td>
-                        <td>{{ $linimasa->tanggal_deadline }}</td>
-                        <td>
-                            <button class="btn btn-warning btn-edit" data-id="{{ $linimasa->id }}" data-bs-toggle="modal" data-bs-target="#editLinimasaModal">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-danger btn-delete" data-id="{{ $linimasa->id }}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+            <div id="timelineContainer">
+                <div id="timeline"></div>
+            </div>
+
+            <div id="tableContainer" class="d-none">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Pegawai</th>
+                            <th>Proyek</th>
+                            <th>Status</th>
+                            <th>Mulai</th>
+                            <th>Tenggat</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($linimasa as $item)
+                        <tr>
+                            <td>{{ $item->pegawai->nama }}</td>
+                            <td>{{ $item->proyek->nama_proyek }}</td>
+                            <td>{{ $item->status_proyek }}</td>
+                            <td>{{ $item->mulai }}</td>
+                            <td>{{ $item->tenggat }}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm btn-edit"
+                                    data-id="{{ $item->id }}"
+                                    data-pegawai="{{ $item->pegawai->id }}"
+                                    data-proyek="{{ $item->proyek->id }}"
+                                    data-status="{{ $item->status_proyek }}"
+                                    data-mulai="{{ $item->mulai }}"
+                                    data-tenggat="{{ $item->tenggat }}"
+                                    data-deskripsi="{{ $item->deskripsi ?? '' }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#linimasaEditModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                <button class="btn btn-danger btn-delete" data-id="{{ $item->id }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                <form id="delete-form-{{ $item->id }}" action="{{ route('linimasa.destroy', $item->id) }}" method="POST" style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
     </div>
 
-    <!-- Include Modal -->
     @include('linimasa/create')
+    @include('linimasa/edit')
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Toggle tampilan antara Vis.js dan tabel
+            let toggleButton = document.getElementById("toggleView");
+            if (toggleButton) {
+                toggleButton.addEventListener("click", function () {
+                    document.getElementById("tableContainer").classList.toggle("d-none");
+                    document.getElementById("timelineContainer").classList.toggle("d-none");
+                    this.textContent = this.textContent.includes("Tabel") ? "Tampilkan Linimasa" : "Tampilkan Tabel";
+                });
+            }
+
+            // Inisialisasi Timeline Vis.js
+            let container = document.getElementById("timeline");
+            let items = new vis.DataSet([
+                @foreach ($linimasa as $item)
+                {
+                    id: {{ $item->id }},
+                    content: "{{ $item->proyek->nama_proyek }}",
+                    start: "{{ $item->mulai }}",
+                    end: "{{ $item->tenggat }}",
+                    group: {{ $item->pegawai->id }}
+                },
+                @endforeach
+            ]);
+
+            let groups = new vis.DataSet([
+                @foreach ($pegawai as $p)
+                {
+                    id: {{ $p->id }},
+                    content: "{{ $p->nama }}"
+                },
+                @endforeach
+            ]);
+
+            let options = {
+                groupOrder: "content",
+                stack: false,
+                showCurrentTime: true,
+                zoomable: true,
+                orientation: { axis: "top" }
+            };
+
+            new vis.Timeline(container, items, groups, options);
+
+            // Submit Form Edit Linimasa
+            let editForm = document.getElementById("editLinimasaForm");
+            if (editForm) {
+                editForm.addEventListener("submit", function (event) {
+                    event.preventDefault(); // Mencegah reload halaman
+
+                    let formData = new FormData(editForm);
+                    let id = document.getElementById("edit_linimasa_id").value;
+
+                    fetch("{{ url('linimasa') }}/" + id, {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let modalElement = document.getElementById("linimasaEditModal");
+                            let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+
+                            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Berhasil!",
+                                text: "Data Linimasa berhasil diperbarui!",
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                location.reload(); // Refresh halaman setelah sukses
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Gagal!",
+                                text: data.message || "Terjadi kesalahan saat memperbarui data.",
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Gagal memperbarui data. Coba lagi!",
+                        });
+                    });
+                });
+            }
+
+            // Hapus Data Linimasa dengan SweetAlert2
+            document.querySelectorAll(".btn-delete").forEach(button => {
+                button.addEventListener("click", function () {
+                    let id = this.getAttribute("data-id");
+
+                    Swal.fire({
+                        title: "Yakin ingin menghapus?",
+                        text: "Data linimasa yang dihapus tidak dapat dikembalikan!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Ya, Hapus!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`{{ url('linimasa') }}/${id}`, {
+                                method: "POST", // Sesuai dengan form submission
+                                headers: {
+                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                                    "X-HTTP-Method-Override": "DELETE"
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Berhasil!",
+                                        text: "Data Linimasa berhasil dihapus!",
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Gagal!",
+                                        text: "Terjadi kesalahan saat menghapus data.",
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Oops...",
+                                    text: "Gagal menghapus data. Coba lagi!",
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 
 </body>
-
 </html>
-=======
-@extends('layouts.app')
-
-@section('content')
-    <h1>Halaman Linimasa</h1>
-@endsection
->>>>>>> parent of a219e14 (menmabahkan isi dari halaman linimasa)
