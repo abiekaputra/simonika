@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreignId('proyek_id')->constrained('proyeks')->onDelete('cascade');
             $table->enum('status_proyek', [
                 'Selesai Lebih Cepat', 'Tepat Waktu', 'Terlambat', 'Revisi', 'Proses', 'To Do Next'
-            ]);
-            $table->date('mulai');
-            $table->date('tenggat');
+            ])->default('Proses');
+            $table->date('mulai')->nullable(); // Diubah menjadi nullable
+            $table->date('tenggat')->nullable(); // Diubah menjadi nullable
             $table->text('deskripsi')->nullable();
             $table->timestamps();
         });
