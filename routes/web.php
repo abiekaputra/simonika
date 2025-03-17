@@ -62,7 +62,12 @@ Route::middleware(['auth'])->group(function () {
     // Prefix untuk Linimasa
     Route::prefix('linimasa')->group(function () {
         Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
-    });
+        Route::post('/store', [LinimasaController::class, 'store'])->name('linimasa.store');
+        Route::get('/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
+        Route::put('/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
+        Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
+
+    });    
 
     // Prefix untuk Pegawai
     Route::prefix('pegawai')->middleware(['auth'])->group(function () {
