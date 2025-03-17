@@ -91,6 +91,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{kategori}/edit', [KategoriController::class, 'edit'])->name('kategori.edit');
         Route::put('/{id}', [KategoriController::class, 'update'])->name('kategori.update');
         Route::delete('/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
+        Route::delete('/kategori/{id}', [ProyekController::class, 'destroyKategori'])->name('kategori.destroy');
     });
 
     Route::get('/chart-data', [AplikasiController::class, 'getChartData']);
