@@ -20,4 +20,9 @@ class Linimasa extends Model
     {
         return $this->belongsTo(Proyek::class);
     }
+    public function kategori()
+{
+    return $this->belongsTo(Kategori::class, 'kategori_id');
+}
+
 }
