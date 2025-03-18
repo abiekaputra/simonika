@@ -83,9 +83,11 @@
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
 
-                                <button class="btn btn-danger btn-delete" data-id="{{ $p->id }}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                                @if (!$p->linimasa()->exists()) 
+                                    <button class="btn btn-danger btn-delete" data-id="{{ $p->id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>                         
+                                @endif
 
                                 <form id="delete-form-{{ $p->id }}" action="{{ route('proyek.destroy', $p->id) }}" method="POST" style="display: none;">
                                     @csrf
