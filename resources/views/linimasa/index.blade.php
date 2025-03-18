@@ -125,11 +125,11 @@
 
     @include('linimasa/create')
     @include('linimasa/edit')
+    @include('linimasa/info')
 
     <script>
-        
         document.addEventListener("DOMContentLoaded", function () {
-            // Toggle tampilan antara Vis.js dan tabel
+            // 🔹 Toggle tampilan antara Vis.js dan tabel
             let toggleButton = document.getElementById("toggleView");
             if (toggleButton) {
                 toggleButton.addEventListener("click", function () {
@@ -139,8 +139,9 @@
                 });
             }
 
-            // Inisialisasi Timeline Vis.js
+            // 🔹 Inisialisasi Timeline Vis.js
             let container = document.getElementById("timeline");
+
             let items = new vis.DataSet([
                 @foreach ($linimasa as $item)
                 {
@@ -149,6 +150,11 @@
                     start: "{{ $item->mulai }}",
                     end: "{{ $item->tenggat }}",
                     group: {{ $item->pegawai->id }},
+                    subgroup: {{ $loop->index + 1 }}, // Supaya tidak bertumpuk
+                    status: "{{ $item->status_proyek }}",
+                    deskripsi: "{{ $item->deskripsi ?? 'Tidak ada deskripsi' }}",
+                    pegawai: "{{ $item->pegawai->nama }}",
+                    proyek: "{{ $item->proyek->nama_proyek }}",
                     style: "background-color: {{
                         match($item->status_proyek) {
                             'Selesai Lebih Cepat' => 'green; color: white;',
@@ -175,20 +181,43 @@
 
             let options = {
                 groupOrder: "content",
-                stack: false,
+                stack: false, // 🔹 Hindari tumpukan
+                subgroupOrder: "subgroup", // 🔹 Urutkan berdasarkan subgroup agar tersusun ke bawah
                 showCurrentTime: true,
                 zoomable: true,
-                orientation: { axis: "top" }
+                orientation: { axis: "top" },
+                margin: {
+                    item: 10, // 🔹 Jarak antar proyek dalam satu pegawai
+                    axis: 10
+                }
             };
-            
 
-            new vis.Timeline(container, items, groups, options);
+            let timeline = new vis.Timeline(container, items, groups, options);
 
-            // Submit Form Edit Linimasa
+            // 🔹 EVENT KETIKA BAR DIKLIK → TAMPILKAN MODAL INFO
+            timeline.on("select", function (props) {
+                if (props.items.length > 0) {
+                    let itemId = props.items[0]; // Ambil ID item yang dipilih
+                    let item = items.get(itemId); // Ambil data dari items
+
+                    // Isi modal dengan data proyek
+                    $("#infoNamaPegawai").text(item.pegawai);
+                    $("#infoNamaProyek").text(item.proyek);
+                    $("#infoMulai").text(item.start);
+                    $("#infoTenggat").text(item.end);
+                    $("#infoStatus").text(item.status);
+                    $("#infoDeskripsi").text(item.deskripsi);
+
+                    // Tampilkan modal
+                    $("#modalInfoLinimasa").modal("show");
+                }
+            });
+
+            // 🔹 SUBMIT FORM EDIT LINIMASA
             let editForm = document.getElementById("editLinimasaForm");
             if (editForm) {
                 editForm.addEventListener("submit", function (event) {
-                    event.preventDefault(); // Mencegah reload halaman
+                    event.preventDefault();
 
                     let formData = new FormData(editForm);
                     let id = document.getElementById("edit_linimasa_id").value;
@@ -238,7 +267,7 @@
                 });
             }
 
-            // Hapus Data Linimasa dengan SweetAlert2
+            // 🔹 HAPUS DATA LINIMASA DENGAN SWEETALERT2
             document.querySelectorAll(".btn-delete").forEach(button => {
                 button.addEventListener("click", function () {
                     let id = this.getAttribute("data-id");
@@ -254,7 +283,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             fetch(`{{ url('linimasa') }}/${id}`, {
-                                method: "POST", // Sesuai dengan form submission
+                                method: "POST",
                                 headers: {
                                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
                                     "X-HTTP-Method-Override": "DELETE"
@@ -293,6 +322,5 @@
             });
         });
     </script>
-
 </body>
 </html>
