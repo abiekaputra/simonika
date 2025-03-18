@@ -26,6 +26,7 @@
 
     <!-- Vis.js -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.css" rel="stylesheet">
+    
 </head>
 <body>
     @include('templates.sidebar')
@@ -76,6 +77,7 @@
                             <td>{{ $item->mulai }}</td>
                             <td>{{ $item->tenggat }}</td>
                             <td>
+                                
                                 <button class="btn btn-warning btn-sm btn-edit"
                                     data-id="{{ $item->id }}"
                                     data-pegawai="{{ $item->pegawai->id }}"
@@ -97,7 +99,22 @@
                                     @csrf
                                     @method('DELETE')
                                 </form>
+                                <td style="
+                                    background-color: {{
+                                        match($item->status_proyek) {
+                                            'Selesai Lebih Cepat' => 'green; color: white;',
+                                            'Tepat Waktu' => 'lightgreen; color: black;',
+                                            'Terlambat' => 'red; color: white;',
+                                            'Revisi' => 'orange; color: black;',
+                                            'Proses' => 'blue; color: white;',
+                                            'Todo Next' => 'gray; color: white;',
+                                            default => 'lightgray; color: black;',
+                                        }
+                                    }}">
+                                </td>
+                                
                             </td>
+                            
                         </tr>
                         @endforeach
                     </tbody>
@@ -110,6 +127,7 @@
     @include('linimasa/edit')
 
     <script>
+        
         document.addEventListener("DOMContentLoaded", function () {
             // Toggle tampilan antara Vis.js dan tabel
             let toggleButton = document.getElementById("toggleView");
@@ -130,7 +148,18 @@
                     content: "{{ $item->proyek->nama_proyek }}",
                     start: "{{ $item->mulai }}",
                     end: "{{ $item->tenggat }}",
-                    group: {{ $item->pegawai->id }}
+                    group: {{ $item->pegawai->id }},
+                    style: "background-color: {{
+                        match($item->status_proyek) {
+                            'Selesai Lebih Cepat' => 'green; color: white;',
+                            'Tepat Waktu' => 'lightgreen; color: black;',
+                            'Terlambat' => 'red; color: white;',
+                            'Revisi' => 'orange; color: black;',
+                            'Proses' => 'blue; color: white;',
+                            'Todo Next' => 'gray; color: white;',
+                            default => 'lightgray; color: black;',
+                        }
+                    }}"
                 },
                 @endforeach
             ]);
@@ -151,6 +180,7 @@
                 zoomable: true,
                 orientation: { axis: "top" }
             };
+            
 
             new vis.Timeline(container, items, groups, options);
 
