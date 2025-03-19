@@ -12,6 +12,9 @@
         rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 
 <body>
@@ -36,28 +39,14 @@
 
         <nav class="sidebar-nav flex-grow-1">
             <ul class="nav flex-column">
-                <!-- Dashboard Utama (Semua User Bisa Akses) -->
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}"
-                        href="{{ url('/dashboard') }}">
-                        <i class="bi bi-house-door"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-
-                <!-- Dashboard Admin (Hanya untuk Admin & Super Admin) -->
                 @if (auth()->user()->role === 'super_admin')
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}"
-                            href="{{ route('admin.dashboard') }}">
-                            <i class="bi bi-speedometer2"></i>
-                            <span>Dashboard Admin</span>
+                        <a class="nav-link {{ request()->is('super-admin/dashboard') ? 'active' : '' }}"
+                            href="{{ route('super-admin.dashboard') }}">
+                            <i class="bi bi-house-door"></i>
+                            <span>Dashboard Super Admin</span>
                         </a>
                     </li>
-                @endif
-
-                <!-- Kelola Admin (Hanya Super Admin) -->
-                @if (auth()->user()->role === 'super_admin')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('admin*') ? 'active' : '' }}"
                             href="{{ route('admin.index') }}">
@@ -65,48 +54,55 @@
                             <span>Kelola Admin</span>
                         </a>
                     </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}"
+                            href="{{ route('admin.dashboard') }}">
+                            <i class="bi bi-house-door"></i>
+                            <span>Dashboard Admin</span>
+                        </a>
+                    </li>
                 @endif
 
-                <!-- Menu yang Bisa Diakses Semua User -->
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('aplikasi*') ? 'active' : '' }}"
-                        href="{{ route('aplikasi.index') }}">
+                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                        <i class="bi bi-house-door"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('aplikasi.*') ? 'active' : '' }}" href="{{ route('aplikasi.index') }}">
                         <i class="bi bi-grid"></i>
                         <span>Aplikasi</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('atribut*') ? 'active' : '' }}"
-                        href="{{ route('atribut.index') }}">
+                    <a class="nav-link {{ request()->routeIs('atribut.*') ? 'active' : '' }}" href="{{ route('atribut.index') }}">
                         <i class="bi bi-clipboard"></i>
                         <span>Atribut</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('profile*') ? 'active' : '' }}"
-                        href="{{ route('profile.index') }}">
+                    <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.index') }}">
                         <i class="bi bi-person-vcard"></i>
                         <span>Profile</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('linimasa*') ? 'active' : '' }}"
-                        href="{{ route('linimasa.index') }}">
-                        <i class="bi bi-calendar-event"></i>
-                        <span>Linimasa Proyek</span>
+                    <a class="nav-link {{ request()->routeIs('linimasa.*') ? 'active' : '' }}" href="{{ route('linimasa.index') }}">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>Linimasa</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('pegawai*') ? 'active' : '' }}"
-                        href="{{ route('pegawai.index') }}">
+                    <a class="nav-link {{ request()->routeIs('pegawai.*') ? 'active' : '' }}" href="{{ route('pegawai.index') }}">
                         <i class="bi bi-people"></i>
-                        <span>Pendaftaran Pegawai</span>
+                        <span>Pegawai</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('proyek*') ? 'active' : '' }}"
-                        href="{{ route('proyek.index') }}">
-                        <i class="bi bi-people"></i>
+                    <a class="nav-link {{ request()->routeIs('proyek.*') ? 'active' : '' }}" href="{{ route('proyek.index') }}">
+                        <i class="bi bi-briefcase"></i>
                         <span>Proyek</span>
                     </a>
                 </li>

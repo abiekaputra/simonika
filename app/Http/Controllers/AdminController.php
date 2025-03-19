@@ -10,7 +10,6 @@ use App\Mail\NewAdminCredentials;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Mail\EmailUpdateNotification;
-use App\Models\Admin;
 
 class AdminController extends Controller
 {
@@ -62,11 +61,6 @@ class AdminController extends Controller
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
-        
-    }
-    public function dashboard()
-    {
-        return view('admin.index');
     }
 
     public function edit($id)
@@ -136,6 +130,4 @@ class AdminController extends Controller
         $admin->delete();
         return redirect()->route('admin.index')->with('success', 'Admin berhasil dihapus');
     }
-    
 }
-

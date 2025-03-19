@@ -4,89 +4,90 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Linimasa;
-use Carbon\Carbon;
+use App\Models\Pegawai;
+use App\Models\Proyek;
 
 class LinimasaController extends Controller
 {
-    /**
-     * Menampilkan semua data linimasa.
-     */
     public function index()
     {
-        $linimasa = Linimasa::all(); // Ambil semua data dari database
-        return view('linimasa.index', compact('linimasa'));
+        $pegawai = Pegawai::all();
+        $proyek = Proyek::all();
+        $linimasa = Linimasa::with(['pegawai', 'proyek'])->get();
+
+        return view('linimasa.index', compact('pegawai', 'proyek', 'linimasa'));
     }
 
-    /**
-     * Menampilkan halaman form untuk membuat linimasa baru.
-     */
     public function create()
     {
-        return view('linimasa.create');
+        $pegawai = Pegawai::all();
+        $proyek = Proyek::all();
+        return view('linimasa.create', compact('pegawai', 'proyek'));
     }
 
-    /**
-     * Menyimpan data linimasa baru ke database.
-     */
+    public function edit($id)
+    {
+        $linimasa = Linimasa::with(['pegawai', 'proyek'])->findOrFail($id);
+        return response()->json($linimasa);
+    }
+
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
-            'tanggal' => 'required|date',
-            'nama_proyek' => 'required|string|max:255',
-            'nama_pegawai' => 'required|string|max:255',
-            'tenggat_waktu' => 'required|date|after_or_equal:tanggal',
-            'status_manual' => 'nullable|string',
-        ], [
-            'tenggat_waktu.after_or_equal' => 'Tanggal tenggat harus sama atau setelah tanggal pembuatan.',
+            'pegawai_id' => 'required|exists:pegawais,id',
+            'proyek_id' => 'required|exists:proyeks,id',
+            'status_proyek' => 'required',
+            'mulai' => 'required|date',
+            'tenggat' => 'required|date|after_or_equal:mulai',
+            'deskripsi' => 'nullable|string',
         ]);
 
-        // Simpan data ke database
-        Linimasa::create($request->all());
+        Linimasa::create([
+            'pegawai_id' => $request->pegawai_id,
+            'proyek_id' => $request->proyek_id,
+            'status_proyek' => $request->status_proyek,
+            'mulai' => $request->mulai,
+            'tenggat' => $request->tenggat,
+            'deskripsi' => $request->deskripsi,
+        ]);
 
-        return redirect()->route('linimasa.index')->with('success', 'Data linimasa berhasil ditambahkan.');
+        return redirect()->route('linimasa.index')->with('success', 'Linimasa berhasil ditambahkan.');
     }
 
-    /**
-     * Memperbarui data linimasa di database.
-     */
     public function update(Request $request, $id)
-{
-    $linimasa = Linimasa::findOrFail($id);
+    {
+        $request->validate([
+            'pegawai_id' => 'required|exists:pegawais,id',
+            'proyek_id' => 'required|exists:proyeks,id',
+            'status_proyek' => 'required',
+            'mulai' => 'required|date',
+            'tenggat' => 'required|date|after_or_equal:mulai',
+            'deskripsi' => 'nullable|string',
+        ]);
 
-    // Simpan status manual jika ada
-    if ($request->has('status_manual')) {
-        $linimasa->status_manual = $request->input('status_manual');
+        $linimasa = Linimasa::find($id);
+
+        if (!$linimasa) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan!'], 404);
+        }
+
+        $linimasa->update([
+            'pegawai_id' => $request->pegawai_id,
+            'proyek_id' => $request->proyek_id,
+            'status_proyek' => $request->status_proyek,
+            'mulai' => $request->mulai,
+            'tenggat' => $request->tenggat,
+            'deskripsi' => $request->deskripsi,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Data berhasil diperbarui!']);
     }
 
-    // Simpan perubahan lain
-    $linimasa->update($request->except(['status_manual'])); // Abaikan status_manual dalam update massal
-
-    return redirect()->route('linimasa.index')->with('success', 'Proyek berhasil diperbarui!');
-}
-
-
-    /**
-     * Menghapus data linimasa dari database.
-     */
     public function destroy($id)
     {
         $linimasa = Linimasa::findOrFail($id);
         $linimasa->delete();
 
-        return redirect()->route('linimasa.index')->with('success', 'Data linimasa berhasil dihapus.');
-    }
-
-    /**
-     * Menampilkan status proyek berdasarkan logika backend tanpa menyimpan status di database.
-     */
-    public function complete($id)
-    {
-        $linimasa = Linimasa::findOrFail($id);
-        $linimasa->tanggal_selesai = now();
-        $linimasa->status_proyek = 'Selesai';
-        $linimasa->save();
-
-        return redirect()->route('linimasa.index')->with('success', 'Proyek telah ditandai selesai.');
+        return response()->json(['success' => true, 'message' => 'Data Linimasa berhasil dihapus.']);
     }
 }

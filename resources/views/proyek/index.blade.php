@@ -1,98 +1,164 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
 
-@section('content')
-<div class="container">
-    <h1>Pendaftaran Proyek</h1>
-    <a href="#" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahProyekModal">Tambah Proyek</a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Daftar Proyek - siMonika</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Toastr & SweetAlert2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</head>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Nama Proyek</th>
-                <th>Deskripsi</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($proyek as $p)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $p->nama_proyek }}</td>
-                <td>{{ $p->deskripsi }}</td>
-                <td>
-                    <!-- Tombol Edit -->
-                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProyekModal{{ $p->id }}">Edit</button>
+<body>
+    <!-- Sidebar -->
+    @include('templates.sidebar')
 
-                    <!-- Tombol Hapus -->
-                    <form action="{{ route('proyek.destroy', $p->id) }}" method="POST" style="display: inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus proyek ini?')">Hapus</button>
-                    </form>
-                </td>
-            </tr>
-
-            <!-- Modal Edit Proyek -->
-            <div class="modal fade" id="editProyekModal{{ $p->id }}" tabindex="-1" aria-labelledby="editProyekModalLabel{{ $p->id }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form action="{{ route('proyek.update', $p->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editProyekModalLabel{{ $p->id }}">Edit Proyek</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="nama_proyek_{{ $p->id }}" class="form-label">Nama Proyek</label>
-                                    <input type="text" class="form-control" id="nama_proyek_{{ $p->id }}" name="nama_proyek" value="{{ $p->nama_proyek }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="deskripsi_{{ $p->id }}" class="form-label">Deskripsi</label>
-                                    <textarea class="form-control" id="deskripsi_{{ $p->id }}" name="deskripsi" rows="4" required>{{ $p->deskripsi }}</textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+    <!-- Main Content -->
+    <div class="main-content p-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="mb-0">Kelola Proyek</h2>
+                <p class="text-muted">Manajemen data proyek dan informasinya</p>
             </div>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-
-<!-- Modal Tambah Proyek -->
-<div class="modal fade" id="tambahProyekModal" tabindex="-1" aria-labelledby="tambahProyekModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ route('proyek.store') }}" method="POST">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tambahProyekModalLabel">Tambah Proyek</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nama_proyek" class="form-label">Nama Proyek</label>
-                        <input type="text" class="form-control" id="nama_proyek" name="nama_proyek" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="deskripsi" class="form-label">Deskripsi</label>
-                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
+            <div class="button-action">
+                <!-- Button Tambah Proyek -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#proyekCreateModal">
+                    <i class="bi bi-plus-lg"></i> Tambah Proyek
+                </button>
+                <!-- Button Tambah Kategori -->
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#kategoriCreateModal">
+                    <i class="bi bi-plus-lg"></i> Tambah Kategori
+                </button>
+                <!-- Button Lihat Kategori -->
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#kategoriViewModal">
+                    <i class="bi bi-list"></i> Lihat Kategori
+                </button>
+            </div>
         </div>
+
+        @if ($proyek->isEmpty())
+        <div class="alert alert-warning text-center">Belum ada proyek terdaftar.</div>
+        @else
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nama proyek</th>
+                            <th>Kategori</th>
+                            <th>Deskripsi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($proyek as $p)
+                        <tr>
+                            <td>{{ $p->nama_proyek }}</td>
+                            <td>{{ $p->kategori ? $p->kategori->nama_kategori : '-' }}</td>
+                            <td>{{ $p->deskripsi }}</td>
+                            <td>
+                                <button class="btn btn-warning btn-edit" 
+                                    data-id="{{ $p->id }}" 
+                                    data-nama-proyek="{{ $p->nama_proyek }}" 
+                                    data-kategori-id="{{ $p->kategori_id }}" 
+                                    data-deskripsi="{{ $p->deskripsi }}"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#proyekEditModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                @if (!$p->linimasa()->exists()) 
+                                    <button class="btn btn-danger btn-delete" data-id="{{ $p->id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>                         
+                                @endif
+
+                                <form id="delete-form-{{ $p->id }}" action="{{ route('proyek.destroy', $p->id) }}" method="POST" style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
-</div>
-@endsection
+
+    <!-- Modal Tambah Proyek -->
+    @include('proyek/create', ['kategori' => $kategori])
+
+    <!-- Modal Edit Proyek -->
+    @include('proyek/edit')
+
+    @include('proyek/kategori')
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Menampilkan Pop Up Error jika ada validasi yang gagal
+            @if ($errors->any())
+            Swal.fire({
+                title: "Terjadi Kesalahan!",
+                text: "{{ implode('\n', $errors->all()) }}",
+                icon: "error",
+                confirmButtonText: "Mengerti"
+            });
+            @endif
+
+            // Menampilkan Pop Up Sukses jika ada session success
+            @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses!',
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 3000,
+                position: 'center'
+            });
+            @endif
+
+            // Pop Up Konfirmasi Hapus
+            document.querySelectorAll(".btn-delete").forEach(button => {
+                button.addEventListener("click", function () {
+                    let id = this.getAttribute("data-id");
+
+                    Swal.fire({
+                        title: "Apakah Anda yakin?",
+                        text: "Data proyek akan dihapus secara permanen!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Ya, Hapus!",
+                        cancelButtonText: "Batal"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById(`delete-form-${id}`).submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

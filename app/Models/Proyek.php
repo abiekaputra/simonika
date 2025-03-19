@@ -9,30 +9,22 @@ class Proyek extends Model
 {
     use HasFactory;
 
-    /**
-     * Nama tabel yang terkait dengan model ini.
-     *
-     * @var string
-     */
-    protected $table = 'proyek'; // Pastikan nama tabel sesuai dengan migrasi
+    protected $table = 'proyeks';
 
-    /**
-     * Kolom yang dapat diisi secara massal.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'nama_proyek',
-        'deskripsi',
-    ];
+    protected $fillable = ['nama_proyek', 'kategori_id', 'deskripsi'];
 
-    /**
-     * Tipe data default untuk atribut tertentu.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    public function linimasa()
+    {
+        return $this->hasMany(Linimasa::class);
+    }
+    
+    public function pegawai()
+    {
+        return $this->belongsToMany(Pegawai::class, 'pegawai_proyek');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_id');
+    }
 }

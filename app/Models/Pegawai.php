@@ -9,38 +9,17 @@ class Pegawai extends Model
 {
     use HasFactory;
 
-    protected $table = 'pegawai'; // Nama tabel
-    protected $fillable = ['nama', 'no_telepon', 'email']; // Kolom yang dapat diisi
+    protected $table = 'pegawais';
 
-    // Relasi ke User
-    public function user(){
-        return $this->belongsTo(User::class); // Tabel pegawai harus punya kolom user_id
+    protected $fillable = ['nama', 'nomor_telepon', 'email'];
+
+    public function linimasa()
+    {
+        return $this->hasMany(Linimasa::class);
     }
 
-    // Relasi ke Linimasa
-    public function linimasa(){
-        return $this->hasMany(Linimasa::class); // Tabel linimasa harus punya kolom pegawai_id
-    }
-
-    // Proyek Aktif
-    public function proyekAktif(){
-        return $this->linimasa()->where('status', 'aktif');
-    }
-
-    // Menghitung jumlah proyek
-    public function jumlahProyek(){
-        return $this->linimasa()->count();
-    }
-
-    // Scope untuk Pegawai dengan Proyek Aktif
-    public function scopeAktif($query){
-        return $query->whereHas('linimasa', function ($query) {
-            $query->where('status', 'aktif');
-        });
-    }
-
-    // Accessor untuk Nama
-    public function getNamaAttribute($value){
-        return ucfirst($value);
+    public function proyek()
+    {
+        return $this->belongsToMany(Proyek::class, 'pegawai_proyek');
     }
 }

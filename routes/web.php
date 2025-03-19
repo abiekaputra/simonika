@@ -12,6 +12,7 @@ use App\Http\Controllers\AtributTambahanController;
 use App\Http\Controllers\LinimasaController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\ProyekController;
+use App\Http\Controllers\KategoriController;
 
 
 // Route untuk guest (belum login)
@@ -34,49 +35,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/aplikasi/export', [AplikasiController::class, 'export'])->name('aplikasi.export');
     // Route::resource('aplikasi', AplikasiController::class);  // Comment atau hapus ini untuk sementara
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    //Route::resource('linimasa', LinimasaController::class);
-
-
-
-    Route::prefix('linimasa')->group(function () {
-        Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
-        Route::get('/create', [LinimasaController::class, 'create'])->name('linimasa.create');
-        Route::post('/', [LinimasaController::class, 'store'])->name('linimasa.store');
-        Route::get('/linimasa/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
-        Route::put('/linimasa/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
-
-        Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
-    });
-
-    Route::middleware(['auth'])->group(function () {
-        Route::prefix('linimasa')->group(function () {
-            Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
-            Route::get('/create', [LinimasaController::class, 'create'])->name('linimasa.create');
-            Route::post('/', [LinimasaController::class, 'store'])->name('linimasa.store');
-            Route::get('/linimasa/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
-            Route::put('/linimasa/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
-            
-            Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
-        });
-        Route::prefix('pegawai')->group(function () {
-            Route::get('/', [PegawaiController::class, 'index'])->name('pegawai.index'); // Rute untuk daftar pegawai
-            Route::get('/create', [PegawaiController::class, 'create'])->name('pegawai.create'); // Form tambah pegawai
-            Route::post('/', [PegawaiController::class, 'store'])->name('pegawai.store'); // Proses simpan pegawai baru
-            Route::get('/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit'); // Form edit pegawai
-            Route::put('/{id}', [PegawaiController::class, 'update'])->name('pegawai.update'); // Proses update pegawai
-            Route::delete('/{id}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy'); // Hapus pegawai
-        });
-        Route::prefix('proyek')->group(function () {
-            Route::get('/', [ProyekController::class, 'index'])->name('proyek.index'); // Daftar semua proyek
-            Route::get('/create', [ProyekController::class, 'create'])->name('proyek.create'); // Form tambah proyek
-            Route::post('/', [ProyekController::class, 'store'])->name('proyek.store'); // Proses simpan proyek baru
-            Route::get('/{id}', [ProyekController::class, 'show'])->name('proyek.show'); // Detail proyek
-            Route::get('/{id}/edit', [ProyekController::class, 'edit'])->name('proyek.edit'); // Form edit proyek
-            Route::put('/proyek/{id}', [ProyekController::class, 'update'])->name('proyek.update');
-            Route::delete('/proyek/{id}', [ProyekController::class, 'destroy'])->name('proyek.destroy');
-
-        });
-    });        
 
     // Definisikan route secara manual dan terorganisir
     Route::prefix('aplikasi')->group(function () {
@@ -99,6 +57,46 @@ Route::middleware(['auth'])->group(function () {
         // Perbaikan route untuk update atribut
         Route::post('/{id}/atribut', [AtributTambahanController::class, 'updateAtributValues'])
             ->name('aplikasi.atribut.update');
+    });
+
+    // Prefix untuk Linimasa
+    Route::prefix('linimasa')->group(function () {
+        Route::get('/', [LinimasaController::class, 'index'])->name('linimasa.index');
+        Route::post('/store', [LinimasaController::class, 'store'])->name('linimasa.store');
+        Route::get('/{id}/edit', [LinimasaController::class, 'edit'])->name('linimasa.edit');
+        Route::put('/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
+        Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
+
+    });    
+
+    // Prefix untuk Pegawai
+    Route::prefix('pegawai')->middleware(['auth'])->group(function () {
+        Route::get('/', [PegawaiController::class, 'index'])->name('pegawai.index');
+        Route::get('/create', [PegawaiController::class, 'create'])->name('pegawai.create');
+        Route::post('/', [PegawaiController::class, 'store'])->name('pegawai.store');
+        Route::get('/{pegawai}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit');
+        Route::put('/{id}', [PegawaiController::class, 'update'])->name('pegawai.update');
+        Route::delete('/{pegawai}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy');
+    });
+    
+    // Prefix untuk Proyek
+    Route::prefix('proyek')->group(function () {
+        Route::get('/', [ProyekController::class, 'index'])->name('proyek.index');
+        Route::get('/create', [ProyekController::class, 'create'])->name('proyek.create');
+        Route::post('/', [ProyekController::class, 'store'])->name('proyek.store');
+        Route::get('/{proyek}/edit', [ProyekController::class, 'edit'])->name('proyek.edit');
+        Route::put('/{id}', [ProyekController::class, 'update'])->name('proyek.update');
+        Route::delete('/{proyek}', [ProyekController::class, 'destroy'])->name('proyek.destroy');
+    });
+    // Prefix untuk Kategori
+    Route::prefix('kategori')->group(function () {
+        Route::get('/', [KategoriController::class, 'index'])->name('kategori.index');
+        Route::get('/create', [KategoriController::class, 'create'])->name('kategori.create');
+        Route::post('/', [KategoriController::class, 'store'])->name('kategori.store');
+        Route::get('/{kategori}/edit', [KategoriController::class, 'edit'])->name('kategori.edit');
+        Route::put('/{id}', [KategoriController::class, 'update'])->name('kategori.update');
+        Route::delete('/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
+        Route::delete('/kategori/{id}', [ProyekController::class, 'destroyKategori'])->name('kategori.destroy');
     });
 
     Route::get('/chart-data', [AplikasiController::class, 'getChartData']);
@@ -131,7 +129,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::put('/{admin}', [AdminController::class, 'update'])->name('admin.update');
     Route::delete('/{admin}', [AdminController::class, 'destroy'])->name('admin.destroy');
 });
-
 
 // Route untuk login
 Route::get('/login', function () {
@@ -201,9 +198,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/atribut', [AplikasiController::class, 'getAtribut']);
         Route::put('/{id}/atribut', [AplikasiController::class, 'updateAtribut'])->name('aplikasi.updateAtribut');
     });
-    
 });
 
 // Pastikan route untuk update atribut sudah terdaftar
 Route::post('/aplikasi/{id}/atribut', [AtributTambahanController::class, 'update'])
     ->name('aplikasi.atribut.update');
+

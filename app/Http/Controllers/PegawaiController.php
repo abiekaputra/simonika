@@ -3,42 +3,73 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Pegawai; // Pastikan model Pegawai sudah dibuat
+use App\Models\Pegawai;
 
 class PegawaiController extends Controller
 {
-    // Menampilkan halaman index pegawai
+    // Menampilkan daftar pegawai
     public function index()
     {
-        $pegawai = Pegawai::all(); // Ambil semua data pegawai dari database
-        return view('pegawai.index', compact('pegawai')); // Pastikan view 'pegawai.index' dibuat
+        $pegawai = Pegawai::all();
+        return view('pegawai.index', compact('pegawai'));
     }
 
-    // Menyimpan data pegawai ke database
+    // Menampilkan form tambah pegawai
+    public function create()
+    {
+        return view('pegawai.create');
+    }
+
+    // Menyimpan pegawai baru
     public function store(Request $request)
     {
-        // Validasi input dari form
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'no_telepon' => 'required|string|max:15',
-            'email' => 'required|email|max:255',
-        ]);
+        try {
+            $request->validate([
+                'nama' => 'required|string|max:255|unique:pegawais,nama',
+                'nomor_telepon' => 'required|string|max:15|unique:pegawais,nomor_telepon',
+                'email' => 'required|email|unique:pegawais,email',
+            ]);
 
-        // Simpan data ke database
-        Pegawai::create($validated);
+            Pegawai::create($request->all());
 
-        // Kembalikan respons JSON untuk notifikasi berhasil
-        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil ditambahkan.');
+            return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil ditambahkan.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors());
+        }
     }
+
+    // Menampilkan form edit pegawai
+    public function edit($id)
+    {
+        $pegawai = Pegawai::findOrFail($id);
+        return view('pegawai.edit', compact('pegawai'));
+    }
+
+    // Menyimpan perubahan pegawai
+    public function update(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'nama' => "required|string|max:255|unique:pegawais,nama,$id",
+                'nomor_telepon' => "required|string|max:20|unique:pegawais,nomor_telepon,$id",
+                'email' => "required|email|max:255|unique:pegawais,email,$id",
+            ]);
+
+            $pegawai = Pegawai::findOrFail($id);
+            $pegawai->update($request->all());
+
+            return redirect()->route('pegawai.index')->with('success', 'Data pegawai berhasil diperbarui.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors());
+        }
+    }
+
+    // Menghapus pegawai
     public function destroy($id)
     {
-        // Cari pegawai berdasarkan ID
         $pegawai = Pegawai::findOrFail($id);
-
-        // Hapus pegawai dari database
         $pegawai->delete();
 
-        // Redirect atau kembalikan respons JSON
         return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil dihapus.');
     }
 }
