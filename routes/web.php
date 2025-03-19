@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
         Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
 
-    });    
+    });
 
     // Prefix untuk Pegawai
     Route::prefix('pegawai')->middleware(['auth'])->group(function () {
@@ -78,7 +78,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}', [PegawaiController::class, 'update'])->name('pegawai.update');
         Route::delete('/{pegawai}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy');
     });
-    
+
     // Prefix untuk Proyek
     Route::prefix('proyek')->group(function () {
         Route::get('/', [ProyekController::class, 'index'])->name('proyek.index');

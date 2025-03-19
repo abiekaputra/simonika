@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,8 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -25,28 +27,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.js"></script>
 
     <!-- Vis.js -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.css"
+        rel="stylesheet">
 
     <style>
         .zoom-controls {
             position: absolute;
-            bottom: 10px;
+            top: 10px;
             right: 10px;
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
+
         .zoom-btn {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             font-size: 20px;
             border-radius: 50%;
-            margin: 0 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
+
 <body>
     @include('templates.sidebar')
 
@@ -74,8 +81,8 @@
             <div id="timelineContainer" style="position: relative;">
                 <div id="timeline"></div>
                 <div class="zoom-controls">
-                    <button id="zoomIn" class="btn btn-light zoom-btn"><i class="bi bi-plus-lg"></i></button>
-                    <button id="zoomOut" class="btn btn-light zoom-btn"><i class="bi bi-dash-lg"></i></button>
+                    <button id="zoomIn" class="btn btn-info zoom-btn"><i class="bi bi-plus-lg"></i></button>
+                    <button id="zoomOut" class="btn btn-info zoom-btn"><i class="bi bi-dash-lg"></i></button>
                 </div>
             </div>
 
@@ -93,52 +100,48 @@
                     </thead>
                     <tbody>
                         @foreach ($linimasa as $item)
-                        <tr>
-                            <td>{{ $item->pegawai->nama }}</td>
-                            <td>{{ $item->proyek->nama_proyek }}</td>
-                            <td>{{ $item->status_proyek }}</td>
-                            <td>{{ $item->mulai }}</td>
-                            <td>{{ $item->tenggat }}</td>
-                            <td>
-                                
-                                <button class="btn btn-warning btn-sm btn-edit"
-                                    data-id="{{ $item->id }}"
-                                    data-pegawai="{{ $item->pegawai->id }}"
-                                    data-proyek="{{ $item->proyek->id }}"
-                                    data-status="{{ $item->status_proyek }}"
-                                    data-mulai="{{ $item->mulai }}"
-                                    data-tenggat="{{ $item->tenggat }}"
-                                    data-deskripsi="{{ $item->deskripsi ?? '' }}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#linimasaEditModal">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
+                                    <tr>
+                                        <td>{{ $item->pegawai->nama }}</td>
+                                        <td>{{ $item->proyek->nama_proyek }}</td>
+                                        <td>{{ $item->status_proyek }}</td>
+                                        <td>{{ $item->mulai }}</td>
+                                        <td>{{ $item->tenggat }}</td>
+                                        <td>
 
-                                <button class="btn btn-danger btn-delete" data-id="{{ $item->id }}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                                            <button class="btn btn-warning btn-sm btn-edit" data-id="{{ $item->id }}"
+                                                data-pegawai="{{ $item->pegawai->id }}" data-proyek="{{ $item->proyek->id }}"
+                                                data-status="{{ $item->status_proyek }}" data-mulai="{{ $item->mulai }}"
+                                                data-tenggat="{{ $item->tenggat }}" data-deskripsi="{{ $item->deskripsi ?? '' }}"
+                                                data-bs-toggle="modal" data-bs-target="#linimasaEditModal">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
 
-                                <form id="delete-form-{{ $item->id }}" action="{{ route('linimasa.destroy', $item->id) }}" method="POST" style="display: none;">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                                <td style="
-                                    background-color: {{
-                                        match($item->status_proyek) {
-                                            'Selesai Lebih Cepat' => 'green; color: white;',
-                                            'Tepat Waktu' => 'lightgreen; color: black;',
-                                            'Terlambat' => 'red; color: white;',
-                                            'Revisi' => 'orange; color: black;',
-                                            'Proses' => 'blue; color: white;',
-                                            'Todo Next' => 'gray; color: white;',
-                                            default => 'lightgray; color: black;',
-                                        }
-                                    }}">
-                                </td>
-                                
-                            </td>
-                            
-                        </tr>
+                                            <button class="btn btn-danger btn-delete" data-id="{{ $item->id }}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+
+                                            <form id="delete-form-{{ $item->id }}" action="{{ route('linimasa.destroy', $item->id) }}"
+                                                method="POST" style="display: none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        <td style="
+                                                                    background-color: {{
+                            match ($item->status_proyek) {
+                                'Selesai Lebih Cepat' => 'green; color: white;',
+                                'Tepat Waktu' => 'lightgreen; color: black;',
+                                'Terlambat' => 'red; color: white;',
+                                'Revisi' => 'orange; color: black;',
+                                'Proses' => 'blue; color: white;',
+                                'Todo Next' => 'gray; color: white;',
+                                default => 'lightgray; color: black;',
+                            }
+                                                                    }}">
+                                        </td>
+
+                                        </td>
+
+                                    </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -152,7 +155,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // 🔹 Toggle tampilan antara Vis.js dan tabel
             let toggleButton = document.getElementById("toggleView");
             if (toggleButton) {
                 toggleButton.addEventListener("click", function () {
@@ -162,12 +164,10 @@
                 });
             }
 
-            // 🔹 Inisialisasi Timeline Vis.js
             let container = document.getElementById("timeline");
-            
-            let zoomStep = 0.2; // Sesuaikan faktor zoom sesuai kebutuhan
-            
-            document.getElementById('zoomIn').addEventListener('click', function() {
+            let zoomStep = 0.5;
+
+            document.getElementById('zoomIn').addEventListener('click', function () {
                 let currentRange = timeline.getWindow();
                 let start = currentRange.start.valueOf();
                 let end = currentRange.end.valueOf();
@@ -177,8 +177,8 @@
                 let newEnd = end - (interval - newInterval) / 2;
                 timeline.setWindow(newStart, newEnd);
             });
-            
-            document.getElementById('zoomOut').addEventListener('click', function() {
+
+            document.getElementById('zoomOut').addEventListener('click', function () {
                 let currentRange = timeline.getWindow();
                 let start = currentRange.start.valueOf();
                 let end = currentRange.end.valueOf();
@@ -191,91 +191,116 @@
 
             let items = new vis.DataSet([
                 @foreach ($linimasa as $item)
-                {
-                    id: {{ $item->id }},
-                    content: "{{ $item->proyek->nama_proyek }}",
-                    start: "{{ $item->mulai }}",
-                    end: "{{ $item->tenggat }}",
-                    group: {{ $item->pegawai->id }},
-                    subgroup: {{ $loop->index + 1 }}, // Supaya tidak bertumpuk
-                    status: "{{ $item->status_proyek }}",
-                    deskripsi: "{{ $item->deskripsi ?? 'Tidak ada deskripsi' }}",
-                    pegawai: "{{ $item->pegawai->nama }}",
-                    proyek: "{{ $item->proyek->nama_proyek }}",
-                    style: "background-color: {{
-                        match($item->status_proyek) {
-                            'Selesai Lebih Cepat' => 'green; color: white;',
-                            'Tepat Waktu' => 'lightgreen; color: black;',
-                            'Terlambat' => 'red; color: white;',
-                            'Revisi' => 'orange; color: black;',
-                            'Proses' => 'blue; color: white;',
-                            'Todo Next' => 'gray; color: white;',
-                            default => 'lightgray; color: black;',
-                        }
-                    }}"
-                },
+                            {
+                                id: {{ $item->id }},
+                                content: "{{ $item->proyek->nama_proyek }}",
+                                start: "{{ $item->mulai }}",
+                                end: "{{ $item->tenggat }}",
+                                group: {{ $item->pegawai->id }},
+                                subgroup: {{ $loop->index + 1 }},
+                                status: "{{ $item->status_proyek }}",
+                                deskripsi: "{{ $item->deskripsi ?? 'Tidak ada deskripsi' }}",
+                                pegawai: "{{ $item->pegawai->nama }}",
+                                proyek: "{{ $item->proyek->nama_proyek }}",
+                                style: "background-color: {{
+                    match ($item->status_proyek) {
+                        'Selesai Lebih Cepat' => 'green; color: white;',
+                        'Tepat Waktu' => 'lightgreen; color: black;',
+                        'Terlambat' => 'red; color: white;',
+                        'Revisi' => 'orange; color: black;',
+                        'Proses' => 'blue; color: white;',
+                        'Todo Next' => 'gray; color: white;',
+                        default => 'lightgray; color: black;',
+                    }
+                                }}"
+                    },
                 @endforeach
-            ]);
+        ]);
 
-            let groups = new vis.DataSet([
-                @foreach ($pegawai as $p)
-                {
+        let groups = new vis.DataSet([
+            @foreach ($pegawai as $p)
+                    {
                     id: {{ $p->id }},
                     content: "{{ $p->nama }}"
                 },
-                @endforeach
-            ]);
+            @endforeach
+        ]);
 
-            let options = {
-                groupOrder: "content",
-                stack: false, // 🔹 Hindari tumpukan
-                subgroupOrder: "subgroup", // 🔹 Urutkan berdasarkan subgroup agar tersusun ke bawah
-                showCurrentTime: true,
-                zoomable: true,
-                orientation: { axis: "top" },
-                margin: {
-                    item: 10, // 🔹 Jarak antar proyek dalam satu pegawai
-                    axis: 10
-                }
-            };
+        let options = {
+            groupOrder: "content",
+            stack: false,
+            subgroupOrder: "subgroup",
+            showCurrentTime: true,
+            zoomable: true,
+            orientation: { axis: "top" },
+            margin: {
+                item: 10,
+                axis: 10
+            }
+        };
 
-            let timeline = new vis.Timeline(container, items, groups, options);
+        let timeline = new vis.Timeline(container, items, groups, options);
 
-            // 🔹 EVENT KETIKA BAR DIKLIK → TAMPILKAN MODAL INFO
-            timeline.on("select", function (props) {
-                if (props.items.length > 0) {
-                    let itemId = props.items[0]; // Ambil ID item yang dipilih
-                    let item = items.get(itemId); // Ambil data dari items
+        // Modal Info
+        timeline.on("select", function (props) {
+            if (props.items.length > 0) {
+                let itemId = props.items[0];
+                let item = items.get(itemId);
 
-                    // Isi modal dengan data proyek
-                    $("#infoNamaPegawai").text(item.pegawai);
-                    $("#infoNamaProyek").text(item.proyek);
-                    $("#infoMulai").text(item.start);
-                    $("#infoTenggat").text(item.end);
-                    $("#infoStatus").text(item.status);
-                    $("#infoDeskripsi").text(item.deskripsi);
+                $("#infoNamaPegawai").text(item.pegawai);
+                $("#infoNamaProyek").text(item.proyek);
+                $("#infoMulai").text(item.start);
+                $("#infoTenggat").text(item.end);
+                $("#infoStatus").text(item.status);
+                $("#infoDeskripsi").text(item.deskripsi);
 
-                    // Tampilkan modal
-                    $("#modalInfoLinimasa").modal("show");
-                }
-            });
+                $("#modalInfoLinimasa").modal("show");
+            }
+        });
 
-            // 🔹 SUBMIT FORM EDIT LINIMASA
-            let editForm = document.getElementById("editLinimasaForm");
-            if (editForm) {
-                editForm.addEventListener("submit", function (event) {
-                    event.preventDefault();
+        // Validasi Tanggal Mulai dan Tenggat
+        let mulaiInput = document.getElementById("mulai");
+        let tenggatInput = document.getElementById("tenggat");
 
-                    let formData = new FormData(editForm);
-                    let id = document.getElementById("edit_linimasa_id").value;
+        function validateDateInput() {
+            let mulai = new Date(mulaiInput.value);
+            let tenggat = new Date(tenggatInput.value);
 
-                    fetch("{{ url('linimasa') }}/" + id, {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                        }
-                    })
+            if (mulai > tenggat) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Input',
+                    text: 'Tanggal mulai tidak boleh lebih besar dari tenggat!',
+                });
+
+                // Reset input yang bermasalah
+                mulaiInput.value = "";
+                return false;
+            }
+            return true;
+        }
+
+        mulaiInput.addEventListener("change", validateDateInput);
+        tenggatInput.addEventListener("change", validateDateInput);
+
+        // Submit Edit Linimasa
+        let editForm = document.getElementById("editLinimasaForm");
+        if (editForm) {
+            editForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                if (!validateDateInput()) return;
+
+                let formData = new FormData(editForm);
+                let id = document.getElementById("edit_linimasa_id").value;
+
+                fetch("{{ url('linimasa') }}/" + id, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                    }
+                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -294,7 +319,7 @@
                                 showConfirmButton: false,
                                 timer: 2000
                             }).then(() => {
-                                location.reload(); // Refresh halaman setelah sukses
+                                location.reload();
                             });
                         } else {
                             Swal.fire({
@@ -311,31 +336,31 @@
                             text: "Gagal memperbarui data. Coba lagi!",
                         });
                     });
-                });
-            }
+            });
+        }
 
-            // 🔹 HAPUS DATA LINIMASA DENGAN SWEETALERT2
-            document.querySelectorAll(".btn-delete").forEach(button => {
-                button.addEventListener("click", function () {
-                    let id = this.getAttribute("data-id");
+        // Pop Up Hapus
+        document.querySelectorAll(".btn-delete").forEach(button => {
+            button.addEventListener("click", function () {
+                let id = this.getAttribute("data-id");
 
-                    Swal.fire({
-                        title: "Yakin ingin menghapus?",
-                        text: "Data linimasa yang dihapus tidak dapat dikembalikan!",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#d33",
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonText: "Ya, Hapus!"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch(`{{ url('linimasa') }}/${id}`, {
-                                method: "POST",
-                                headers: {
-                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                                    "X-HTTP-Method-Override": "DELETE"
-                                }
-                            })
+                Swal.fire({
+                    title: "Yakin ingin menghapus?",
+                    text: "Data linimasa yang dihapus tidak dapat dikembalikan!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Ya, Hapus!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`{{ url('linimasa') }}/${id}`, {
+                            method: "POST",
+                            headers: {
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                                "X-HTTP-Method-Override": "DELETE"
+                            }
+                        })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
@@ -363,11 +388,13 @@
                                     text: "Gagal menghapus data. Coba lagi!",
                                 });
                             });
-                        }
-                    });
+                    }
                 });
             });
         });
+    });
     </script>
+
 </body>
+
 </html>

@@ -54,7 +54,7 @@
         </div>
 
         @if ($proyek->isEmpty())
-        <div class="alert alert-warning text-center">Belum ada proyek terdaftar.</div>
+            <div class="alert alert-warning text-center">Belum ada proyek terdaftar.</div>
         @else
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -68,33 +68,31 @@
                     </thead>
                     <tbody>
                         @foreach ($proyek as $p)
-                        <tr>
-                            <td>{{ $p->nama_proyek }}</td>
-                            <td>{{ $p->kategori ? $p->kategori->nama_kategori : '-' }}</td>
-                            <td>{{ $p->deskripsi }}</td>
-                            <td>
-                                <button class="btn btn-warning btn-edit" 
-                                    data-id="{{ $p->id }}" 
-                                    data-nama-proyek="{{ $p->nama_proyek }}" 
-                                    data-kategori-id="{{ $p->kategori_id }}" 
-                                    data-deskripsi="{{ $p->deskripsi }}"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#proyekEditModal">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
+                            <tr>
+                                <td>{{ $p->nama_proyek }}</td>
+                                <td>{{ $p->kategori ? $p->kategori->nama_kategori : '-' }}</td>
+                                <td>{{ $p->deskripsi }}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-edit" data-id="{{ $p->id }}"
+                                        data-nama-proyek="{{ $p->nama_proyek }}" data-kategori-id="{{ $p->kategori_id }}"
+                                        data-deskripsi="{{ $p->deskripsi }}" data-bs-toggle="modal"
+                                        data-bs-target="#proyekEditModal">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
 
-                                @if (!$p->linimasa()->exists()) 
-                                    <button class="btn btn-danger btn-delete" data-id="{{ $p->id }}">
-                                        <i class="bi bi-trash"></i>
-                                    </button>                         
-                                @endif
+                                    @if (!$p->linimasa()->exists())
+                                        <button class="btn btn-danger btn-delete" data-id="{{ $p->id }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    @endif
 
-                                <form id="delete-form-{{ $p->id }}" action="{{ route('proyek.destroy', $p->id) }}" method="POST" style="display: none;">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                            </td>
-                        </tr>
+                                    <form id="delete-form-{{ $p->id }}" action="{{ route('proyek.destroy', $p->id) }}"
+                                        method="POST" style="display: none;">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -115,24 +113,24 @@
         document.addEventListener("DOMContentLoaded", function () {
             // Menampilkan Pop Up Error jika ada validasi yang gagal
             @if ($errors->any())
-            Swal.fire({
-                title: "Terjadi Kesalahan!",
-                text: "{{ implode('\n', $errors->all()) }}",
-                icon: "error",
-                confirmButtonText: "Mengerti"
-            });
+                Swal.fire({
+                    title: "Terjadi Kesalahan!",
+                    text: "{{ implode('\n', $errors->all()) }}",
+                    icon: "error",
+                    confirmButtonText: "Mengerti"
+                });
             @endif
 
             // Menampilkan Pop Up Sukses jika ada session success
             @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Sukses!',
-                text: "{{ session('success') }}",
-                showConfirmButton: false,
-                timer: 3000,
-                position: 'center'
-            });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses!',
+                    text: "{{ session('success') }}",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    position: 'center'
+                });
             @endif
 
             // Pop Up Konfirmasi Hapus
