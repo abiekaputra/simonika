@@ -26,7 +26,26 @@
 
     <!-- Vis.js -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.css" rel="stylesheet">
-    
+
+    <style>
+        .zoom-controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            border-radius: 50%;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
     @include('templates.sidebar')
@@ -52,8 +71,12 @@
                 <i class="alert alert-warning text-center"></i> Belum ada linimasa terdaftar.
             </div>
         @else
-            <div id="timelineContainer">
+            <div id="timelineContainer" style="position: relative;">
                 <div id="timeline"></div>
+                <div class="zoom-controls">
+                    <button id="zoomIn" class="btn btn-light zoom-btn"><i class="bi bi-plus-lg"></i></button>
+                    <button id="zoomOut" class="btn btn-light zoom-btn"><i class="bi bi-dash-lg"></i></button>
+                </div>
             </div>
 
             <div id="tableContainer" class="d-none">
@@ -141,6 +164,30 @@
 
             // 🔹 Inisialisasi Timeline Vis.js
             let container = document.getElementById("timeline");
+            
+            let zoomStep = 0.2; // Sesuaikan faktor zoom sesuai kebutuhan
+            
+            document.getElementById('zoomIn').addEventListener('click', function() {
+                let currentRange = timeline.getWindow();
+                let start = currentRange.start.valueOf();
+                let end = currentRange.end.valueOf();
+                let interval = end - start;
+                let newInterval = interval * (1 - zoomStep);
+                let newStart = start + (interval - newInterval) / 2;
+                let newEnd = end - (interval - newInterval) / 2;
+                timeline.setWindow(newStart, newEnd);
+            });
+            
+            document.getElementById('zoomOut').addEventListener('click', function() {
+                let currentRange = timeline.getWindow();
+                let start = currentRange.start.valueOf();
+                let end = currentRange.end.valueOf();
+                let interval = end - start;
+                let newInterval = interval * (1 + zoomStep);
+                let newStart = start - (newInterval - interval) / 2;
+                let newEnd = end + (newInterval - interval) / 2;
+                timeline.setWindow(newStart, newEnd);
+            });
 
             let items = new vis.DataSet([
                 @foreach ($linimasa as $item)
