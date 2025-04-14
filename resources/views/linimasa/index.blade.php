@@ -78,6 +78,10 @@
                 <i class="alert alert-warning text-center"></i> Belum ada linimasa terdaftar.
             </div>
         @else
+            <div class="mb-3 d-flex justify-content-end">
+                <button id="toggleSubject" class="btn btn-outline-primary">Tampilkan Berdasarkan Proyek</button>
+            </div>
+
             <div id="timelineContainer" style="position: relative;">
                 <div id="timeline"></div>
                 <div class="zoom-controls">
@@ -189,40 +193,47 @@
                 timeline.setWindow(newStart, newEnd);
             });
 
-            let items = new vis.DataSet([
-                @foreach ($linimasa as $item)
-                            {
-                                id: {{ $item->id }},
-                                content: "{{ $item->proyek->nama_proyek }}",
-                                start: "{{ $item->mulai }}",
-                                end: "{{ $item->tenggat }}",
-                                group: {{ $item->pegawai->id }},
-                                subgroup: {{ $loop->index + 1 }},
-                                status: "{{ $item->status_proyek }}",
-                                deskripsi: "{{ $item->deskripsi ?? 'Tidak ada deskripsi' }}",
-                                pegawai: "{{ $item->pegawai->nama }}",
-                                proyek: "{{ $item->proyek->nama_proyek }}",
-                                style: "background-color: {{
-                    match ($item->status_proyek) {
-                        'Selesai Lebih Cepat' => 'green; color: white;',
-                        'Tepat Waktu' => 'lightgreen; color: black;',
-                        'Terlambat' => 'red; color: white;',
-                        'Revisi' => 'orange; color: black;',
-                        'Proses' => 'blue; color: white;',
-                        'Todo Next' => 'gray; color: white;',
-                        default => 'lightgray; color: black;',
-                    }
-                                }}"
-                    },
-                @endforeach
-        ]);
+            function getItems(mode = 'pegawai') {
+                return new vis.DataSet([
+                    @foreach ($linimasa as $item)
+                        {
+                            id: {{ $item->id }},
+                            content: mode === 'pegawai' ? "{{ $item->proyek->nama_proyek }}" : "{{ $item->pegawai->nama }}",
+                            start: "{{ $item->mulai }}",
+                            end: "{{ $item->tenggat }}",
+                            group: mode === 'pegawai' ? {{ $item->pegawai->id }} : {{ $item->proyek->id }},
+                            subgroup: {{ $loop->index + 1 }},
+                            status: "{{ $item->status_proyek }}",
+                            deskripsi: "{{ $item->deskripsi ?? 'Tidak ada deskripsi' }}",
+                            pegawai: "{{ $item->pegawai->nama }}",
+                            proyek: "{{ $item->proyek->nama_proyek }}",
+                            id_proyek: {{ $item->proyek->id }},
+                            id_pegawai: {{ $item->pegawai->id }},
+                            style: "background-color: {{
+                                match ($item->status_proyek) {
+                                    'Selesai Lebih Cepat' => 'green; color: white;',
+                                    'Tepat Waktu' => 'lightgreen; color: black;',
+                                    'Terlambat' => 'red; color: white;',
+                                    'Revisi' => 'orange; color: black;',
+                                    'Proses' => 'blue; color: white;',
+                                    'Todo Next' => 'gray; color: white;',
+                                    default => 'lightgray; color: black;',
+                                }
+                            }}"
+                        },
+                    @endforeach
+                ]);
+            }
 
-        let groups = new vis.DataSet([
+        let groupBy = 'pegawai'; // default
+        const groupPegawai = new vis.DataSet([
             @foreach ($pegawai as $p)
-                    {
-                    id: {{ $p->id }},
-                    content: "{{ $p->nama }}"
-                },
+                { id: {{ $p->id }}, content: "{{ $p->nama }}" },
+            @endforeach
+        ]);
+        const groupProyek = new vis.DataSet([
+            @foreach ($proyek as $p)
+                { id: {{ $p->id }}, content: "{{ $p->nama_proyek }}" },
             @endforeach
         ]);
 
@@ -239,7 +250,17 @@
             }
         };
 
-        let timeline = new vis.Timeline(container, items, groups, options);
+        let items = getItems(groupBy);
+        let timeline = new vis.Timeline(container, items, groupPegawai, options);
+
+        document.getElementById("toggleSubject").addEventListener("click", function () {
+            groupBy = groupBy === 'pegawai' ? 'proyek' : 'pegawai';
+            this.textContent = groupBy === 'pegawai' ? 'Tampilkan Berdasarkan Proyek' : 'Tampilkan Berdasarkan Pegawai';
+
+            // Update timeline
+            timeline.setGroups(groupBy === 'pegawai' ? groupPegawai : groupProyek);
+            timeline.setItems(getItems(groupBy));
+        });
 
         // Modal Info
         timeline.on("select", function (props) {
@@ -253,6 +274,18 @@
                 $("#infoTenggat").text(item.end);
                 $("#infoStatus").text(item.status);
                 $("#infoDeskripsi").text(item.deskripsi);
+
+                let btnEdit = document.querySelector("#modalInfoLinimasa .btn-edit");
+                btnEdit.setAttribute("data-id", item.id);
+                btnEdit.setAttribute("data-pegawai", item.group); 
+                btnEdit.setAttribute("data-proyek", item.id_proyek);
+                btnEdit.setAttribute("data-status", item.status);
+                btnEdit.setAttribute("data-mulai", item.start);
+                btnEdit.setAttribute("data-tenggat", item.end);
+                btnEdit.setAttribute("data-deskripsi", item.deskripsi || "");
+
+                let btnDelete = document.querySelector("#modalInfoLinimasa .btn-delete");
+                btnDelete.setAttribute("data-id", item.id);
 
                 $("#modalInfoLinimasa").modal("show");
             }
