@@ -54,7 +54,11 @@
         </div>
 
         @if ($proyek->isEmpty())
+<<<<<<< HEAD
             <div class="alert alert-warning text-center">Belum ada proyek terdaftar.</div>
+=======
+        <div class="alert alert-warning text-center">Belum ada proyek terdaftar.</div>
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
         @else
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -68,6 +72,7 @@
                     </thead>
                     <tbody>
                         @foreach ($proyek as $p)
+<<<<<<< HEAD
                             <tr>
                                 <td>{{ $p->nama_proyek }}</td>
                                 <td>{{ $p->kategori ? $p->kategori->nama_kategori : '-' }}</td>
@@ -93,6 +98,35 @@
                                     </form>
                                 </td>
                             </tr>
+=======
+                        <tr>
+                            <td>{{ $p->nama_proyek }}</td>
+                            <td>{{ $p->kategori ? $p->kategori->nama_kategori : '-' }}</td>
+                            <td>{{ $p->deskripsi }}</td>
+                            <td>
+                                <button class="btn btn-warning btn-edit" 
+                                    data-id="{{ $p->id }}" 
+                                    data-nama-proyek="{{ $p->nama_proyek }}" 
+                                    data-kategori-id="{{ $p->kategori_id }}" 
+                                    data-deskripsi="{{ $p->deskripsi }}"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#proyekEditModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                @if (!$p->linimasa()->exists()) 
+                                    <button class="btn btn-danger btn-delete" data-id="{{ $p->id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>                         
+                                @endif
+
+                                <form id="delete-form-{{ $p->id }}" action="{{ route('proyek.destroy', $p->id) }}" method="POST" style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
                         @endforeach
                     </tbody>
                 </table>
@@ -113,16 +147,26 @@
         document.addEventListener("DOMContentLoaded", function () {
             // Menampilkan Pop Up Error jika ada validasi yang gagal
             @if ($errors->any())
+<<<<<<< HEAD
                 Swal.fire({
                     title: "Terjadi Kesalahan!",
                     text: "{{ implode('\n', $errors->all()) }}",
                     icon: "error",
                     confirmButtonText: "Mengerti"
                 });
+=======
+            Swal.fire({
+                title: "Terjadi Kesalahan!",
+                text: "{{ implode('\n', $errors->all()) }}",
+                icon: "error",
+                confirmButtonText: "Mengerti"
+            });
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
             @endif
 
             // Menampilkan Pop Up Sukses jika ada session success
             @if (session('success'))
+<<<<<<< HEAD
                 Swal.fire({
                     icon: 'success',
                     title: 'Sukses!',
@@ -131,6 +175,16 @@
                     timer: 3000,
                     position: 'center'
                 });
+=======
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses!',
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 3000,
+                position: 'center'
+            });
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
             @endif
 
             // Pop Up Konfirmasi Hapus
@@ -159,4 +213,8 @@
 
 </body>
 
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c

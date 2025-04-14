@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+<<<<<<< HEAD
 
+=======
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +12,12 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<<<<<<< HEAD
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
         rel="stylesheet">
+=======
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -27,12 +34,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.js"></script>
 
     <!-- Vis.js -->
+<<<<<<< HEAD
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.css"
         rel="stylesheet">
+=======
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-timeline/7.4.6/vis-timeline-graph2d.min.css" rel="stylesheet">
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
 
     <style>
         .zoom-controls {
             position: absolute;
+<<<<<<< HEAD
             top: 10px;
             right: 10px;
             z-index: 1000;
@@ -54,6 +66,25 @@
     </style>
 </head>
 
+=======
+            bottom: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            border-radius: 50%;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
 <body>
     @include('templates.sidebar')
 
@@ -78,6 +109,7 @@
                 <i class="alert alert-warning text-center"></i> Belum ada linimasa terdaftar.
             </div>
         @else
+<<<<<<< HEAD
             <div class="mb-3 d-flex justify-content-end">
                 <button id="toggleSubject" class="btn btn-outline-primary">Tampilkan Berdasarkan Proyek</button>
             </div>
@@ -87,6 +119,13 @@
                 <div class="zoom-controls">
                     <button id="zoomIn" class="btn btn-info zoom-btn"><i class="bi bi-plus-lg"></i></button>
                     <button id="zoomOut" class="btn btn-info zoom-btn"><i class="bi bi-dash-lg"></i></button>
+=======
+            <div id="timelineContainer" style="position: relative;">
+                <div id="timeline"></div>
+                <div class="zoom-controls">
+                    <button id="zoomIn" class="btn btn-light zoom-btn"><i class="bi bi-plus-lg"></i></button>
+                    <button id="zoomOut" class="btn btn-light zoom-btn"><i class="bi bi-dash-lg"></i></button>
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
                 </div>
             </div>
 
@@ -104,6 +143,7 @@
                     </thead>
                     <tbody>
                         @foreach ($linimasa as $item)
+<<<<<<< HEAD
                                     <tr>
                                         <td>{{ $item->pegawai->nama }}</td>
                                         <td>{{ $item->proyek->nama_proyek }}</td>
@@ -146,6 +186,54 @@
                                         </td>
 
                                     </tr>
+=======
+                        <tr>
+                            <td>{{ $item->pegawai->nama }}</td>
+                            <td>{{ $item->proyek->nama_proyek }}</td>
+                            <td>{{ $item->status_proyek }}</td>
+                            <td>{{ $item->mulai }}</td>
+                            <td>{{ $item->tenggat }}</td>
+                            <td>
+                                
+                                <button class="btn btn-warning btn-sm btn-edit"
+                                    data-id="{{ $item->id }}"
+                                    data-pegawai="{{ $item->pegawai->id }}"
+                                    data-proyek="{{ $item->proyek->id }}"
+                                    data-status="{{ $item->status_proyek }}"
+                                    data-mulai="{{ $item->mulai }}"
+                                    data-tenggat="{{ $item->tenggat }}"
+                                    data-deskripsi="{{ $item->deskripsi ?? '' }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#linimasaEditModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                <button class="btn btn-danger btn-delete" data-id="{{ $item->id }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                <form id="delete-form-{{ $item->id }}" action="{{ route('linimasa.destroy', $item->id) }}" method="POST" style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <td style="
+                                    background-color: {{
+                                        match($item->status_proyek) {
+                                            'Selesai Lebih Cepat' => 'green; color: white;',
+                                            'Tepat Waktu' => 'lightgreen; color: black;',
+                                            'Terlambat' => 'red; color: white;',
+                                            'Revisi' => 'orange; color: black;',
+                                            'Proses' => 'blue; color: white;',
+                                            'Todo Next' => 'gray; color: white;',
+                                            default => 'lightgray; color: black;',
+                                        }
+                                    }}">
+                                </td>
+                                
+                            </td>
+                            
+                        </tr>
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
                         @endforeach
                     </tbody>
                 </table>
@@ -159,6 +247,10 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+<<<<<<< HEAD
+=======
+            // 🔹 Toggle tampilan antara Vis.js dan tabel
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
             let toggleButton = document.getElementById("toggleView");
             if (toggleButton) {
                 toggleButton.addEventListener("click", function () {
@@ -168,10 +260,19 @@
                 });
             }
 
+<<<<<<< HEAD
             let container = document.getElementById("timeline");
             let zoomStep = 0.5;
 
             document.getElementById('zoomIn').addEventListener('click', function () {
+=======
+            // 🔹 Inisialisasi Timeline Vis.js
+            let container = document.getElementById("timeline");
+            
+            let zoomStep = 0.2; // Sesuaikan faktor zoom sesuai kebutuhan
+            
+            document.getElementById('zoomIn').addEventListener('click', function() {
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
                 let currentRange = timeline.getWindow();
                 let start = currentRange.start.valueOf();
                 let end = currentRange.end.valueOf();
@@ -181,8 +282,13 @@
                 let newEnd = end - (interval - newInterval) / 2;
                 timeline.setWindow(newStart, newEnd);
             });
+<<<<<<< HEAD
 
             document.getElementById('zoomOut').addEventListener('click', function () {
+=======
+            
+            document.getElementById('zoomOut').addEventListener('click', function() {
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
                 let currentRange = timeline.getWindow();
                 let start = currentRange.start.valueOf();
                 let end = currentRange.end.valueOf();
@@ -193,6 +299,7 @@
                 timeline.setWindow(newStart, newEnd);
             });
 
+<<<<<<< HEAD
             function getItems(mode = 'pegawai') {
                 return new vis.DataSet([
                     @foreach ($linimasa as $item)
@@ -334,6 +441,95 @@
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
                     }
                 })
+=======
+            let items = new vis.DataSet([
+                @foreach ($linimasa as $item)
+                {
+                    id: {{ $item->id }},
+                    content: "{{ $item->proyek->nama_proyek }}",
+                    start: "{{ $item->mulai }}",
+                    end: "{{ $item->tenggat }}",
+                    group: {{ $item->pegawai->id }},
+                    subgroup: {{ $loop->index + 1 }}, // Supaya tidak bertumpuk
+                    status: "{{ $item->status_proyek }}",
+                    deskripsi: "{{ $item->deskripsi ?? 'Tidak ada deskripsi' }}",
+                    pegawai: "{{ $item->pegawai->nama }}",
+                    proyek: "{{ $item->proyek->nama_proyek }}",
+                    style: "background-color: {{
+                        match($item->status_proyek) {
+                            'Selesai Lebih Cepat' => 'green; color: white;',
+                            'Tepat Waktu' => 'lightgreen; color: black;',
+                            'Terlambat' => 'red; color: white;',
+                            'Revisi' => 'orange; color: black;',
+                            'Proses' => 'blue; color: white;',
+                            'Todo Next' => 'gray; color: white;',
+                            default => 'lightgray; color: black;',
+                        }
+                    }}"
+                },
+                @endforeach
+            ]);
+
+            let groups = new vis.DataSet([
+                @foreach ($pegawai as $p)
+                {
+                    id: {{ $p->id }},
+                    content: "{{ $p->nama }}"
+                },
+                @endforeach
+            ]);
+
+            let options = {
+                groupOrder: "content",
+                stack: false, // 🔹 Hindari tumpukan
+                subgroupOrder: "subgroup", // 🔹 Urutkan berdasarkan subgroup agar tersusun ke bawah
+                showCurrentTime: true,
+                zoomable: true,
+                orientation: { axis: "top" },
+                margin: {
+                    item: 10, // 🔹 Jarak antar proyek dalam satu pegawai
+                    axis: 10
+                }
+            };
+
+            let timeline = new vis.Timeline(container, items, groups, options);
+
+            // 🔹 EVENT KETIKA BAR DIKLIK → TAMPILKAN MODAL INFO
+            timeline.on("select", function (props) {
+                if (props.items.length > 0) {
+                    let itemId = props.items[0]; // Ambil ID item yang dipilih
+                    let item = items.get(itemId); // Ambil data dari items
+
+                    // Isi modal dengan data proyek
+                    $("#infoNamaPegawai").text(item.pegawai);
+                    $("#infoNamaProyek").text(item.proyek);
+                    $("#infoMulai").text(item.start);
+                    $("#infoTenggat").text(item.end);
+                    $("#infoStatus").text(item.status);
+                    $("#infoDeskripsi").text(item.deskripsi);
+
+                    // Tampilkan modal
+                    $("#modalInfoLinimasa").modal("show");
+                }
+            });
+
+            // 🔹 SUBMIT FORM EDIT LINIMASA
+            let editForm = document.getElementById("editLinimasaForm");
+            if (editForm) {
+                editForm.addEventListener("submit", function (event) {
+                    event.preventDefault();
+
+                    let formData = new FormData(editForm);
+                    let id = document.getElementById("edit_linimasa_id").value;
+
+                    fetch("{{ url('linimasa') }}/" + id, {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                        }
+                    })
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -352,7 +548,11 @@
                                 showConfirmButton: false,
                                 timer: 2000
                             }).then(() => {
+<<<<<<< HEAD
                                 location.reload();
+=======
+                                location.reload(); // Refresh halaman setelah sukses
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
                             });
                         } else {
                             Swal.fire({
@@ -369,6 +569,7 @@
                             text: "Gagal memperbarui data. Coba lagi!",
                         });
                     });
+<<<<<<< HEAD
             });
         }
 
@@ -394,6 +595,33 @@
                                 "X-HTTP-Method-Override": "DELETE"
                             }
                         })
+=======
+                });
+            }
+
+            // 🔹 HAPUS DATA LINIMASA DENGAN SWEETALERT2
+            document.querySelectorAll(".btn-delete").forEach(button => {
+                button.addEventListener("click", function () {
+                    let id = this.getAttribute("data-id");
+
+                    Swal.fire({
+                        title: "Yakin ingin menghapus?",
+                        text: "Data linimasa yang dihapus tidak dapat dikembalikan!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Ya, Hapus!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`{{ url('linimasa') }}/${id}`, {
+                                method: "POST",
+                                headers: {
+                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                                    "X-HTTP-Method-Override": "DELETE"
+                                }
+                            })
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
@@ -421,6 +649,7 @@
                                     text: "Gagal menghapus data. Coba lagi!",
                                 });
                             });
+<<<<<<< HEAD
                     }
                 });
             });
@@ -430,4 +659,13 @@
 
 </body>
 
+=======
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+>>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
 </html>
