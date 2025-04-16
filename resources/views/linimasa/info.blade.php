@@ -19,7 +19,7 @@
                 </div>
             </div>
             
-<<<<<<< HEAD
+
             <div class="modal-footer d-flex justify-content-between">
                 <button 
                     class="btn btn-warning btn-sm btn-edit"
@@ -30,7 +30,7 @@
                     data-mulai=""
                     data-tenggat=""
                     data-deskripsi=""
-=======
+
             @foreach ($linimasa as $item)
             <div class="modal-footer d-flex justify-content-between">
                 <button class="btn btn-warning btn-sm btn-edit"
@@ -41,18 +41,18 @@
                     data-mulai="{{ $item->mulai }}"
                     data-tenggat="{{ $item->tenggat }}"
                     data-deskripsi="{{ $item->deskripsi ?? '' }}"
->>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
+
                     data-bs-toggle="modal"
                     data-bs-target="#linimasaEditModal">
                     <i class="bi bi-pencil-square"></i>
                 </button>
 
-<<<<<<< HEAD
+
                 <button class="btn btn-danger btn-delete" data-id="">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>
-=======
+
                 <button class="btn btn-danger btn-delete" data-id="{{ $item->id }}">
                     <i class="bi bi-trash"></i>
                 </button>
@@ -63,7 +63,7 @@
                 </form>
             </div>
             @endforeach
->>>>>>> edeee0bd34cd3898043d42c2b28b807a42882b0c
+
         </div>
     </div>
 </div>
