@@ -19,7 +19,6 @@
                 </div>
             </div>
             
-
             <div class="modal-footer d-flex justify-content-between">
                 <button 
                     class="btn btn-warning btn-sm btn-edit"
@@ -30,40 +29,15 @@
                     data-mulai=""
                     data-tenggat=""
                     data-deskripsi=""
-
-            @foreach ($linimasa as $item)
-            <div class="modal-footer d-flex justify-content-between">
-                <button class="btn btn-warning btn-sm btn-edit"
-                    data-id="{{ $item->id }}"
-                    data-pegawai="{{ $item->pegawai->id }}"
-                    data-proyek="{{ $item->proyek->id }}"
-                    data-status="{{ $item->status_proyek }}"
-                    data-mulai="{{ $item->mulai }}"
-                    data-tenggat="{{ $item->tenggat }}"
-                    data-deskripsi="{{ $item->deskripsi ?? '' }}"
-
                     data-bs-toggle="modal"
                     data-bs-target="#linimasaEditModal">
                     <i class="bi bi-pencil-square"></i>
                 </button>
 
-
                 <button class="btn btn-danger btn-delete" data-id="">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>
-
-                <button class="btn btn-danger btn-delete" data-id="{{ $item->id }}">
-                    <i class="bi bi-trash"></i>
-                </button>
-
-                <form id="delete-form-{{ $item->id }}" action="{{ route('linimasa.destroy', $item->id) }}" method="POST" style="display: none;">
-                    @csrf
-                    @method('DELETE')
-                </form>
-            </div>
-            @endforeach
-
         </div>
     </div>
 </div>
