@@ -13,6 +13,7 @@ use App\Http\Controllers\LinimasaController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PendataanController ;
 
 
 // Route untuk guest (belum login)
@@ -67,7 +68,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}', [LinimasaController::class, 'update'])->name('linimasa.update');
         Route::delete('/{id}', [LinimasaController::class, 'destroy'])->name('linimasa.destroy');
 
-    });
+    });    
 
     // Prefix untuk Pegawai
     Route::prefix('pegawai')->middleware(['auth'])->group(function () {
@@ -78,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}', [PegawaiController::class, 'update'])->name('pegawai.update');
         Route::delete('/{pegawai}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy');
     });
-
+    
     // Prefix untuk Proyek
     Route::prefix('proyek')->group(function () {
         Route::get('/', [ProyekController::class, 'index'])->name('proyek.index');
@@ -99,6 +100,13 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/kategori/{id}', [ProyekController::class, 'destroyKategori'])->name('kategori.destroy');
     });
 
+//pendataan
+Route::prefix('pendataan')->group(function () {
+    Route::get('/', [PendataanController::class, 'index'])->name('pendataan.index');
+    Route::post('/store', [PendataanController::class, 'store'])->name('pendataan.store');
+    Route::put('/update/{id}', [PendataanController::class, 'update'])->name('pendataan.update');
+    Route::delete('/delete/{id}', [PendataanController::class, 'destroy'])->name('pendataan.destroy');
+});
     Route::get('/chart-data', [AplikasiController::class, 'getChartData']);
 
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
