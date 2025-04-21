@@ -81,6 +81,12 @@
                     <span>Proyek</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('pendataan.*') ? 'active' : '' }}" href="{{ route('pendataan.index') }}">
+                    <i class="bi bi-briefcase"></i>
+                    <span>Pendataan Mahasiswa</span>
+                </a>
+            </li>
         </ul>
     </nav>
 
