@@ -9,8 +9,8 @@ class Pendataan extends Model
 {
     use HasFactory;
 
-    protected $table = 'pendataans'; // Nama tabel yang baru
-
+    protected $table = 'pendataans';
+    
     protected $fillable = [
         'universitas',
         'jumlah_orang',
