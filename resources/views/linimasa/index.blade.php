@@ -107,7 +107,6 @@
                                         <td>{{ $item->mulai }}</td>
                                         <td>{{ $item->tenggat }}</td>
                                         <td>
-
                                             <button class="btn btn-warning btn-sm btn-edit" data-id="{{ $item->id }}"
                                                 data-pegawai="{{ $item->pegawai->id }}" data-proyek="{{ $item->proyek->id }}"
                                                 data-status="{{ $item->status_proyek }}" data-mulai="{{ $item->mulai }}"

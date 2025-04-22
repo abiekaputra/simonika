@@ -107,6 +107,7 @@ Route::prefix('pendataan')->group(function () {
     Route::put('/update/{id}', [PendataanController::class, 'update'])->name('pendataan.update');
     Route::delete('/delete/{id}', [PendataanController::class, 'destroy'])->name('pendataan.destroy');
 });
+
     Route::get('/chart-data', [AplikasiController::class, 'getChartData']);
 
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
