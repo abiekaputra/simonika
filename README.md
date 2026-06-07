@@ -1,93 +1,93 @@
-# siMonika v3 — Sistem Informasi Monitoring Aplikasi
+# siMonika v3 — Government Application Monitoring System
 
-Aplikasi web berbasis Laravel untuk monitoring dan pendataan aplikasi milik OPD (Organisasi Perangkat Daerah), mencakup manajemen pegawai, proyek, linimasa kegiatan, serta pendataan magang.
+A Laravel-based web application for monitoring and tracking government agency (OPD) applications, covering employee management, project tracking, activity timelines, and intern data collection.
 
-## Fitur Utama
+## Features
 
-- **Dashboard** — ringkasan jumlah aplikasi aktif, tidak aktif, dan log pembaruan terakhir
-- **Manajemen Aplikasi** — CRUD aplikasi OPD beserta atribut tambahan yang dinamis, ekspor data ke Excel
-- **Manajemen Pegawai** — data pegawai yang terlibat dalam pengembangan/pengelolaan aplikasi
-- **Manajemen Proyek** — pelacakan proyek pengembangan beserta kategori dan status
-- **Linimasa** — pencatatan riwayat kegiatan per aplikasi
-- **Pendataan Magang** — manajemen data peserta magang
-- **Log Aktivitas** — rekam jejak aksi pengguna (khusus Super Admin)
-- **Autentikasi** — login, register, lupa password, dan manajemen profil
-- **Ekspor Data** — unduh data aplikasi dalam format Excel
+- **Dashboard** — overview of active/inactive application counts and last update log
+- **Application Management** — full CRUD for government applications with dynamic custom attributes and Excel export
+- **Employee Management** — data of employees involved in application development and management
+- **Project Management** — track development projects by category and status
+- **Timeline** — activity history log per application
+- **Intern Data Collection** — manage intern participant records
+- **Activity Log** — audit trail of user actions (Super Admin only)
+- **Authentication** — login, registration, forgot password, and profile management
+- **Data Export** — download application data as Excel
 
-## Peran Pengguna
+## User Roles
 
-| Peran | Akses |
-|-------|-------|
-| **Admin** | Dashboard, aplikasi, pegawai, proyek, linimasa, pendataan, profil |
-| **Super Admin** | Semua fitur Admin + manajemen pengguna, log aktivitas, ekspor log |
+| Role | Access |
+|------|--------|
+| **Admin** | Dashboard, applications, employees, projects, timelines, intern data, profile |
+| **Super Admin** | All Admin features + user management, activity log, log export |
 
 ## Tech Stack
 
 - **Framework** — Laravel 11
 - **Frontend** — Blade, Tailwind CSS, Vite
 - **Database** — MySQL
-- **Bahasa** — PHP 8.x
+- **Language** — PHP 8.x
 
-## Instalasi
+## Installation
 
-### Prasyarat
+### Prerequisites
 
 - PHP >= 8.1
 - Composer
 - Node.js & npm
 - MySQL
 
-### Langkah-langkah
+### Steps
 
 ```bash
-# 1. Clone repo
+# 1. Clone the repository
 git clone https://github.com/abiekaputra/siMonikaVer3.git
 cd siMonikaVer3
 
-# 2. Install dependensi PHP
+# 2. Install PHP dependencies
 composer install
 
-# 3. Install dependensi frontend
+# 3. Install frontend dependencies
 npm install && npm run build
 
-# 4. Salin konfigurasi environment
+# 4. Copy environment configuration
 cp .env.example .env
 
 # 5. Generate application key
 php artisan key:generate
 
-# 6. Konfigurasi database di .env
-#    DB_DATABASE, DB_USERNAME, DB_PASSWORD
+# 6. Configure database in .env
+#    Set DB_DATABASE, DB_USERNAME, DB_PASSWORD
 
-# 7. Jalankan migrasi
+# 7. Run migrations
 php artisan migrate
 
-# 8. (Opsional) Jalankan seeder
+# 8. (Optional) Run seeders
 php artisan db:seed
 
-# 9. Jalankan server
+# 9. Start development server
 php artisan serve
 ```
 
-Akses aplikasi di `http://localhost:8000`.
+Visit `http://localhost:8000` in your browser.
 
-## Struktur Proyek
+## Project Structure
 
 ```
 app/
-├── Http/Controllers/      # Controller per modul
+├── Http/Controllers/      # Module controllers
 ├── Models/                # Eloquent models
-├── Exports/               # Kelas ekspor Excel
-├── Imports/               # Kelas impor data
-├── Mail/                  # Mailable (notifikasi email)
-└── Traits/                # Trait reusable
+├── Exports/               # Excel export classes
+├── Imports/               # Data import classes
+├── Mail/                  # Mailable classes
+└── Traits/                # Reusable traits
 database/
-├── migrations/            # Skema database
-└── seeders/               # Data awal
+├── migrations/            # Database schema
+└── seeders/               # Seed data
 resources/views/           # Blade templates
-routes/web.php             # Definisi routing
+routes/web.php             # Route definitions
 ```
 
-## Lisensi
+## License
 
-Proyek ini dibuat untuk keperluan akademis dan pengembangan portofolio.
+Built for academic purposes and portfolio development.
