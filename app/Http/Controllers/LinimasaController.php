@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Linimasa;
+use App\Models\LogAktivitas;
 use App\Models\Pegawai;
 use App\Models\Proyek;
 
@@ -12,17 +14,10 @@ class LinimasaController extends Controller
     public function index()
     {
         $pegawai = Pegawai::all();
-        $proyek = Proyek::all();
+        $proyek = Proyek::with('kategori')->get();
         $linimasa = Linimasa::with(['pegawai', 'proyek'])->get();
 
         return view('linimasa.index', compact('pegawai', 'proyek', 'linimasa'));
-    }
-
-    public function create()
-    {
-        $pegawai = Pegawai::all();
-        $proyek = Proyek::all();
-        return view('linimasa.create', compact('pegawai', 'proyek'));
     }
 
     public function edit($id)
@@ -42,13 +37,22 @@ class LinimasaController extends Controller
             'deskripsi' => 'nullable|string',
         ]);
 
-        Linimasa::create([
+        $linimasa = Linimasa::create([
             'pegawai_id' => $request->pegawai_id,
             'proyek_id' => $request->proyek_id,
             'status_proyek' => $request->status_proyek,
             'mulai' => $request->mulai,
             'tenggat' => $request->tenggat,
             'deskripsi' => $request->deskripsi,
+        ]);
+
+        $proyek = Proyek::find($request->proyek_id);
+        LogAktivitas::create([
+            'user_id' => Auth::id(),
+            'aktivitas' => 'Add Timeline',
+            'tipe_aktivitas' => 'create',
+            'modul' => 'Linimasa',
+            'detail' => "Added timeline entry for project '{$proyek->nama_proyek}'",
         ]);
 
         return redirect()->route('linimasa.index')->with('success', 'Timeline entry added successfully.');
@@ -65,11 +69,7 @@ class LinimasaController extends Controller
             'deskripsi' => 'nullable|string',
         ]);
 
-        $linimasa = Linimasa::find($id);
-
-        if (!$linimasa) {
-            return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
-        }
+        $linimasa = Linimasa::findOrFail($id);
 
         $linimasa->update([
             'pegawai_id' => $request->pegawai_id,
@@ -80,13 +80,32 @@ class LinimasaController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
+        $proyek = Proyek::find($request->proyek_id);
+        LogAktivitas::create([
+            'user_id' => Auth::id(),
+            'aktivitas' => 'Update Timeline',
+            'tipe_aktivitas' => 'update',
+            'modul' => 'Linimasa',
+            'detail' => "Updated timeline entry for project '{$proyek->nama_proyek}'",
+        ]);
+
         return response()->json(['success' => true, 'message' => 'Timeline entry updated successfully.']);
     }
 
     public function destroy($id)
     {
-        $linimasa = Linimasa::findOrFail($id);
+        $linimasa = Linimasa::with('proyek')->findOrFail($id);
+        $proyekNama = $linimasa->proyek->nama_proyek ?? 'unknown';
+
         $linimasa->delete();
+
+        LogAktivitas::create([
+            'user_id' => Auth::id(),
+            'aktivitas' => 'Delete Timeline',
+            'tipe_aktivitas' => 'delete',
+            'modul' => 'Linimasa',
+            'detail' => "Deleted timeline entry for project '{$proyekNama}'",
+        ]);
 
         return response()->json(['success' => true, 'message' => 'Timeline entry deleted successfully.']);
     }

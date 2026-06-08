@@ -16,7 +16,6 @@ class LogAktivitas extends Model
         'detail'
     ];
 
-    // Definisikan tipe aktivitas yang valid
     public const TIPE_AKTIVITAS = [
         'create',
         'read',
@@ -33,7 +32,7 @@ class LogAktivitas extends Model
 
         static::saving(function ($model) {
             if (!in_array($model->tipe_aktivitas, self::TIPE_AKTIVITAS)) {
-                throw new \Exception('Tipe aktivitas tidak valid');
+                throw new \Exception('Invalid activity type: ' . $model->tipe_aktivitas);
             }
         });
     }

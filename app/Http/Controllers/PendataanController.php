@@ -16,17 +16,15 @@ class PendataanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'universitas' => 'required',
-            'jumlah_orang' => 'required|integer',
+            'universitas' => 'required|string|max:255',
+            'jumlah_orang' => 'required|integer|min:1',
             'tanggal_masuk' => 'required|date',
             'tanggal_keluar' => 'required|date|after:tanggal_masuk',
         ]);
 
-        $pendataan = $request->id ? Pendataan::findOrFail($request->id) : new Pendataan();
-        $pendataan->fill($request->all());
-        $pendataan->save();
+        Pendataan::create($request->only('universitas', 'jumlah_orang', 'tanggal_masuk', 'tanggal_keluar'));
 
-        return redirect()->route('pendataan.index')->with('success', $request->id ? 'Record updated successfully.' : 'Record saved successfully.');
+        return redirect()->route('pendataan.index')->with('success', 'Record saved successfully.');
     }
 
     public function edit($id)
@@ -38,19 +36,14 @@ class PendataanController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'universitas' => 'required',
-            'jumlah_orang' => 'required|integer',
+            'universitas' => 'required|string|max:255',
+            'jumlah_orang' => 'required|integer|min:1',
             'tanggal_masuk' => 'required|date',
             'tanggal_keluar' => 'required|date|after:tanggal_masuk',
         ]);
 
         $pendataan = Pendataan::findOrFail($id);
-        $pendataan->update([
-            'universitas' => $request->universitas,
-            'jumlah_orang' => $request->jumlah_orang,
-            'tanggal_masuk' => $request->tanggal_masuk,
-            'tanggal_keluar' => $request->tanggal_keluar,
-        ]);
+        $pendataan->update($request->only('universitas', 'jumlah_orang', 'tanggal_masuk', 'tanggal_keluar'));
 
         return redirect()->route('pendataan.index')->with('success', 'Record updated successfully.');
     }

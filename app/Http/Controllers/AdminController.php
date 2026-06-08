@@ -13,6 +13,11 @@ use App\Mail\EmailUpdateNotification;
 
 class AdminController extends Controller
 {
+    public function dashboard()
+    {
+        return redirect()->route('dashboard');
+    }
+
     public function index()
     {
         $admins = Pengguna::where('role', 'admin')->get();
@@ -32,14 +37,12 @@ class AdminController extends Controller
                 'email' => 'required|email|unique:penggunas',
             ]);
 
-            
             $plainPassword = Str::random(8);
             $validated['password'] = Hash::make($plainPassword);
             $validated['role'] = 'admin';
 
             $admin = Pengguna::create($validated);
 
-            
             Mail::to($validated['email'])->send(new NewAdminCredentials(
                 $validated['nama'],
                 $validated['email'],
@@ -82,10 +85,9 @@ class AdminController extends Controller
             $validated = $request->validate([
                 'nama' => 'required|string|max:100',
                 'email' => 'required|email|unique:penggunas,email,' . $id . ',id_user',
-                'password' => 'nullable|min:6'
+                'password' => 'nullable|min:8'
             ]);
 
-            
             if ($validated['email'] !== $oldEmail) {
                 Mail::to($validated['email'])->send(new EmailUpdateNotification(
                     $validated['nama'],
@@ -94,11 +96,9 @@ class AdminController extends Controller
                 ));
             }
 
-            
             if ($request->filled('password')) {
                 $validated['password'] = Hash::make($validated['password']);
             } else {
-                
                 unset($validated['password']);
             }
 
@@ -106,9 +106,9 @@ class AdminController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => $validated['email'] !== $oldEmail ?
-                    'Admin updated and notification sent to new email.' :
-                    'Admin updated successfully.'
+                'message' => $validated['email'] !== $oldEmail
+                    ? 'Admin updated and notification sent to new email.'
+                    : 'Admin updated successfully.'
             ]);
         } catch (ValidationException $e) {
             return response()->json([

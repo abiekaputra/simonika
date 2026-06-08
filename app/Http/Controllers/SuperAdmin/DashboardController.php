@@ -7,7 +7,6 @@ use App\Models\LogAktivitas;
 use App\Models\Pengguna;
 use App\Models\Aplikasi;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -21,7 +20,6 @@ class DashboardController extends Controller
 
     public function index()
     {
-        
         $data = [
             'total_admin' => Pengguna::where('role', 'admin')->count(),
             'total_aplikasi' => Aplikasi::count(),
@@ -32,45 +30,33 @@ class DashboardController extends Controller
                 ->paginate(10),
         ];
 
-        
-        $activeAdmins = Pengguna::where('role', 'admin')
+        $admins = Pengguna::where('role', 'admin')->get();
+        $adminIds = $admins->pluck('id_user');
+
+        // Load all relevant logs in one query instead of N*3 queries
+        $logs = LogAktivitas::whereIn('user_id', $adminIds)
+            ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function ($admin) {
-                
-                $lastLogin = LogAktivitas::where('user_id', $admin->id_user)
-                    ->where('aktivitas', 'Login')
-                    ->latest()
-                    ->first();
+            ->groupBy('user_id');
 
-                $lastLogout = LogAktivitas::where('user_id', $admin->id_user)
-                    ->where('aktivitas', 'Logout')
-                    ->latest()
-                    ->first();
+        $activeAdmins = $admins->map(function ($admin) use ($logs) {
+            $adminLogs = $logs->get($admin->id_user, collect());
 
-                
-                $lastActivity = LogAktivitas::where('user_id', $admin->id_user)
-                    ->latest()
-                    ->first();
+            $lastLogin = $adminLogs->where('aktivitas', 'Login')->first();
+            $lastLogout = $adminLogs->where('aktivitas', 'Logout')->first();
+            $lastActivity = $adminLogs->first();
 
-                
-                $isOnline = false;
-                if ($lastLogin) {
-                    if (!$lastLogout || $lastLogin->created_at > $lastLogout->created_at) {
-                        $isOnline = true;
-                    }
-                }
+            $isOnline = $lastLogin && (!$lastLogout || $lastLogin->created_at > $lastLogout->created_at);
 
-                return [
-                    'nama' => $admin->nama,
-                    'email' => $admin->email,
-                    'last_activity' => $lastActivity ? $lastActivity->created_at : null,
-                    'last_action' => $lastActivity ? $lastActivity->aktivitas : 'No activity',
-                    'status' => $isOnline ? 'Online' : 'Offline',
-                    'sort_order' => $isOnline ? 0 : 1
-                ];
-            })
-            ->sortBy('sort_order')
-            ->values();
+            return [
+                'nama' => $admin->nama,
+                'email' => $admin->email,
+                'last_activity' => $lastActivity ? $lastActivity->created_at : null,
+                'last_action' => $lastActivity ? $lastActivity->aktivitas : 'No activity',
+                'status' => $isOnline ? 'Online' : 'Offline',
+                'sort_order' => $isOnline ? 0 : 1,
+            ];
+        })->sortBy('sort_order')->values();
 
         $data['admin_aktif'] = $activeAdmins;
 
