@@ -24,7 +24,7 @@ class ProfileController extends Controller
         $user->nama = $request->nama;
         $user->save();
 
-        return redirect()->back()->with('success', 'Profil berhasil diperbarui');
+        return redirect()->back()->with('success', 'Profile updated successfully.');
     }
 
     public function updatePassword(Request $request)
@@ -37,7 +37,7 @@ class ProfileController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
 
-        return redirect()->back()->with('success', 'Password berhasil diperbarui');
+        return redirect()->back()->with('success', 'Password updated successfully.');
     }
 
     public function index()
