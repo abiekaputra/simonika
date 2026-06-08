@@ -25,8 +25,8 @@ class Pengguna extends Authenticatable
         'remember_token',
     ];
 
-    protected $dates = [
-        'last_activity'
+    protected $casts = [
+        'last_activity' => 'datetime',
     ];
 
     // Helper method untuk cek role

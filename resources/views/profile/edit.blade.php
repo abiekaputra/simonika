@@ -39,10 +39,10 @@
                 <div class="card mb-4">
                     <div class="list-group list-group-flush">
                         <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="list">
-                            <i class="bi bi-person me-2"></i>Profil Pengguna
+                            <i class="bi bi-person me-2"></i>Profile
                         </a>
                         <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                            <i class="bi bi-shield-lock me-2"></i>Keamanan
+                            <i class="bi bi-shield-lock me-2"></i>Security
                         </a>
                     </div>
                 </div>
@@ -55,9 +55,9 @@
                         <div class="card">
                             <div class="card-header bg-transparent">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">Profil Pengguna</h5>
+                                    <h5 class="mb-0">User Profile</h5>
                                     <a href="{{ route('profile.index') }}" class="btn btn-outline-secondary btn-sm">
-                                        <i class="bi bi-arrow-left me-1"></i>Kembali
+                                        <i class="bi bi-arrow-left me-1"></i>Back
                                     </a>
                                 </div>
                             </div>
@@ -67,7 +67,7 @@
                                     @method('PUT')
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Nama Lengkap</label>
+                                            <label class="form-label">Full Name</label>
                                             <input type="text"
                                                 class="form-control @error('nama') is-invalid @enderror" name="nama"
                                                 value="{{ old('nama', auth()->user()->nama) }}">
@@ -79,15 +79,15 @@
                                             <label class="form-label">Email</label>
                                             <input type="email" class="form-control"
                                                 value="{{ auth()->user()->email }}" disabled>
-                                            <small class="text-muted">Email tidak dapat diubah</small>
+                                            <small class="text-muted">Email cannot be changed.</small>
                                         </div>
                                     </div>
                                     <div class="mt-3">
                                         <button type="submit" class="btn btn-primary me-2">
-                                            <i class="bi bi-check-lg me-1"></i>Simpan Perubahan
+                                            <i class="bi bi-check-lg me-1"></i>Save Changes
                                         </button>
                                         <a href="{{ route('profile.index') }}" class="btn btn-light">
-                                            <i class="bi bi-x-lg me-1"></i>Batal
+                                            <i class="bi bi-x-lg me-1"></i>Cancel
                                         </a>
                                     </div>
                                 </form>
@@ -100,9 +100,9 @@
                         <div class="card">
                             <div class="card-header bg-transparent">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">Keamanan</h5>
+                                    <h5 class="mb-0">Security</h5>
                                     <a href="{{ route('profile.index') }}" class="btn btn-outline-secondary btn-sm">
-                                        <i class="bi bi-arrow-left me-1"></i>Kembali
+                                        <i class="bi bi-arrow-left me-1"></i>Back
                                     </a>
                                 </div>
                             </div>
@@ -111,9 +111,18 @@
                                     @csrf
                                     @method('PUT')
                                     <div class="mb-4">
-                                        <h6>Ubah Password</h6>
+                                        <h6>Change Password</h6>
                                         <div class="mb-3">
-                                            <label class="form-label">Password Baru</label>
+                                            <label class="form-label">Current Password</label>
+                                            <input type="password"
+                                                class="form-control @error('current_password') is-invalid @enderror"
+                                                name="current_password">
+                                            @error('current_password')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">New Password</label>
                                             <div class="input-group">
                                                 <input type="password"
                                                     class="form-control @error('password') is-invalid @enderror"
@@ -128,16 +137,16 @@
                                             </div>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Konfirmasi Password Baru</label>
+                                            <label class="form-label">Confirm New Password</label>
                                             <input type="password" class="form-control" name="password_confirmation">
                                         </div>
                                     </div>
                                     <div class="mt-3">
                                         <button type="submit" class="btn btn-primary me-2">
-                                            <i class="bi bi-check-lg me-1"></i>Simpan Perubahan
+                                            <i class="bi bi-check-lg me-1"></i>Save Changes
                                         </button>
                                         <a href="{{ route('profile.index') }}" class="btn btn-light">
-                                            <i class="bi bi-x-lg me-1"></i>Batal
+                                            <i class="bi bi-x-lg me-1"></i>Cancel
                                         </a>
                                     </div>
                                 </form>
