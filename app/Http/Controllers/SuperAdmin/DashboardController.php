@@ -21,7 +21,7 @@ class DashboardController extends Controller
 
     public function index()
     {
-        // Data untuk statistik
+        
         $data = [
             'total_admin' => Pengguna::where('role', 'admin')->count(),
             'total_aplikasi' => Aplikasi::count(),
@@ -32,11 +32,11 @@ class DashboardController extends Controller
                 ->paginate(10),
         ];
 
-        // Dapatkan admin yang aktif
+        
         $activeAdmins = Pengguna::where('role', 'admin')
             ->get()
             ->map(function ($admin) {
-                // Cek login/logout terakhir
+                
                 $lastLogin = LogAktivitas::where('user_id', $admin->id_user)
                     ->where('aktivitas', 'Login')
                     ->latest()
@@ -47,12 +47,12 @@ class DashboardController extends Controller
                     ->latest()
                     ->first();
 
-                // Ambil aktivitas terakhir untuk ditampilkan
+                
                 $lastActivity = LogAktivitas::where('user_id', $admin->id_user)
                     ->latest()
                     ->first();
 
-                // Tentukan status
+                
                 $isOnline = false;
                 if ($lastLogin) {
                     if (!$lastLogout || $lastLogin->created_at > $lastLogout->created_at) {
@@ -64,7 +64,7 @@ class DashboardController extends Controller
                     'nama' => $admin->nama,
                     'email' => $admin->email,
                     'last_activity' => $lastActivity ? $lastActivity->created_at : null,
-                    'last_action' => $lastActivity ? $lastActivity->aktivitas : 'Tidak ada aktivitas',
+                    'last_action' => $lastActivity ? $lastActivity->aktivitas : 'No activity',
                     'status' => $isOnline ? 'Online' : 'Offline',
                     'sort_order' => $isOnline ? 0 : 1
                 ];
