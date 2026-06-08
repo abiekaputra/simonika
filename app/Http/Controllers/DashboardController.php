@@ -15,8 +15,6 @@ class DashboardController extends Controller
         $jumlahAplikasiAktif = Aplikasi::where('status_pemakaian', 'Aktif')->count();
         $jumlahAplikasiTidakDigunakan = Aplikasi::where('status_pemakaian', '!=', 'Aktif')->count();
         $aplikasis = Aplikasi::all();
-        
-        // Ambil waktu update terakhir
         $lastUpdate = $this->getLastUpdateTime();
 
         return view('index', compact(
@@ -44,10 +42,10 @@ class DashboardController extends Controller
     public function getLastUpdate()
     {
         $lastUpdate = $this->getLastUpdateTime();
-        
+
         return response()->json([
             'lastUpdate' => $lastUpdate->format('Y-m-d H:i:s'),
-            'formatted' => $lastUpdate->locale('id')->isoFormat('dddd, D MMMM YYYY HH:mm [WIB]')
+            'formatted' => $lastUpdate->isoFormat('dddd, D MMMM YYYY HH:mm [WIB]')
         ]);
     }
 }
