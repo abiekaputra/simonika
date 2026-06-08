@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
     // Atribut
     Route::prefix('atribut')->group(function () {
         Route::get('/', [AtributController::class, 'index'])->name('atribut.index');
-        Route::get('/create', [AtributController::class, 'create'])->name('atribut.create');
+        Route::get('/create', fn() => redirect()->route('atribut.index'))->name('atribut.create'); // create is a modal on index
         Route::post('/', [AtributController::class, 'store'])->name('atribut.store');
         Route::post('/check-duplicate', [AtributController::class, 'checkDuplicate'])->name('atribut.check-duplicate');
         Route::get('/{id}/detail', [AtributController::class, 'detail'])->name('atribut.detail');
