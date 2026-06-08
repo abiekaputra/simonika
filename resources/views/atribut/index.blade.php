@@ -74,7 +74,7 @@
             <div class="col-md-4">
                 <select id="atributFilter" class="form-select">
                     <option value="">Semua Atribut</option>
-                    @foreach ($atributs as $atribut)
+                    @foreach ($atributOptions as $atribut)
                         <option value="{{ strtolower($atribut->nama_atribut) }}">
                             {{ $atribut->nama_atribut }}
                         </option>

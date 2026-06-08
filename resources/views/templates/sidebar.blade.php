@@ -29,14 +29,6 @@
                             <span>Kelola Admin</span>
                         </a>
                     </li>
-                @else
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}"
-                            href="{{ route('admin.dashboard') }}">
-                            <i class="bi bi-house-door"></i>
-                            <span>Dashboard Admin</span>
-                        </a>
-                    </li>
                 @endif
 
             <li class="nav-item">

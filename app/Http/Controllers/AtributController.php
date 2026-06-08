@@ -14,9 +14,10 @@ class AtributController extends Controller
 {
     public function index()
     {
-        $atributs = AtributTambahan::with('aplikasi')->paginate(20);
-        $aplikasis = Aplikasi::all(); // full list needed for modal dropdown
-        return view('atribut.index', compact('atributs', 'aplikasis'));
+        $atributs = AtributTambahan::with('aplikasis')->paginate(20);
+        $atributOptions = AtributTambahan::orderBy('nama_atribut')->get(['id_atribut', 'nama_atribut']); // for filter dropdown
+        $aplikasis = Aplikasi::all(); // for modal dropdown
+        return view('atribut.index', compact('atributs', 'atributOptions', 'aplikasis'));
     }
 
     public function store(Request $request)
@@ -86,7 +87,7 @@ class AtributController extends Controller
 
     public function edit($id)
     {
-        $atribut = AtributTambahan::with('aplikasi')->findOrFail($id);
+        $atribut = AtributTambahan::with('aplikasis')->findOrFail($id);
         return response()->json($atribut);
     }
 
