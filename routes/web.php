@@ -21,8 +21,6 @@ Route::middleware(['guest', 'throttle:6,1'])->group(function () {
     Route::get('/', fn () => redirect()->route('login'));
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
 });
 
 // ─── Password Reset ───────────────────────────────────────────────────────────

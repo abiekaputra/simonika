@@ -70,28 +70,6 @@ class AuthController extends \Illuminate\Routing\Controller
         return redirect()->route('login')->with('success', 'You have been logged out.');
     }
 
-    public function showRegistrationForm()
-    {
-        return view('auth.register');
-    }
-
-    public function register(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:100',
-            'email' => 'required|string|email|max:100|unique:penggunas',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        Pengguna::create([
-            'nama' => $request->nama,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        return redirect()->route('login')->with('success', 'Registration successful. Please log in.');
-    }
-
     public function showForgotPasswordForm()
     {
         return view('auth.forgot-password');

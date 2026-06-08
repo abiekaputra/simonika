@@ -18,11 +18,6 @@ class Proyek extends Model
         return $this->hasMany(Linimasa::class);
     }
     
-    public function pegawai()
-    {
-        return $this->belongsToMany(Pegawai::class, 'pegawai_proyek');
-    }
-
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'kategori_id');
