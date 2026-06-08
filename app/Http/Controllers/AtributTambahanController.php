@@ -24,108 +24,103 @@ class AtributTambahanController extends Controller
     {
         try {
             DB::beginTransaction();
-    
+
             $validated = $request->validate([
                 'nama_atribut' => 'required|string|max:100|unique:atribut_tambahans',
                 'tipe_data' => 'required|in:varchar,number,date,text,enum',
                 'enum_options' => 'required_if:tipe_data,enum|array'
             ]);
-    
-            // Prepare enum_options
-            $enumOptions = null;
+
             $enumOptions = null;
             if ($validated['tipe_data'] === 'enum' && !empty($request->enum_options)) {
                 $enumOptions = array_filter($request->enum_options, function($value) {
                     return !empty(trim($value));
                 });
-                $enumOptions = array_values($enumOptions); // Re-index array
+                $enumOptions = array_values($enumOptions);
             }
-    
+
             $atribut = AtributTambahan::create([
                 'nama_atribut' => $validated['nama_atribut'],
                 'tipe_data' => $validated['tipe_data'],
                 'enum_options' => $enumOptions ? json_encode($enumOptions) : null
             ]);
-    
-            // Attach to all applications with default value
+
             $aplikasis = Aplikasi::all();
             foreach ($aplikasis as $aplikasi) {
                 $aplikasi->atributTambahans()->attach($atribut->id_atribut, [
                     'nilai_atribut' => $validated['nilai_default'] ?? null
                 ]);
             }
-    
+
             LogAktivitas::create([
                 'user_id' => Auth::id(),
-                'aktivitas' => 'Tambah Atribut',
+                'aktivitas' => 'Add Attribute',
                 'tipe_aktivitas' => 'create',
                 'modul' => 'Atribut',
                 'detail' => sprintf(
-                    "Admin %s menambahkan atribut baru '%s' ke %d aplikasi",
+                    "Admin %s added attribute '%s' to %d applications",
                     Auth::user()->nama,
                     $validated['nama_atribut'],
                     count($aplikasis)
                 )
             ]);
-    
+
             DB::commit();
             return response()->json([
                 'success' => true,
-                'message' => 'Atribut berhasil ditambahkan'
+                'message' => 'Attribute added successfully.'
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menambahkan atribut: ' . $e->getMessage()
+                'message' => 'Failed to add attribute: ' . $e->getMessage()
             ], 500);
         }
     }
-    
+
 
     public function update(Request $request, $id)
     {
         try {
             DB::beginTransaction();
-    
+
             $aplikasi = Aplikasi::findOrFail($id);
             $atributUpdates = $request->input('atribut', []);
             $successCount = 0;
             $errors = [];
-    
+
             foreach ($atributUpdates as $atributId => $nilai) {
                 try {
                     $atribut = AtributTambahan::findOrFail($atributId);
-                    
-                    // Update nilai atribut
+
                     $aplikasi->atributTambahans()->updateExistingPivot($atributId, [
                         'nilai_atribut' => $nilai
                     ]);
-    
-                    // Log perubahan
+
                     LogAktivitas::create([
                         'user_id' => Auth::id(),
-                        'aktivitas' => 'Update Nilai Atribut',
+                        'aktivitas' => 'Update Attribute Value',
                         'tipe_aktivitas' => 'update',
                         'modul' => 'Atribut',
                         'detail' => sprintf(
-                            "Mengubah nilai atribut '%s' pada aplikasi '%s'",
+                            "Updated attribute value '%s' for application '%s'",
                             $atribut->nama_atribut,
                             $aplikasi->nama
                         )
                     ]);
-    
+
                     $successCount++;
                 } catch (\Exception $e) {
-                    $errors[] = "Gagal mengupdate atribut {$atribut->nama_atribut}: " . $e->getMessage();
+                    $errors[] = "Failed to update attribute {$atribut->nama_atribut}: " . $e->getMessage();
                 }
             }
-    
+
             if ($successCount > 0) {
                 DB::commit();
                 return response()->json([
                     'success' => true,
-                    'message' => 'Berhasil mengupdate ' . $successCount . ' atribut'
+                    'message' => 'Successfully updated ' . $successCount . ' attributes.'
                 ]);
             } else {
                 DB::rollback();
@@ -139,7 +134,7 @@ class AtributTambahanController extends Controller
             Log::error('Error updating attributes: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat mengupdate atribut: ' . $e->getMessage()
+                'message' => 'An error occurred while updating attributes: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -153,14 +148,13 @@ class AtributTambahanController extends Controller
             $namaAtribut = $atribut->nama_atribut;
             $jumlahAplikasi = $atribut->aplikasis->count();
 
-            // Perbaikan format log
             LogAktivitas::create([
                 'user_id' => Auth::id(),
-                'aktivitas' => 'Hapus Atribut',
+                'aktivitas' => 'Delete Attribute',
                 'tipe_aktivitas' => 'delete',
                 'modul' => 'Atribut',
                 'detail' => sprintf(
-                    "Admin %s menghapus atribut '%s' dari %d aplikasi",
+                    "Admin %s deleted attribute '%s' from %d applications",
                     Auth::user()->nama,
                     $namaAtribut,
                     $jumlahAplikasi
@@ -170,10 +164,10 @@ class AtributTambahanController extends Controller
             $atribut->delete();
 
             DB::commit();
-            return redirect()->back()->with('success', 'Atribut berhasil dihapus');
+            return redirect()->back()->with('success', 'Attribute deleted successfully.');
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'Gagal menghapus atribut');
+            return redirect()->back()->with('error', 'Failed to delete attribute.');
         }
     }
 
@@ -191,7 +185,7 @@ class AtributTambahanController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal memuat detail atribut'
+                'message' => 'Failed to load attribute detail.'
             ], 500);
         }
     }
@@ -204,7 +198,6 @@ class AtributTambahanController extends Controller
             $atribut = AtributTambahan::findOrFail($id);
             $aplikasi = Aplikasi::findOrFail($request->id_aplikasi);
 
-            // Validasi berdasarkan tipe data
             $rules = $this->getValidationRules($atribut->tipe_data);
             $validator = Validator::make(
                 ['nilai_atribut' => $request->nilai_atribut],
@@ -214,7 +207,7 @@ class AtributTambahanController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Nilai tidak sesuai dengan tipe data ' . $this->getTypeLabel($atribut->tipe_data)
+                    'message' => 'Value does not match data type ' . $this->getTypeLabel($atribut->tipe_data)
                 ], 422);
             }
 
@@ -224,13 +217,12 @@ class AtributTambahanController extends Controller
                 'nilai_atribut' => $request->nilai_atribut
             ]);
 
-            // Log aktivitas
             LogAktivitas::create([
                 'user_id' => Auth::id(),
-                'aktivitas' => 'Update Nilai Atribut',
+                'aktivitas' => 'Update Attribute Value',
                 'tipe_aktivitas' => 'update',
                 'modul' => 'Atribut',
-                'detail' => "Mengubah nilai atribut '{$atribut->nama_atribut}' pada aplikasi '{$aplikasi->nama}' dari '{$oldValue}' menjadi '{$request->nilai_atribut}'"
+                'detail' => "Updated attribute '{$atribut->nama_atribut}' for application '{$aplikasi->nama}' from '{$oldValue}' to '{$request->nilai_atribut}'"
             ]);
 
             DB::commit();
@@ -239,26 +231,22 @@ class AtributTambahanController extends Controller
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengupdate nilai atribut'
+                'message' => 'Failed to update attribute value.'
             ], 500);
         }
     }
 
-    /**
-     * Update nilai atribut untuk aplikasi tertentu
-     */
     public function updateAtributValues(Request $request, $id)
     {
         try {
             DB::beginTransaction();
-    
+
             $aplikasi = Aplikasi::findOrFail($id);
             $atributUpdates = $request->input('atribut', []);
-    
+
             foreach ($atributUpdates as $atributId => $nilai) {
                 $atribut = AtributTambahan::findOrFail($atributId);
-                
-                // Validasi nilai berdasarkan tipe data
+
                 $rules = $this->getValidationRules($atribut->tipe_data, $atribut->enum_options);
                 $validator = Validator::make(
                     ['nilai' => $nilai],
@@ -266,52 +254,47 @@ class AtributTambahanController extends Controller
                 );
 
                 if ($validator->fails()) {
-                    throw new \Exception("Nilai tidak valid untuk atribut {$atribut->nama_atribut}");
+                    throw new \Exception("Invalid value for attribute {$atribut->nama_atribut}");
                 }
 
-                // Update nilai atribut
                 $aplikasi->atributTambahans()->updateExistingPivot($atributId, [
                     'nilai_atribut' => $nilai
                 ]);
 
-                // Log perubahan
                 LogAktivitas::create([
                     'user_id' => Auth::id(),
-                    'aktivitas' => 'Update Nilai Atribut',
+                    'aktivitas' => 'Update Attribute Value',
                     'tipe_aktivitas' => 'update',
                     'modul' => 'Atribut',
                     'detail' => sprintf(
-                        "Mengubah nilai atribut '%s' pada aplikasi '%s'",
+                        "Updated attribute value '%s' for application '%s'",
                         $atribut->nama_atribut,
                         $aplikasi->nama
                     )
                 ]);
             }
-    
+
             DB::commit();
             return response()->json([
                 'success' => true,
-                'message' => 'Atribut berhasil diperbarui'
+                'message' => 'Attributes updated successfully.'
             ]);
-            
+
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error updating attribute values: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'An error occurred: ' . $e->getMessage()
             ], 500);
         }
     }
 
-    /**
-     * Helper method untuk mendapatkan aturan validasi berdasarkan tipe data
-     */
     private function getValidationRules($tipeData, $enumOptions = null)
     {
         $rules = 'nullable|';
-        
+
         switch ($tipeData) {
             case 'number':
                 $rules .= 'numeric';
@@ -328,10 +311,10 @@ class AtributTambahanController extends Controller
                     $rules .= 'in:' . implode(',', $options);
                 }
                 break;
-            default: // varchar
+            default:
                 $rules .= 'string|max:255';
         }
-        
+
         return $rules;
     }
 
@@ -339,17 +322,17 @@ class AtributTambahanController extends Controller
     {
         switch ($tipeData) {
             case 'number':
-                return 'Angka';
+                return 'Number';
             case 'date':
-                return 'Tanggal';
+                return 'Date';
             case 'varchar':
-                return 'Teks (max 255 karakter)';
+                return 'Text (max 255 chars)';
             case 'text':
-                return 'Teks Panjang';
-                case 'enum':
-                    return 'Pilihan (Enum)';
-                default:
-                    return 'Teks';
-            }
+                return 'Long Text';
+            case 'enum':
+                return 'Options (Enum)';
+            default:
+                return 'Text';
+        }
     }
 }
