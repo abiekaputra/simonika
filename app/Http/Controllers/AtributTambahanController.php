@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class AtributTambahanController extends Controller
 {
+    // No route points to this method — atribut listing is handled by AtributController::index()
     public function index()
     {
-        $atributs = AtributTambahan::with('aplikasis')->get();
-        $aplikasis = Aplikasi::all();
+        $atributs = AtributTambahan::with('aplikasis')->paginate(20);
+        $aplikasis = Aplikasi::all(); // full list needed for modal dropdown
         return view('atribut.index', compact('atributs', 'aplikasis'));
     }
 

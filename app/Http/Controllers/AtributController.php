@@ -14,8 +14,8 @@ class AtributController extends Controller
 {
     public function index()
     {
-        $atributs = AtributTambahan::with('aplikasi')->get();
-        $aplikasis = Aplikasi::all();
+        $atributs = AtributTambahan::with('aplikasi')->paginate(20);
+        $aplikasis = Aplikasi::all(); // full list needed for modal dropdown
         return view('atribut.index', compact('atributs', 'aplikasis'));
     }
 
@@ -242,7 +242,7 @@ class AtributController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Atribut berhasil dihapus from application'
+                'message' => 'Attribute removed from application successfully.'
             ]);
         } catch (\Exception $e) {
             return response()->json([

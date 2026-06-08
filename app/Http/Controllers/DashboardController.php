@@ -14,7 +14,7 @@ class DashboardController extends Controller
         $user = Auth::user();
         $jumlahAplikasiAktif = Aplikasi::where('status_pemakaian', 'Aktif')->count();
         $jumlahAplikasiTidakDigunakan = Aplikasi::where('status_pemakaian', '!=', 'Aktif')->count();
-        $aplikasis = Aplikasi::all();
+        $aplikasis = Aplikasi::latest('updated_at')->limit(200)->get(); // safety cap for dashboard table
         $lastUpdate = $this->getLastUpdateTime();
 
         return view('index', compact(
