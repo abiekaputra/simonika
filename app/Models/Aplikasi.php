@@ -33,27 +33,12 @@ class Aplikasi extends Model
                     ->withTimestamps();
     }
 
-    // Method untuk mendapatkan nilai atribut
     public function getNilaiAtribut($id_atribut)
     {
         $atribut = $this->atributTambahans()
             ->where('atribut_tambahans.id_atribut', $id_atribut)
             ->first();
-            
-        return $atribut ? $atribut->pivot->nilai_atribut : null;
-    }
 
-    // Method untuk menambah atribut ke semua aplikasi
-    public static function addGlobalAttribute($namaAtribut)
-    {
-        $aplikasis = self::all();
-        
-        foreach ($aplikasis as $aplikasi) {
-            AtributTambahan::create([
-                'id_aplikasi' => $aplikasi->id_aplikasi,
-                'nama_atribut' => $namaAtribut,
-                'nilai_atribut' => null
-            ]);
-        }
+        return $atribut ? $atribut->pivot->nilai_atribut : null;
     }
 }

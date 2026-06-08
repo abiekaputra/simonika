@@ -9,7 +9,16 @@ class Linimasa extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['pegawai_id', 'proyek_id', 'status_proyek', 'mulai', 'tenggat', 'deskripsi'];
+    protected $fillable = [
+        'pegawai_id',
+        'proyek_id',
+        'status_proyek',
+        'mulai',
+        'tenggat',
+        'tanggal_selesai',
+        'deskripsi',
+        'status_manual',
+    ];
 
     public function pegawai()
     {
@@ -20,9 +29,4 @@ class Linimasa extends Model
     {
         return $this->belongsTo(Proyek::class);
     }
-    public function kategori()
-{
-    return $this->belongsTo(Kategori::class, 'kategori_id');
-}
-
 }
