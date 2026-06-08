@@ -13,11 +13,12 @@ class LinimasaController extends Controller
 {
     public function index()
     {
-        $pegawai = Pegawai::all();
-        $proyek = Proyek::with('kategori')->get();
-        $linimasa = Linimasa::with(['pegawai', 'proyek'])->get();
+        $pegawai = Pegawai::all(); // full list needed for create/edit dropdown
+        $proyek = Proyek::with('kategori')->get(); // full list needed for create/edit dropdown
+        $linimasa = Linimasa::with(['pegawai', 'proyek'])->paginate(20);
+        $linimasaAll = Linimasa::with(['pegawai', 'proyek'])->get(); // needed for vis.js chart
 
-        return view('linimasa.index', compact('pegawai', 'proyek', 'linimasa'));
+        return view('linimasa.index', compact('pegawai', 'proyek', 'linimasa', 'linimasaAll'));
     }
 
     public function edit($id)

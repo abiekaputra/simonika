@@ -9,8 +9,8 @@ class KategoriController extends Controller
 {
     public function index()
     {
-        $kategori = Kategori::all();
-        return view('kategori.index', compact('kategori'));
+        // Categories are managed via modal on the projects page
+        return redirect()->route('proyek.index');
     }
 
     public function store(Request $request)

@@ -9,7 +9,7 @@ class PendataanController extends Controller
 {
     public function index()
     {
-        $pendataans = Pendataan::all();
+        $pendataans = Pendataan::paginate(20);
         return view('pendataan.index', compact('pendataans'));
     }
 

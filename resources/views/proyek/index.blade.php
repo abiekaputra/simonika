@@ -96,6 +96,9 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">
+                    {{ $proyek->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         @endif
     </div>

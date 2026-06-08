@@ -129,6 +129,9 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">
+                    {{ $pendataans->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         @endif
     </div>
