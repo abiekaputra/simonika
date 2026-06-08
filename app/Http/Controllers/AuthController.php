@@ -17,7 +17,6 @@ class AuthController extends \Illuminate\Routing\Controller
 {
     public function __construct()
     {
-        // Terapkan middleware guest untuk method tertentu
         $this->middleware('guest')->except('logout');
     }
 
@@ -36,21 +35,16 @@ class AuthController extends \Illuminate\Routing\Controller
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
 
-            // Catat aktivitas login
             LogAktivitas::create([
                 'user_id' => Auth::id(),
                 'aktivitas' => 'Login',
                 'tipe_aktivitas' => 'login',
                 'modul' => 'Auth',
-                'detail' => 'User login ke sistem'
+                'detail' => 'User logged in.'
             ]);
 
-            // Update last_activity
-            Auth::user()->update([
-                'last_activity' => now()
-            ]);
+            Auth::user()->update(['last_activity' => now()]);
 
-            // Ubah redirect untuk super admin ke dashboard super admin
             if (Auth::user()->isSuperAdmin()) {
                 return redirect()->route('super-admin.dashboard');
             }
@@ -58,32 +52,26 @@ class AuthController extends \Illuminate\Routing\Controller
         }
 
         return back()->withErrors([
-            'email' => 'Email atau password salah.',
+            'email' => 'Invalid email or password.',
         ])->withInput($request->only('email'));
     }
 
     public function logout(Request $request)
     {
-        // Catat aktivitas logout
         LogAktivitas::create([
             'user_id' => Auth::id(),
             'aktivitas' => 'Logout',
             'tipe_aktivitas' => 'logout',
             'modul' => 'Auth',
-            'detail' => 'User logout dari sistem'
+            'detail' => 'User logged out.'
         ]);
 
-        // Set last_activity ke null saat logout
-        Auth::user()->update([
-            'last_activity' => null
-        ]);
-
+        Auth::user()->update(['last_activity' => null]);
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')
-            ->with('success', 'Berhasil logout dari sistem');
+        return redirect()->route('login')->with('success', 'You have been logged out.');
     }
 
     public function showRegistrationForm()
@@ -99,15 +87,13 @@ class AuthController extends \Illuminate\Routing\Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = Pengguna::create([
+        Pengguna::create([
             'nama' => $request->nama,
             'email' => $request->email,
             'password' => $request->password,
         ]);
 
-        // Redirect ke halaman login dengan pesan sukses
-        return redirect()->route('login')
-            ->with('success', 'Registrasi berhasil! Silakan login dengan akun Anda.');
+        return redirect()->route('login')->with('success', 'Registration successful. Please log in.');
     }
 
     public function showForgotPasswordForm()
@@ -120,30 +106,24 @@ class AuthController extends \Illuminate\Routing\Controller
         $request->validate([
             'email' => 'required|email|exists:penggunas,email',
         ], [
-            'email.required' => 'Email wajib diisi',
-            'email.email' => 'Format email tidak valid',
-            'email.exists' => 'Email tidak terdaftar dalam sistem'
+            'email.required' => 'Email is required.',
+            'email.email' => 'Invalid email format.',
+            'email.exists' => 'Email is not registered.',
         ]);
 
         $token = Str::random(64);
 
-        // Simpan token ke database
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $request->email],
-            [
-                'email' => $request->email,
-                'token' => $token,
-                'created_at' => Carbon::now()
-            ]
+            ['email' => $request->email, 'token' => $token, 'created_at' => Carbon::now()]
         );
 
-        // Kirim email
         Mail::send('emails.reset-password', ['token' => $token], function ($message) use ($request) {
             $message->to($request->email);
             $message->subject('SiMonika — Password Reset');
         });
 
-        return back()->with('success', 'Link reset password telah dikirim ke email Anda. Silakan cek inbox email Anda.');
+        return back()->with('success', 'Password reset link has been sent to your email.');
     }
 
     public function showResetPasswordForm($token)
@@ -158,49 +138,41 @@ class AuthController extends \Illuminate\Routing\Controller
             'email' => 'required|email|exists:penggunas',
             'password' => 'required|confirmed|min:8',
         ], [
-            'email.required' => 'Email wajib diisi',
-            'email.email' => 'Format email tidak valid',
-            'email.exists' => 'Email tidak terdaftar',
-            'password.required' => 'Password baru wajib diisi',
-            'password.confirmed' => 'Konfirmasi password tidak cocok',
-            'password.min' => 'Password minimal 8 karakter'
+            'email.required' => 'Email is required.',
+            'email.email' => 'Invalid email format.',
+            'email.exists' => 'Email is not registered.',
+            'password.required' => 'New password is required.',
+            'password.confirmed' => 'Password confirmation does not match.',
+            'password.min' => 'Password must be at least 8 characters.',
         ]);
 
-        // Cek token valid
         $resetToken = DB::table('password_reset_tokens')
             ->where('email', $request->email)
             ->where('token', $request->token)
             ->first();
 
         if (!$resetToken) {
-            return back()->withErrors(['email' => 'Token reset password tidak valid.']);
+            return back()->withErrors(['email' => 'Invalid password reset token.']);
         }
 
-        // Cek token tidak expired (60 menit)
         if (Carbon::parse($resetToken->created_at)->addMinutes(60)->isPast()) {
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-            return back()->withErrors(['email' => 'Token reset password sudah kadaluarsa.']);
+            return back()->withErrors(['email' => 'Password reset token has expired.']);
         }
 
-        // Update password
         $user = Pengguna::where('email', $request->email)->first();
-        $user->update([
-            'password' => bcrypt($request->password)
-        ]);
+        $user->update(['password' => bcrypt($request->password)]);
 
-        // Hapus token yang sudah digunakan
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
-        // Catat di log aktivitas
         LogAktivitas::create([
             'user_id' => $user->id_user,
             'aktivitas' => 'Reset Password',
             'tipe_aktivitas' => 'update',
             'modul' => 'auth',
-            'detail' => 'User melakukan reset password'
+            'detail' => 'User reset their password.'
         ]);
 
-        return redirect()->route('login')
-            ->with('success', 'Password berhasil direset. Silakan login dengan password baru Anda.');
+        return redirect()->route('login')->with('success', 'Password reset successfully. Please log in with your new password.');
     }
 }
