@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Pengguna;
 use Illuminate\Validation\Rules\Password;
 use App\Models\LogAktivitas;
@@ -15,11 +16,6 @@ use Carbon\Carbon;
 
 class AuthController extends \Illuminate\Routing\Controller
 {
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
-    }
-
     public function showLoginForm()
     {
         return view('auth.login');
@@ -90,7 +86,7 @@ class AuthController extends \Illuminate\Routing\Controller
         Pengguna::create([
             'nama' => $request->nama,
             'email' => $request->email,
-            'password' => $request->password,
+            'password' => Hash::make($request->password),
         ]);
 
         return redirect()->route('login')->with('success', 'Registration successful. Please log in.');
@@ -161,7 +157,7 @@ class AuthController extends \Illuminate\Routing\Controller
         }
 
         $user = Pengguna::where('email', $request->email)->first();
-        $user->update(['password' => bcrypt($request->password)]);
+        $user->update(['password' => Hash::make($request->password)]);
 
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
