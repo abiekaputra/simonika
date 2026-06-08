@@ -7,14 +7,12 @@ use App\Models\Kategori;
 
 class KategoriController extends Controller
 {
-    // Menampilkan daftar kategori
     public function index()
     {
         $kategori = Kategori::all();
         return view('kategori.index', compact('kategori'));
     }
 
-    // Menyimpan kategori baru
     public function store(Request $request)
     {
         $request->validate([
@@ -25,15 +23,14 @@ class KategoriController extends Controller
             'nama_kategori' => $request->nama_kategori,
         ]);
 
-        return redirect()->back()->with('success', 'Kategori berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Category added successfully.');
     }
 
-    // Menghapus kategori
     public function destroy($id)
     {
         $kategori = Kategori::findOrFail($id);
         $kategori->delete();
 
-        return redirect()->back()->with('success', 'Kategori berhasil dihapus!');
+        return redirect()->back()->with('success', 'Category deleted successfully.');
     }
 }
