@@ -51,7 +51,7 @@ class LinimasaController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect()->route('linimasa.index')->with('success', 'Linimasa berhasil ditambahkan.');
+        return redirect()->route('linimasa.index')->with('success', 'Timeline entry added successfully.');
     }
 
     public function update(Request $request, $id)
@@ -68,7 +68,7 @@ class LinimasaController extends Controller
         $linimasa = Linimasa::find($id);
 
         if (!$linimasa) {
-            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan!'], 404);
+            return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
         }
 
         $linimasa->update([
@@ -80,7 +80,7 @@ class LinimasaController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Data berhasil diperbarui!']);
+        return response()->json(['success' => true, 'message' => 'Timeline entry updated successfully.']);
     }
 
     public function destroy($id)
@@ -88,6 +88,6 @@ class LinimasaController extends Controller
         $linimasa = Linimasa::findOrFail($id);
         $linimasa->delete();
 
-        return response()->json(['success' => true, 'message' => 'Data Linimasa berhasil dihapus.']);
+        return response()->json(['success' => true, 'message' => 'Timeline entry deleted successfully.']);
     }
 }
