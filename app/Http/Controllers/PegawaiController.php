@@ -7,20 +7,20 @@ use App\Models\Pegawai;
 
 class PegawaiController extends Controller
 {
-    // Menampilkan daftar pegawai
+    
     public function index()
     {
         $pegawai = Pegawai::all();
         return view('pegawai.index', compact('pegawai'));
     }
 
-    // Menampilkan form tambah pegawai
+    
     public function create()
     {
         return view('pegawai.create');
     }
 
-    // Menyimpan pegawai baru
+    
     public function store(Request $request)
     {
         try {
@@ -32,20 +32,20 @@ class PegawaiController extends Controller
 
             Pegawai::create($request->all());
 
-            return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil ditambahkan.');
+            return redirect()->route('pegawai.index')->with('success', 'Employee added successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()->withErrors($e->errors());
         }
     }
 
-    // Menampilkan form edit pegawai
+    
     public function edit($id)
     {
         $pegawai = Pegawai::findOrFail($id);
         return view('pegawai.edit', compact('pegawai'));
     }
 
-    // Menyimpan perubahan pegawai
+    
     public function update(Request $request, $id)
     {
         try {
@@ -58,18 +58,18 @@ class PegawaiController extends Controller
             $pegawai = Pegawai::findOrFail($id);
             $pegawai->update($request->all());
 
-            return redirect()->route('pegawai.index')->with('success', 'Data pegawai berhasil diperbarui.');
+            return redirect()->route('pegawai.index')->with('success', 'Employee updated successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()->withErrors($e->errors());
         }
     }
 
-    // Menghapus pegawai
+    
     public function destroy($id)
     {
         $pegawai = Pegawai::findOrFail($id);
         $pegawai->delete();
 
-        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil dihapus.');
+        return redirect()->route('pegawai.index')->with('success', 'Employee deleted successfully.');
     }
 }
