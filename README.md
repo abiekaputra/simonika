@@ -1,4 +1,4 @@
-# siMonika v3 — Government Application Monitoring System
+# SiMonika — Application Monitoring System
 
 A Laravel-based web application for monitoring and tracking government agency (OPD) applications, covering employee management, project tracking, activity timelines, and intern data collection.
 
@@ -41,8 +41,8 @@ A Laravel-based web application for monitoring and tracking government agency (O
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/abiekaputra/siMonikaVer3.git
-cd siMonikaVer3
+git clone https://github.com/abiekaputra/simonika.git
+cd simonika
 
 # 2. Install PHP dependencies
 composer install
