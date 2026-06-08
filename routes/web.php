@@ -54,8 +54,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/atribut', [AplikasiController::class, 'getAtribut']);
         Route::put('/{id}/atribut', [AplikasiController::class, 'updateAtribut'])->name('aplikasi.updateAtribut');
         Route::post('/{id}/atribut', [AtributTambahanController::class, 'updateAtributValues'])->name('aplikasi.atribut.update');
-        Route::get('/{id}/atribut-tambahan', [AplikasiController::class, 'getAtributTambahan'])->name('aplikasi.atribut-tambahan');
-        Route::put('/{id}/atribut-tambahan', [AplikasiController::class, 'updateAtributTambahan'])->name('aplikasi.update-atribut-tambahan');
     });
 
     // Atribut

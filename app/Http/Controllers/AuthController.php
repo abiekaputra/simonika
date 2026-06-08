@@ -84,7 +84,7 @@ class AuthController extends \Illuminate\Routing\Controller
         $request->validate([
             'nama' => 'required|string|max:100',
             'email' => 'required|string|email|max:100|unique:penggunas',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         Pengguna::create([
