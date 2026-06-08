@@ -209,11 +209,20 @@ class AplikasiController extends Controller
             DB::beginTransaction();
 
             $aplikasi = Aplikasi::findOrFail($id);
+            $namaAplikasi = $aplikasi->nama;
 
             $aplikasi->atributTambahans()->detach();
             $aplikasi->delete();
 
             DB::commit();
+
+            LogAktivitas::create([
+                'user_id' => Auth::id(),
+                'aktivitas' => 'Delete Application',
+                'tipe_aktivitas' => 'delete',
+                'modul' => 'Aplikasi',
+                'detail' => "Deleted application '{$namaAplikasi}'"
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -259,18 +268,8 @@ class AplikasiController extends Controller
     public function export()
     {
         try {
-            Log::info('Starting export process');
-
-            $count = Aplikasi::count();
-            Log::info("Found {$count} records to export");
-
-            $export = new AplikasiExport();
-            Log::info('AplikasiExport instance created');
-
-            return Excel::download($export, 'aplikasi.xlsx');
+            return Excel::download(new AplikasiExport(), 'aplikasi.xlsx');
         } catch (\Exception $e) {
-            Log::error('Export error details: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', 'An error occurred while exporting data: ' . $e->getMessage());
         }
     }
@@ -326,17 +325,21 @@ class AplikasiController extends Controller
     public function updateByNama(Request $request, $nama)
     {
         try {
+            $request->validate([
+                'status_pemakaian' => 'required|in:Aktif,Tidak Aktif',
+            ]);
+
             $aplikasi = Aplikasi::where('nama', $nama)->firstOrFail();
             $oldStatus = $aplikasi->status_pemakaian;
 
-            $aplikasi->update($request->all());
+            $aplikasi->update($request->only('status_pemakaian'));
 
             LogAktivitas::create([
-                'user_id' => Auth::user()->id_user,
+                'user_id' => Auth::id(),
                 'aktivitas' => 'Update Application',
                 'tipe_aktivitas' => 'update',
-                'modul' => 'aplikasi',
-                'detail' => "Updated application status '{$nama}' from '{$oldStatus}' to '{$request->status_pemakaian}'"
+                'modul' => 'Aplikasi',
+                'detail' => "Updated status of '{$nama}' from '{$oldStatus}' to '{$request->status_pemakaian}'"
             ]);
 
             return redirect()->route('aplikasi.index')

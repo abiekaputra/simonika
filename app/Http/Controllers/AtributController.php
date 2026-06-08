@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class AtributController extends Controller
 {
@@ -24,9 +23,6 @@ class AtributController extends Controller
     {
         DB::beginTransaction();
         try {
-            
-            Log::info('Request data:', $request->all());
-
             $validated = $request->validate([
                 'id_aplikasi' => 'required|exists:aplikasis,id_aplikasi',
                 'nama_atribut' => [
@@ -76,9 +72,6 @@ class AtributController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error di AtributController@store: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -101,11 +94,8 @@ class AtributController extends Controller
     {
         DB::beginTransaction();
         try {
-            Log::info('Request data:', $request->all());
-            
             $atribut = AtributTambahan::findOrFail($id);
-            
-            
+
             $validated = $request->validate([
                 'id_aplikasi' => 'required|exists:aplikasis,id_aplikasi',
                 'nama_atribut' => [
@@ -143,8 +133,6 @@ class AtributController extends Controller
             return redirect()->back()->with('success', 'Attribute updated successfully.');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error di AtributController@update: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
             return redirect()->back()
                 ->with('error', 'Failed to update attribute: ' . $e->getMessage());
         }
@@ -239,7 +227,6 @@ class AtributController extends Controller
                 'message' => 'Attribute value updated successfully.'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating atribut nilai: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update attribute value: ' . $e->getMessage()
