@@ -24,6 +24,6 @@ class EmailUpdateNotification extends Mailable
     public function build()
     {
         return $this->markdown('emails.email-update')
-            ->subject('Perubahan Email Admin SiMonika');
+            ->subject('SiMonika — Email Change Notification');
     }
 }

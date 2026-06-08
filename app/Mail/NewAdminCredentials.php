@@ -23,7 +23,7 @@ class NewAdminCredentials extends Mailable
 
     public function build()
     {
-        return $this->subject('Kredensial Akun Admin SiMonika')
+        return $this->subject('SiMonika — Admin Credentials')
                     ->view('emails.new-admin-credentials');
     }
 }
