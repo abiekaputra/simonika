@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Aplikasi;
 use App\Models\AtributTambahan;
 use App\Models\LogAktivitas;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +47,7 @@ class AtributTambahanController extends Controller
             $aplikasis = Aplikasi::all();
             foreach ($aplikasis as $aplikasi) {
                 $aplikasi->atributTambahans()->attach($atribut->id_atribut, [
-                    'nilai_atribut' => $validated['nilai_default'] ?? null
+                    'nilai_atribut' => $request->input('nilai_default') ?? null
                 ]);
             }
 
@@ -131,7 +130,6 @@ class AtributTambahanController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error updating attributes: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while updating attributes: ' . $e->getMessage()
@@ -282,8 +280,6 @@ class AtributTambahanController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error updating attribute values: ' . $e->getMessage());
-
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred: ' . $e->getMessage()

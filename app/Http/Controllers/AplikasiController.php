@@ -8,10 +8,8 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\AplikasiExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
 use App\Models\AtributTambahan;
-use App\Traits\CatatAktivitas;
 use App\Models\LogAktivitas;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -19,8 +17,6 @@ use Illuminate\Validation\ValidationException;
 
 class AplikasiController extends Controller
 {
-    use CatatAktivitas;
-
     public function __construct()
     {
         $this->middleware('auth');

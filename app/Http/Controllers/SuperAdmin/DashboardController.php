@@ -11,12 +11,7 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function __construct()
-    {
-        if (!Auth::check() || Auth::user()->role !== 'super_admin') {
-            abort(403, 'Unauthorized action.');
-        }
-    }
+    // Access controlled by CheckRole:super_admin middleware on route group
 
     public function index()
     {
