@@ -19,14 +19,14 @@ class LogAktivitasController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Set header
-        $sheet->setCellValue('A1', 'Waktu');
+        
+        $sheet->setCellValue('A1', 'Timestamp');
         $sheet->setCellValue('B1', 'Admin');
-        $sheet->setCellValue('C1', 'Aktivitas');
-        $sheet->setCellValue('D1', 'Modul');
+        $sheet->setCellValue('C1', 'Activity');
+        $sheet->setCellValue('D1', 'Module');
         $sheet->setCellValue('E1', 'Detail');
 
-        // Populate data
+        
         $row = 2;
         foreach ($logs as $log) {
             $sheet->setCellValue('A' . $row, $log->created_at->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB');
@@ -37,13 +37,13 @@ class LogAktivitasController extends Controller
             $row++;
         }
 
-        // Auto size columns
+        
         foreach (range('A', 'E') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
         $writer = new Xlsx($spreadsheet);
-        $filename = 'log_aktivitas_' . date('Y-m-d_His') . '.xlsx';
+        $filename = 'activity_log_' . date('Y-m-d_His') . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
