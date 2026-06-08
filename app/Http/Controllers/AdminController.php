@@ -20,7 +20,7 @@ class AdminController extends Controller
 
     public function index()
     {
-        $admins = Pengguna::where('role', 'admin')->get();
+        $admins = Pengguna::where('role', 'admin')->paginate(20);
         return view('admin.index', compact('admins'));
     }
 
@@ -126,6 +126,11 @@ class AdminController extends Controller
     public function destroy($id)
     {
         $admin = Pengguna::findOrFail($id);
+
+        if ($admin->role === 'super_admin') {
+            return redirect()->back()->with('error', 'Super admin account cannot be deleted.');
+        }
+
         $admin->delete();
         return redirect()->route('admin.index')->with('success', 'Admin deleted successfully.');
     }

@@ -123,8 +123,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
     });
 
-    // Admin
-    Route::prefix('admin')->group(function () {
+    // Admin — super_admin only
+    Route::prefix('admin')->middleware(\App\Http\Middleware\CheckRole::class . ':super_admin')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::get('/', [AdminController::class, 'index'])->name('admin.index');
         Route::get('/create', [AdminController::class, 'create'])->name('admin.create');
