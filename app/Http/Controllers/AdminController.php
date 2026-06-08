@@ -87,7 +87,6 @@ class AdminController extends Controller
 
             
             if ($validated['email'] !== $oldEmail) {
-                 notifikasi ke alamat baru
                 Mail::to($validated['email'])->send(new EmailUpdateNotification(
                     $validated['nama'],
                     $validated['email'],

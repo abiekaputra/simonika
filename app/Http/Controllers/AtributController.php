@@ -101,7 +101,6 @@ class AtributController extends Controller
     {
         DB::beginTransaction();
         try {
-             untuk debugging
             Log::info('Request data:', $request->all());
             
             $atribut = AtributTambahan::findOrFail($id);
