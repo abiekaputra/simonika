@@ -117,6 +117,9 @@
                     @endforelse
                 </tbody>
             </table>
+            <div class="mt-3">
+                {{ $atributs->links('pagination::bootstrap-5') }}
+            </div>
         </div>
 
         <!-- Search untuk tabel aplikasi -->

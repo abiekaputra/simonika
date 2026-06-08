@@ -24,8 +24,11 @@ class AplikasiController extends Controller
 
     public function index()
     {
+        // ::all() is intentional — the view uses client-side JS filtering with
+        // ->pluck()->unique() for filter dropdowns and data-* attributes on each row.
+        // Server-side pagination would break the existing JS filter. Refactor in UI week.
         $aplikasis = Aplikasi::all();
-        $atributs = AtributTambahan::all();
+        $atributs = AtributTambahan::all(); // for create/edit modal dropdowns
         return view('aplikasi.index', compact('aplikasis', 'atributs'));
     }
 
