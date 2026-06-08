@@ -140,7 +140,7 @@ class AuthController extends \Illuminate\Routing\Controller
         // Kirim email
         Mail::send('emails.reset-password', ['token' => $token], function ($message) use ($request) {
             $message->to($request->email);
-            $message->subject('Reset Password - SiMonika');
+            $message->subject('SiMonika — Password Reset');
         });
 
         return back()->with('success', 'Link reset password telah dikirim ke email Anda. Silakan cek inbox email Anda.');
