@@ -26,24 +26,24 @@ class ForgotPasswordController extends Controller
 
         if (!$user) {
             return response()->json([
-                'message' => 'Email tidak terdaftar'
+                'message' => 'Email not registered.'
             ], 404);
         }
 
-        // Generate OTP
+        
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         
-        // Simpan OTP ke session
+        
         session([
             'reset_email' => $request->email,
             'reset_otp' => $otp,
             'reset_otp_expires' => now()->addMinutes(5)
         ]);
 
-        // Kirim email OTP
+        
         Mail::to($user->email)->send(new OtpMail($user->nama, $otp));
 
-        return response()->json(['message' => 'OTP berhasil dikirim']);
+        return response()->json(['message' => 'OTP sent successfully.']);
     }
 
     public function verifyOTP(Request $request)
@@ -56,17 +56,17 @@ class ForgotPasswordController extends Controller
             !session('reset_otp_expires') || 
             now()->isAfter(session('reset_otp_expires'))) {
             return response()->json([
-                'message' => 'OTP telah kadaluarsa'
+                'message' => 'OTP has expired.'
             ], 400);
         }
 
         if ($request->otp !== session('reset_otp')) {
             return response()->json([
-                'message' => 'Kode OTP tidak valid'
+                'message' => 'Invalid OTP code.'
             ], 400);
         }
 
-        return response()->json(['message' => 'OTP valid']);
+        return response()->json(['message' => 'OTP verified.']);
     }
 
     public function resetPassword(Request $request)
@@ -77,7 +77,7 @@ class ForgotPasswordController extends Controller
 
         if (!session('reset_email')) {
             return response()->json([
-                'message' => 'Sesi telah berakhir'
+                'message' => 'Session has expired.'
             ], 400);
         }
 
@@ -85,9 +85,9 @@ class ForgotPasswordController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
 
-        // Clear session
+        
         session()->forget(['reset_email', 'reset_otp', 'reset_otp_expires']);
 
-        return response()->json(['message' => 'Password berhasil direset']);
+        return response()->json(['message' => 'Password reset successfully.']);
     }
 }
