@@ -9,6 +9,11 @@ use App\Models\Pengguna;
 
 class ProfileController extends Controller
 {
+    public function index()
+    {
+        return view('profile.index');
+    }
+
     public function edit()
     {
         return view('profile.edit');
@@ -20,7 +25,7 @@ class ProfileController extends Controller
             'nama' => 'required|string|max:255',
         ]);
 
-        $user = Pengguna::find(Auth::id());
+        $user = Pengguna::findOrFail(Auth::id());
         $user->nama = $request->nama;
         $user->save();
 
@@ -30,18 +35,19 @@ class ProfileController extends Controller
     public function updatePassword(Request $request)
     {
         $request->validate([
+            'current_password' => 'required',
             'password' => 'required|min:8|confirmed',
         ]);
 
-        $user = Pengguna::find(Auth::id());
+        $user = Pengguna::findOrFail(Auth::id());
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
+        }
+
         $user->password = Hash::make($request->password);
         $user->save();
 
         return redirect()->back()->with('success', 'Password updated successfully.');
-    }
-
-    public function index()
-    {
-        return view('profile.index');
     }
 }

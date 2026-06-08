@@ -4,27 +4,24 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Proyek;
-use App\Models\Kategori; 
+use App\Models\Kategori;
 
 class ProyekController extends Controller
 {
-    
     public function index()
     {
-        $proyek = Proyek::all();  
+        $proyek = Proyek::with('kategori')->get();
         $kategori = Kategori::all();
 
         return view('proyek.index', compact('proyek', 'kategori'));
     }
 
-    
     public function create()
     {
         $kategori = Kategori::all();
         return view('proyek.create', compact('kategori'));
     }
 
-    
     public function store(Request $request)
     {
         $request->validate([
@@ -42,17 +39,14 @@ class ProyekController extends Controller
         return redirect()->route('proyek.index')->with('success', 'Project added successfully.');
     }
 
-    
     public function edit($id)
     {
-        $proyek = Proyek::find($id);
-
+        $proyek = Proyek::findOrFail($id);
         $kategori = Kategori::all();
 
         return view('proyek.edit', compact('proyek', 'kategori'));
     }
 
-    
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -71,7 +65,6 @@ class ProyekController extends Controller
         return redirect()->route('proyek.index')->with('success', 'Project updated successfully.');
     }
 
-    
     public function destroy($id)
     {
         $proyek = Proyek::findOrFail($id);
