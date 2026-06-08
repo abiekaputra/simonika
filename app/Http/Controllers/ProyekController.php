@@ -10,8 +10,8 @@ class ProyekController extends Controller
 {
     public function index()
     {
-        $proyek = Proyek::with('kategori')->get();
-        $kategori = Kategori::all();
+        $proyek = Proyek::with('kategori')->paginate(15);
+        $kategori = Kategori::all(); // full list needed for dropdown
 
         return view('proyek.index', compact('proyek', 'kategori'));
     }

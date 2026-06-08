@@ -144,6 +144,9 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">
+                    {{ $linimasa->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         @endif
     </div>
@@ -189,7 +192,7 @@
             });
 
             let items = new vis.DataSet([
-                @foreach ($linimasa as $item)
+                @foreach ($linimasaAll as $item)
                             {
                                 id: {{ $item->id }},
                                 content: "{{ $item->proyek->nama_proyek }}",
@@ -198,7 +201,7 @@
                                 group: {{ $item->pegawai->id }},
                                 subgroup: {{ $loop->index + 1 }},
                                 status: "{{ $item->status_proyek }}",
-                                deskripsi: "{{ $item->deskripsi ?? 'Tidak ada deskripsi' }}",
+                                deskripsi: "{{ $item->deskripsi ?? 'No description' }}",
                                 pegawai: "{{ $item->pegawai->nama }}",
                                 proyek: "{{ $item->proyek->nama_proyek }}",
                                 style: "background-color: {{
