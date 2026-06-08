@@ -8,7 +8,7 @@ use App\Models\Kategori;
 
 class ProyekController extends Controller
 {
-    // Menampilkan daftar pegawai
+    
     public function index()
     {
         $proyek = Proyek::all();  
@@ -17,14 +17,14 @@ class ProyekController extends Controller
         return view('proyek.index', compact('proyek', 'kategori'));
     }
 
-    // Menampilkan form tambah pegawai
+    
     public function create()
     {
         $kategori = Kategori::all();
         return view('proyek.create', compact('kategori'));
     }
 
-    // Menyimpan pegawai baru
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -39,20 +39,20 @@ class ProyekController extends Controller
             'kategori_id' => $request->kategori_id,
         ]);
 
-        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil ditambahkan!');
+        return redirect()->route('proyek.index')->with('success', 'Project added successfully.');
     }
 
-    // Menampilkan form edit pegawai
+    
     public function edit($id)
     {
-        $proyek = Proyek::find($id); // Ambil proyek berdasarkan ID
+        $proyek = Proyek::find($id);
 
-        $kategori = Kategori::all(); // Ambil semua kategori
+        $kategori = Kategori::all();
 
         return view('proyek.edit', compact('proyek', 'kategori'));
     }
 
-    // Menyimpan perubahan pegawai
+    
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -68,15 +68,15 @@ class ProyekController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil diperbarui!');
+        return redirect()->route('proyek.index')->with('success', 'Project updated successfully.');
     }
 
-    // Menghapus pegawai
+    
     public function destroy($id)
     {
         $proyek = Proyek::findOrFail($id);
         $proyek->delete();
 
-        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil dihapus.');
+        return redirect()->route('proyek.index')->with('success', 'Project deleted successfully.');
     }
 }
