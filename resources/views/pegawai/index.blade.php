@@ -1,159 +1,62 @@
-    <!DOCTYPE html>
-    <html lang="en">
+@extends('layouts.authenticated')
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Daftar Pegawai - siMonika</title>
-        <!-- Bootstrap CSS -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-        <!-- Bootstrap Icons -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
-            rel="stylesheet">
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-        <!-- Toastr CSS -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-        <!-- SweetAlert2 CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-        <!-- Toastr & SweetAlert2 -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <!-- Bootstrap Bundle with Popper -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    </head>
+@section('title', 'Pegawai — SiMonika')
 
-    <body>
-        <!-- Sidebar -->
-        @include('templates.sidebar')
+@section('content')
+    <header class="page-heading d-flex justify-content-between align-items-end">
+        <div><h1 class="mb-0">Pegawai</h1><p>Kelola kontak pegawai yang dapat ditugaskan ke linimasa proyek.</p></div>
+        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#createEmployee"><i class="bi bi-plus-lg me-1"></i>Tambah pegawai</button>
+    </header>
 
-        <!-- Main Content -->
-        <div class="main-content p-4">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h2 class="mb-0">Kelola Pegawai</h2>
-                    <p class="text-muted">Manajemen data pegawai dan informasinya</p>
-                </div>
-                <div class="button-action">
-                    <!-- Button Tambah Pegawai -->
-                    <button id="btnCreate"class="btn btn-primary" onclick="openCreateModal()">
-                        <i class="bi bi-plus-lg"></i> Tambah Pegawai
-                    </button>
-                </div>
-            </div>
-
-            <!-- Daftar Pegawai -->
-            @if ($pegawai->isEmpty())
-                <div class="alert alert-warning text-center">Belum ada pegawai terdaftar.</div>
-            @else
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Nomor Telepon</th>
-                                <th>Email</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($pegawai as $p)
-                            <tr>
-                                <td>{{ $p->nama }}</td>
-                                <td>{{ $p->nomor_telepon }}</td>
-                                <td>{{ $p->email }}</td>
-                                <td>
-                                    <button class="btn btn-warning btn-edit" 
-                                        data-id="{{ $p->id }}" 
-                                        data-nama="{{ $p->nama }}" 
-                                        data-telepon="{{ $p->nomor_telepon }}" 
-                                        data-email="{{ $p->email }}"
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#pegawaiEditModal">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-
-                                    @if (!$p->linimasa()->exists()) 
-                                        <button class="btn btn-danger btn-delete" data-id="{{ $p->id }}">
-                                            <i class="bi bi-trash"></i>
-                                        </button>                         
-                                    @endif
-
-                                    <form id="delete-form-{{ $p->id }}" action="{{ route('pegawai.destroy', $p->id) }}" method="POST" style="display: none;">
-                                            @csrf
-                                            @method('DELETE')
-                                    </form>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    <div class="mt-3">
-                        {{ $pegawai->links('pagination::bootstrap-5') }}
-                    </div>
-                </div>
-            @endif
+    <section id="createEmployee" class="collapse mb-4">
+        <div class="panel panel-body">
+            <h2 class="h5 mb-3">Pegawai baru</h2>
+            <form action="{{ route('pegawai.store') }}" method="POST" class="row g-3">
+                @csrf
+                <div class="col-md-4"><label class="form-label" for="nama">Nama</label><input class="form-control" id="nama" name="nama" value="{{ old('nama') }}" required maxlength="255"></div>
+                <div class="col-md-4"><label class="form-label" for="nomor_telepon">Nomor telepon</label><input class="form-control" id="nomor_telepon" name="nomor_telepon" value="{{ old('nomor_telepon') }}" required pattern="\+?[0-9]{9,15}"></div>
+                <div class="col-md-4"><label class="form-label" for="email">Email</label><input class="form-control" id="email" name="email" value="{{ old('email') }}" type="email" required></div>
+                <div><button class="btn btn-primary" type="submit">Simpan pegawai</button></div>
+            </form>
         </div>
+    </section>
 
-        @include('pegawai/create')
-        @include('pegawai/edit')
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                
-                // 🔹 Menampilkan Pop Up Error jika ada validasi yang gagal
-                @if ($errors->any())
-                let errorMessage = "";
-                @foreach ($errors->all() as $error)
-                    errorMessage += "{{ $error }}\n";
-                @endforeach
-
-                Swal.fire({
-                    title: "Terjadi Kesalahan!",
-                    icon: "error",
-                    confirmButtonText: "Mengerti"
-                });
-            @endif
-                
-                // 🔹 Menampilkan Pop Up Sukses jika ada session success
-                @if (session('success'))
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sukses!',
-                        text: "{{ session('success') }}",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        position: 'center'
-                    });
-                @endif
-
-                // 🔹 Pop Up Konfirmasi Hapus
-                document.querySelectorAll(".btn-delete").forEach(button => {
-                    button.addEventListener("click", function () {
-                        let id = this.getAttribute("data-id");
-
-                        Swal.fire({
-                            title: "Apakah Anda yakin?",
-                            text: "Data pegawai akan dihapus secara permanen!",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#d33",
-                            cancelButtonColor: "#3085d6",
-                            confirmButtonText: "Ya, Hapus!",
-                            cancelButtonText: "Batal"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                document.getElementById(`delete-form-${id}`).submit();
-                            }
-                        });
-                    });
-                });
-            });
-        </script>
-        
-    </body>
-
-    </html>
+    <section class="panel">
+        <div class="panel-header"><h2 class="h5 mb-0">Daftar pegawai</h2><span class="badge text-bg-light">{{ $pegawai->total() }} orang</span></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Nama</th><th>Kontak</th><th>Penugasan</th><th class="text-end">Tindakan</th></tr></thead>
+                <tbody>
+                    @forelse ($pegawai as $item)
+                        <tr>
+                            <td class="fw-semibold">{{ $item->nama }}</td>
+                            <td><a href="mailto:{{ $item->email }}">{{ $item->email }}</a><br><small class="text-muted">{{ $item->nomor_telepon }}</small></td>
+                            <td>{{ $item->linimasa_count }} linimasa</td>
+                            <td class="text-end">
+                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#employee-{{ $item->id }}">Edit</button>
+                                <form action="{{ route('pegawai.destroy', $item) }}" method="POST" class="d-inline" data-confirm="Linimasa terkait juga akan dihapus.">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-outline-danger btn-sm" type="submit">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="employee-{{ $item->id }}">
+                            <td colspan="4">
+                                <form action="{{ route('pegawai.update', $item) }}" method="POST" class="row g-2 p-2">
+                                    @csrf @method('PUT')
+                                    <div class="col-md-4"><label class="form-label">Nama</label><input class="form-control" name="nama" value="{{ $item->nama }}" required></div>
+                                    <div class="col-md-4"><label class="form-label">Telepon</label><input class="form-control" name="nomor_telepon" value="{{ $item->nomor_telepon }}" required pattern="\+?[0-9]{9,15}"></div>
+                                    <div class="col-md-4"><label class="form-label">Email</label><input class="form-control" name="email" value="{{ $item->email }}" type="email" required></div>
+                                    <div><button class="btn btn-primary btn-sm">Simpan perubahan</button></div>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4"><div class="empty-state"><i class="bi bi-people"></i>Belum ada pegawai.</div></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if ($pegawai->hasPages()) <div class="panel-body border-top">{{ $pegawai->links('pagination::bootstrap-5') }}</div> @endif
+    </section>
+@endsection

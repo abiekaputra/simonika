@@ -1,146 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.authenticated')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pendataan - siMonika</title>
+@section('title', 'Program Magang — SiMonika')
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
-        rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@push('styles')
+    <link href="https://unpkg.com/vis-timeline@7.4.6/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
+@endpush
 
-    <!-- Toastr & SweetAlert2 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@section('content')
+    <header class="page-heading d-flex justify-content-between align-items-end">
+        <div><h1 class="mb-0">Program magang</h1><p>Catat periode dan kapasitas peserta tanpa menyimpan identitas personal.</p></div>
+        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#createInternship"><i class="bi bi-plus-lg me-1"></i>Tambah periode</button>
+    </header>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://unpkg.com/vis-timeline@7.4.6/standalone/umd/vis-timeline-graph2d.min.js"></script>
-
-    <!-- Vis.js -->
-    <link href="https://unpkg.com/vis-timeline@7.4.6/styles/vis-timeline-graph2d.min.css"
-        rel="stylesheet">
-
-    <style>
-        .zoom-controls {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .zoom-btn {
-            width: 30px;
-            height: 30px;
-            font-size: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-    </style>
-</head>
-
-<body>
-    @include('templates.sidebar')
-
-    <div class="main-content p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h2 class="mb-0">Pendataan Mahasiswa</h2>
-                <p class="text-muted">Menampilkan data magang mahasiswa</p>
-            </div>
-            <div class="button-action">
-                @if ($pendataans->isNotEmpty())
-                    <button id="toggleView" class="btn btn-secondary">Tampilkan Tabel</button>
-                @endif
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pendataanCreateModal">
-                    <i class="bi bi-plus-lg"></i> Tambah Data Magang
-                </button>
-            </div>
+    <section id="createInternship" class="collapse mb-4">
+        <div class="panel panel-body">
+            <h2 class="h5 mb-3">Periode magang baru</h2>
+            <form action="{{ route('pendataan.store') }}" method="POST" class="row g-3">
+                @csrf
+                <div class="col-md-5"><label class="form-label">Institusi</label><input class="form-control" name="universitas" value="{{ old('universitas') }}" required maxlength="255"></div>
+                <div class="col-md-2"><label class="form-label">Peserta</label><input class="form-control" name="jumlah_orang" value="{{ old('jumlah_orang', 1) }}" type="number" min="1" required></div>
+                <div class="col-md-2"><label class="form-label">Mulai</label><input class="form-control" name="tanggal_masuk" type="date" required></div>
+                <div class="col-md-3"><label class="form-label">Selesai</label><input class="form-control" name="tanggal_keluar" type="date" required></div>
+                <div><button class="btn btn-primary">Simpan periode</button></div>
+            </form>
         </div>
+    </section>
 
-        @if ($pendataans->isEmpty())
-            <div class="alert alert-warning text-center">
-                <i class="alert alert-warning text-center"></i> Belum ada data magang terdaftar.
-            </div>
-        @else
-            <div id="pendataanContainer" style="position: relative;">
-                <div id="pendataanTimeline"></div>
-                <div class="zoom-controls">
-                    <button id="zoomIn" class="btn btn-info zoom-btn"><i class="bi bi-plus-lg"></i></button>
-                    <button id="zoomOut" class="btn btn-info zoom-btn"><i class="bi bi-dash-lg"></i></button>
-                </div>
-            </div>
+    @if ($timelineRecords->isNotEmpty())
+        <section class="panel mb-4">
+            <div class="panel-header"><h2 class="h5 mb-0">Kalender program</h2></div>
+            <div class="panel-body"><div id="internship-timeline" class="timeline-board"></div></div>
+        </section>
+    @endif
 
-            <div id="tableContainer" class="d-none">
-                <table class="table table-hover">
-                    <thead>
+    <section class="panel">
+        <div class="panel-header"><h2 class="h5 mb-0">Riwayat periode</h2><span class="badge text-bg-light">{{ $pendataans->total() }} periode</span></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Institusi</th><th>Peserta</th><th>Periode</th><th class="text-end">Tindakan</th></tr></thead>
+                <tbody>
+                    @forelse ($pendataans as $item)
                         <tr>
-                            <th>Universitas</th>
-                            <th>Jumlah Orang</th>
-                            <th>Tanggal Masuk</th>
-                            <th>Tanggal Keluar</th>
-                            <th>Aksi</th>
+                            <td class="fw-semibold">{{ $item->universitas }}</td>
+                            <td>{{ $item->jumlah_orang }} orang</td>
+                            <td>{{ $item->tanggal_masuk->format('d M Y') }} — {{ $item->tanggal_keluar->format('d M Y') }}</td>
+                            <td class="text-end">
+                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#internship-{{ $item->id }}">Edit</button>
+                                <form class="d-inline" action="{{ route('pendataan.destroy', $item) }}" method="POST" data-confirm="Periode magang ini akan dihapus.">@csrf @method('DELETE')<button class="btn btn-outline-danger btn-sm">Hapus</button></form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($pendataans as $pendataan)
-                            <tr>
-                                <td>{{ $pendataan->universitas }}</td>
-                                <td>{{ $pendataan->jumlah_orang }}</td>
-                                <td>{{ $pendataan->tanggal_masuk }}</td>
-                                <td>{{ $pendataan->tanggal_keluar }}</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm btn-edit" data-id="{{ $pendataan->id }}"
-                                        data-universitas="{{ $pendataan->universitas }}"
-                                        data-jumlah_orang="{{ $pendataan->jumlah_orang }}"
-                                        data-tanggal_masuk="{{ $pendataan->tanggal_masuk }}"
-                                        data-tanggal_keluar="{{ $pendataan->tanggal_keluar }}" data-bs-toggle="modal"
-                                        data-bs-target="#pendataanEditModal">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+                        <tr class="collapse" id="internship-{{ $item->id }}">
+                            <td colspan="4">
+                                <form action="{{ route('pendataan.update', $item) }}" method="POST" class="row g-2 p-2">
+                                    @csrf @method('PUT')
+                                    <div class="col-md-5"><label class="form-label">Institusi</label><input class="form-control" name="universitas" value="{{ $item->universitas }}" required></div>
+                                    <div class="col-md-2"><label class="form-label">Peserta</label><input class="form-control" name="jumlah_orang" value="{{ $item->jumlah_orang }}" type="number" min="1" required></div>
+                                    <div class="col-md-2"><label class="form-label">Mulai</label><input class="form-control" name="tanggal_masuk" value="{{ $item->tanggal_masuk->format('Y-m-d') }}" type="date" required></div>
+                                    <div class="col-md-3"><label class="form-label">Selesai</label><input class="form-control" name="tanggal_keluar" value="{{ $item->tanggal_keluar->format('Y-m-d') }}" type="date" required></div>
+                                    <div><button class="btn btn-primary btn-sm">Simpan perubahan</button></div>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4"><div class="empty-state"><i class="bi bi-mortarboard"></i>Belum ada periode magang.</div></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if ($pendataans->hasPages()) <div class="panel-body border-top">{{ $pendataans->links('pagination::bootstrap-5') }}</div> @endif
+    </section>
 
-                                    <button class="btn btn-danger btn-sm btn-delete" data-id="{{ $pendataan->id }}">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+    <script type="application/json" id="internship-data">@json($timelineData)</script>
+@endsection
 
-                                    <form id="delete-form-{{ $pendataan->id }}"
-                                        action="{{ route('pendataan.destroy', $pendataan->id) }}" method="POST"
-                                        style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="mt-3">
-                    {{ $pendataans->links('pagination::bootstrap-5') }}
-                </div>
-            </div>
-        @endif
-    </div>
-
-    @include('pendataan.create')
-    @include('pendataan.edit')
-    @include('pendataan.info')
-</body>
-
-    @include('pendataan.partials.page-script')
-
-</html>
+@push('scripts')
+    <script src="https://unpkg.com/vis-timeline@7.4.6/standalone/umd/vis-timeline-graph2d.min.js"></script>
+    <script type="module" src="{{ asset('js/pendataan/index.js') }}"></script>
+@endpush
