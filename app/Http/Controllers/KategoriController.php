@@ -2,57 +2,38 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\KategoriRequest;
 use App\Models\Kategori;
-use Illuminate\Http\Request;
+use App\Services\KategoriService;
+use Illuminate\Http\RedirectResponse;
 
 class KategoriController extends Controller
 {
-    public function index()
+    public function __construct(private readonly KategoriService $service) {}
+
+    public function index(): RedirectResponse
     {
-        // Categories are managed via modal on the projects page
         return redirect()->route('proyek.index');
     }
 
-    public function store(Request $request)
+    public function store(KategoriRequest $request): RedirectResponse
     {
-        $request->validate([
-            'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori',
-        ]);
+        $this->service->create($request->validated());
 
-        Kategori::create(['nama_kategori' => $request->nama_kategori]);
-
-        return redirect()->back()->with('success', 'Category added successfully.');
+        return redirect()->route('proyek.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    public function edit($id)
+    public function update(KategoriRequest $request, Kategori $kategori): RedirectResponse
     {
-        $kategori = Kategori::findOrFail($id);
+        $this->service->update($kategori, $request->validated());
 
-        return response()->json($kategori);
+        return redirect()->route('proyek.index')->with('success', 'Kategori berhasil diperbarui.');
     }
 
-    public function update(Request $request, $id)
+    public function destroy(Kategori $kategori): RedirectResponse
     {
-        $request->validate([
-            'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori,'.$id,
-        ]);
+        $this->service->delete($kategori);
 
-        $kategori = Kategori::findOrFail($id);
-        $kategori->update(['nama_kategori' => $request->nama_kategori]);
-
-        return redirect()->back()->with('success', 'Category updated successfully.');
-    }
-
-    public function destroy($id)
-    {
-        $kategori = Kategori::findOrFail($id);
-
-        if ($kategori->proyek()->count() > 0) {
-            return redirect()->back()->with('error', 'Cannot delete category — it is still used by '.$kategori->proyek()->count().' project(s).');
-        }
-
-        $kategori->delete();
-
-        return redirect()->back()->with('success', 'Category deleted successfully.');
+        return redirect()->route('proyek.index')->with('success', 'Kategori berhasil dihapus.');
     }
 }

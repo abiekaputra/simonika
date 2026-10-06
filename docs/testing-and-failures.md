@@ -21,9 +21,19 @@ The command fails when a production non Python file exceeds 300 lines, a Python 
 - Attribute and application deletion cascades pivot data.
 - CSV export neutralizes cells interpreted as spreadsheet formulas.
 - Timeline status and date ranges are constrained.
+- Completed timeline statuses and completion dates must agree.
 - Project deletion cascades timeline entries.
 - Categories in use cannot be removed through the application.
 - Employee identifiers and operational date ranges are validated.
+- Deleting an administrator preserves prior audit events with an anonymous actor.
+- Profile password changes require the current password.
+- Primary authenticated screens render without server errors.
+
+## Current result
+
+The Phase 3 gate passes 32 tests with 126 assertions. Blade compilation, route discovery, Laravel Pint, and the repository file-length check run alongside this suite.
+
+Browser validation covers all ten primary authenticated screens for a super admin, admin navigation restrictions, the forbidden governance route, fresh console errors, and 390 × 844 responsive behavior. See [browser validation](browser-validation.md).
 
 ## Failure boundaries
 

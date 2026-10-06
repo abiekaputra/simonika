@@ -9,7 +9,6 @@ use App\Models\AtributTambahan;
 use App\Services\AtributService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AtributController extends Controller
@@ -57,21 +56,6 @@ class AtributController extends Controller
         $this->service->delete($atribut);
 
         return redirect()->route('atribut.index')->with('success', 'Attribute deleted successfully.');
-    }
-
-    public function checkDuplicate(Request $request): JsonResponse
-    {
-        $request->validate([
-            'nama_atribut' => ['required', 'string', 'max:100'],
-            'current_id' => ['nullable', 'integer'],
-        ]);
-
-        $exists = AtributTambahan::query()
-            ->where('nama_atribut', $request->string('nama_atribut')->trim())
-            ->when($request->integer('current_id'), fn ($query, $id) => $query->whereKeyNot($id))
-            ->exists();
-
-        return response()->json(['exists' => $exists]);
     }
 
     public function detail(AtributTambahan $atribut): JsonResponse

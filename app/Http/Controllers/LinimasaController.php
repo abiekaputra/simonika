@@ -4,77 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LinimasaRequest;
 use App\Models\Linimasa;
-use App\Models\LogAktivitas;
 use App\Models\Pegawai;
 use App\Models\Proyek;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Services\LinimasaService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class LinimasaController extends Controller
 {
-    public function index()
+    public function __construct(private readonly LinimasaService $service) {}
+
+    public function index(): View
     {
-        $pegawai = Pegawai::all(); // full list needed for create/edit dropdown
-        $proyek = Proyek::with('kategori')->get(); // full list needed for create/edit dropdown
-        $linimasa = Linimasa::with(['pegawai', 'proyek'])->paginate(20);
-        $linimasaAll = Linimasa::with(['pegawai', 'proyek'])->get(); // needed for vis.js chart
+        $records = Linimasa::query()->with(['pegawai', 'proyek'])->orderBy('mulai')->get();
 
-        return view('linimasa.index', compact('pegawai', 'proyek', 'linimasa', 'linimasaAll'));
-    }
-
-    public function edit($id)
-    {
-        $linimasa = Linimasa::with(['pegawai', 'proyek'])->findOrFail($id);
-
-        return response()->json($linimasa);
-    }
-
-    public function store(LinimasaRequest $request)
-    {
-        $project = Proyek::findOrFail($request->integer('proyek_id'));
-
-        DB::transaction(function () use ($request, $project) {
-            Linimasa::create($request->validated());
-            $this->log('Add Timeline', 'create', "Added timeline entry for project '{$project->nama_proyek}'");
-        });
-
-        return redirect()->route('linimasa.index')->with('success', 'Timeline entry added successfully.');
-    }
-
-    public function update(LinimasaRequest $request, $id)
-    {
-        $timeline = Linimasa::findOrFail($id);
-        $project = Proyek::findOrFail($request->integer('proyek_id'));
-
-        DB::transaction(function () use ($request, $timeline, $project) {
-            $timeline->update($request->validated());
-            $this->log('Update Timeline', 'update', "Updated timeline entry for project '{$project->nama_proyek}'");
-        });
-
-        return response()->json(['success' => true, 'message' => 'Timeline entry updated successfully.']);
-    }
-
-    public function destroy($id)
-    {
-        $linimasa = Linimasa::with('proyek')->findOrFail($id);
-        $proyekNama = $linimasa->proyek->nama_proyek ?? 'unknown';
-
-        DB::transaction(function () use ($linimasa, $proyekNama) {
-            $linimasa->delete();
-            $this->log('Delete Timeline', 'delete', "Deleted timeline entry for project '{$proyekNama}'");
-        });
-
-        return response()->json(['success' => true, 'message' => 'Timeline entry deleted successfully.']);
-    }
-
-    private function log(string $activity, string $type, string $detail): void
-    {
-        LogAktivitas::create([
-            'user_id' => Auth::id(),
-            'aktivitas' => $activity,
-            'tipe_aktivitas' => $type,
-            'modul' => 'Linimasa',
-            'detail' => $detail,
+        return view('linimasa.index', [
+            'pegawai' => Pegawai::query()->orderBy('nama')->get(),
+            'proyek' => Proyek::query()->with('kategori')->orderBy('nama_proyek')->get(),
+            'linimasa' => Linimasa::query()->with(['pegawai', 'proyek'])->latest('mulai')->paginate(20),
+            'timelineRecords' => $records,
+            'statuses' => Linimasa::STATUSES,
+            'timelineData' => $records->map(fn (Linimasa $item) => [
+                'id' => $item->id,
+                'content' => $item->pegawai->nama.' · '.$item->proyek->nama_proyek,
+                'start' => $item->mulai->format('Y-m-d'),
+                'end' => $item->tenggat->copy()->addDay()->format('Y-m-d'),
+                'title' => $item->status_proyek,
+            ]),
         ]);
+    }
+
+    public function store(LinimasaRequest $request): RedirectResponse
+    {
+        $this->service->create($request->validated());
+
+        return to_route('linimasa.index')->with('success', 'Timeline entry added successfully.');
+    }
+
+    public function update(LinimasaRequest $request, Linimasa $linimasa): RedirectResponse
+    {
+        $this->service->update($linimasa, $request->validated());
+
+        return to_route('linimasa.index')->with('success', 'Timeline entry updated successfully.');
+    }
+
+    public function destroy(Linimasa $linimasa): RedirectResponse
+    {
+        $this->service->delete($linimasa);
+
+        return to_route('linimasa.index')->with('success', 'Timeline entry deleted successfully.');
     }
 }

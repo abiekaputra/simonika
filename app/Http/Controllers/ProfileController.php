@@ -2,53 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdatePasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Pengguna;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\ActivityLogger;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function index()
+    public function __construct(private readonly ActivityLogger $logger) {}
+
+    public function index(): View
     {
         return view('profile.index');
     }
 
-    public function edit()
+    public function update(UpdateProfileRequest $request): RedirectResponse
     {
-        return view('profile.edit');
+        /** @var Pengguna $user */
+        $user = $request->user();
+        $user->update($request->validated());
+        $this->logger->record('Profile', 'Update Profile', 'update', 'Updated account profile.');
+
+        return back()->with('success', 'Profile updated successfully.');
     }
 
-    public function update(Request $request)
+    public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
     {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-        ]);
+        /** @var Pengguna $user */
+        $user = $request->user();
+        $user->update(['password' => Hash::make($request->validated('password'))]);
+        $this->logger->record('Profile', 'Update Password', 'update', 'Updated account password.');
 
-        $user = Pengguna::findOrFail(Auth::id());
-        $user->nama = $request->nama;
-        $user->save();
-
-        return redirect()->back()->with('success', 'Profile updated successfully.');
-    }
-
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-            'current_password' => 'required',
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ]);
-
-        $user = Pengguna::findOrFail(Auth::id());
-
-        if (! Hash::check($request->current_password, $user->password)) {
-            return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
-        }
-
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        return redirect()->back()->with('success', 'Password updated successfully.');
+        return back()->with('success', 'Password updated successfully.');
     }
 }

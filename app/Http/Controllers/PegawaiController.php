@@ -2,63 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PegawaiRequest;
 use App\Models\Pegawai;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use App\Services\PegawaiService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PegawaiController extends Controller
 {
-    public function index()
-    {
-        $pegawai = Pegawai::paginate(20);
+    public function __construct(private readonly PegawaiService $service) {}
 
-        return view('pegawai.index', compact('pegawai'));
-    }
-
-    public function create()
+    public function index(): View
     {
-        return view('pegawai.create');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:255|unique:pegawais,nama',
-            'nomor_telepon' => 'required|string|max:15|unique:pegawais,nomor_telepon',
-            'email' => 'required|email|unique:pegawais,email',
+        return view('pegawai.index', [
+            'pegawai' => Pegawai::query()->withCount('linimasa')->orderBy('nama')->paginate(20),
         ]);
-
-        Pegawai::create($request->only('nama', 'nomor_telepon', 'email'));
-
-        return redirect()->route('pegawai.index')->with('success', 'Employee added successfully.');
     }
 
-    public function edit($id)
+    public function store(PegawaiRequest $request): RedirectResponse
     {
-        $pegawai = Pegawai::findOrFail($id);
+        $this->service->create($request->validated());
 
-        return view('pegawai.edit', compact('pegawai'));
+        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil ditambahkan.');
     }
 
-    public function update(Request $request, $id)
+    public function update(PegawaiRequest $request, Pegawai $pegawai): RedirectResponse
     {
-        $request->validate([
-            'nama' => ['required', 'string', 'max:255', Rule::unique('pegawais', 'nama')->ignore($id)],
-            'nomor_telepon' => ['required', 'string', 'max:20', Rule::unique('pegawais', 'nomor_telepon')->ignore($id)],
-            'email' => ['required', 'email', 'max:255', Rule::unique('pegawais', 'email')->ignore($id)],
-        ]);
+        $this->service->update($pegawai, $request->validated());
 
-        $pegawai = Pegawai::findOrFail($id);
-        $pegawai->update($request->only('nama', 'nomor_telepon', 'email'));
-
-        return redirect()->route('pegawai.index')->with('success', 'Employee updated successfully.');
+        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(Pegawai $pegawai): RedirectResponse
     {
-        $pegawai = Pegawai::findOrFail($id);
-        $pegawai->delete();
+        $this->service->delete($pegawai);
 
-        return redirect()->route('pegawai.index')->with('success', 'Employee deleted successfully.');
+        return redirect()->route('pegawai.index')->with('success', 'Pegawai dan linimasa terkait berhasil dihapus.');
     }
 }

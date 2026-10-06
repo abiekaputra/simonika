@@ -10,6 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         if (config('simonika.demo_seed.enabled')) {
             $this->call(SuperAdminSeeder::class);
+            $this->call(DemoDataSeeder::class);
         }
     }
 }

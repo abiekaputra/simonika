@@ -58,7 +58,7 @@ class ScreenSmokeTest extends TestCase
             ->assertRedirect('/proyek');
     }
 
-    public function test_admin_dashboard_redirects_to_shared_dashboard(): void
+    public function test_admin_uses_shared_dashboard(): void
     {
         $admin = Pengguna::create([
             'nama' => 'Admin',
@@ -68,7 +68,7 @@ class ScreenSmokeTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            ->get('/admin/dashboard')
-            ->assertRedirect('/dashboard');
+            ->get('/dashboard')
+            ->assertOk();
     }
 }

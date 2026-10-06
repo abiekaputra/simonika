@@ -2,147 +2,94 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\EmailUpdateNotification;
-use App\Mail\NewAdminCredentials;
+use App\Http\Requests\StoreAdminRequest;
+use App\Http\Requests\UpdateAdminRequest;
 use App\Models\Pengguna;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use App\Services\AdminService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use Throwable;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function __construct(private readonly AdminService $service) {}
+
+    public function index(): View
     {
-        return redirect()->route('dashboard');
+        return view('admin.index', [
+            'admins' => Pengguna::query()->where('role', 'admin')->orderBy('nama')->paginate(20),
+        ]);
     }
 
-    public function index()
-    {
-        $admins = Pengguna::where('role', 'admin')->paginate(20);
-
-        return view('admin.index', compact('admins'));
-    }
-
-    public function create()
-    {
-        return view('admin.create');
-    }
-
-    public function store(Request $request)
+    public function store(StoreAdminRequest $request): JsonResponse|RedirectResponse
     {
         try {
-            $validated = $request->validate([
-                'nama' => 'required|string|max:100',
-                'email' => 'required|email|unique:penggunas',
-            ]);
+            $this->service->create($request->validated());
 
-            $plainPassword = Str::password(16, symbols: false);
-            $validated['password'] = Hash::make($plainPassword);
-            $validated['role'] = 'admin';
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Admin berhasil ditambahkan.'], 201);
+            }
 
-            DB::transaction(function () use ($validated, $plainPassword) {
-                Pengguna::create($validated);
-                Mail::to($validated['email'])->send(new NewAdminCredentials(
-                    $validated['nama'],
-                    $validated['email'],
-                    $plainPassword
-                ));
-            });
+            return to_route('admin.index')->with('success', 'Admin berhasil ditambahkan.');
+        } catch (Throwable $exception) {
+            Log::error('Failed to create admin account.', ['exception' => $exception]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Admin added successfully.',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error('Failed to create admin account.', ['exception' => $e]);
+            $message = 'Akun admin tidak dapat dibuat. Periksa konfigurasi email lalu coba kembali.';
+            if (! $request->expectsJson()) {
+                return back()->withInput()->with('error', $message);
+            }
 
             return response()->json([
                 'success' => false,
-                'message' => 'Unable to create the admin account.',
+                'message' => $message,
             ], 500);
         }
     }
 
-    public function edit($id)
+    public function edit(Pengguna $admin): JsonResponse
     {
-        try {
-            $admin = Pengguna::findOrFail($id);
+        abort_unless($admin->isAdmin(), 404);
 
-            return response()->json($admin);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Admin not found.'], 404);
-        }
+        return response()->json(['success' => true, 'data' => $admin]);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateAdminRequest $request, Pengguna $admin): JsonResponse|RedirectResponse
     {
+        abort_unless($admin->isAdmin(), 404);
+
         try {
-            $admin = Pengguna::findOrFail($id);
-            $oldEmail = $admin->email;
+            $updated = $this->service->update($admin, $request->validated());
 
-            $validated = $request->validate([
-                'nama' => 'required|string|max:100',
-                'email' => 'required|email|unique:penggunas,email,'.$id.',id_user',
-                'password' => ['nullable', Password::min(8)],
-            ]);
-
-            if ($validated['email'] !== $oldEmail) {
-                Mail::to($validated['email'])->send(new EmailUpdateNotification(
-                    $validated['nama'],
-                    $validated['email'],
-                    $oldEmail
-                ));
+            if (! $request->expectsJson()) {
+                return to_route('admin.index')->with('success', 'Admin berhasil diperbarui.');
             }
-
-            if ($request->filled('password')) {
-                $validated['password'] = Hash::make($validated['password']);
-            } else {
-                unset($validated['password']);
-            }
-
-            $admin->update($validated);
 
             return response()->json([
                 'success' => true,
-                'message' => $validated['email'] !== $oldEmail
-                    ? 'Admin updated and notification sent to new email.'
-                    : 'Admin updated successfully.',
+                'message' => 'Admin berhasil diperbarui.',
+                'data' => $updated,
             ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error('Failed to update admin account.', ['exception' => $e]);
+        } catch (Throwable $exception) {
+            Log::error('Failed to update admin account.', ['exception' => $exception]);
+
+            $message = 'Akun admin tidak dapat diperbarui. Periksa konfigurasi email lalu coba kembali.';
+            if (! $request->expectsJson()) {
+                return back()->withInput()->with('error', $message);
+            }
 
             return response()->json([
                 'success' => false,
-                'message' => 'Unable to update the admin account.',
+                'message' => $message,
             ], 500);
         }
     }
 
-    public function destroy($id)
+    public function destroy(Pengguna $admin): RedirectResponse
     {
-        $admin = Pengguna::findOrFail($id);
+        $this->service->delete($admin);
 
-        if ($admin->role === 'super_admin') {
-            return redirect()->back()->with('error', 'Super admin account cannot be deleted.');
-        }
-
-        $admin->delete();
-
-        return redirect()->route('admin.index')->with('success', 'Admin deleted successfully.');
+        return redirect()->route('admin.index')->with('success', 'Admin berhasil dihapus.');
     }
 }

@@ -4,13 +4,14 @@ namespace App\Services;
 
 use App\Models\Aplikasi;
 use App\Models\AtributTambahan;
-use App\Models\LogAktivitas;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AtributService
 {
-    public function __construct(private readonly AttributeValueValidator $validator) {}
+    public function __construct(
+        private readonly AttributeValueValidator $validator,
+        private readonly ActivityLogger $logger,
+    ) {}
 
     public function create(array $data): AtributTambahan
     {
@@ -20,7 +21,7 @@ class AtributService
             $attribute->aplikasis()->sync($applicationIds->mapWithKeys(
                 fn ($id) => [$id => ['nilai_atribut' => null]]
             )->all());
-            $this->log('Add Attribute', 'create', "Added global attribute '{$attribute->nama_atribut}'");
+            $this->logger->record('Atribut', 'Add Attribute', 'create', "Added global attribute '{$attribute->nama_atribut}'");
 
             return $attribute;
         });
@@ -34,7 +35,7 @@ class AtributService
 
         return DB::transaction(function () use ($attribute, $normalized) {
             $attribute->update($normalized);
-            $this->log('Update Attribute', 'update', "Updated global attribute '{$attribute->nama_atribut}'");
+            $this->logger->record('Atribut', 'Update Attribute', 'update', "Updated global attribute '{$attribute->nama_atribut}'");
 
             return $attribute->refresh();
         });
@@ -45,7 +46,7 @@ class AtributService
         DB::transaction(function () use ($attribute) {
             $name = $attribute->nama_atribut;
             $attribute->delete();
-            $this->log('Delete Attribute', 'delete', "Deleted global attribute '{$name}'");
+            $this->logger->record('Atribut', 'Delete Attribute', 'delete', "Deleted global attribute '{$name}'");
         });
     }
 
@@ -56,16 +57,5 @@ class AtributService
             : null;
 
         return $data;
-    }
-
-    private function log(string $activity, string $type, string $detail): void
-    {
-        LogAktivitas::create([
-            'user_id' => Auth::id(),
-            'aktivitas' => $activity,
-            'tipe_aktivitas' => $type,
-            'modul' => 'Atribut',
-            'detail' => $detail,
-        ]);
     }
 }
