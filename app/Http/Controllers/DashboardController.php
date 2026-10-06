@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aplikasi;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -45,7 +44,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'lastUpdate' => $lastUpdate->format('Y-m-d H:i:s'),
-            'formatted' => $lastUpdate->isoFormat('dddd, D MMMM YYYY HH:mm [WIB]')
+            'formatted' => $lastUpdate->isoFormat('dddd, D MMMM YYYY HH:mm [WIB]'),
         ]);
     }
 }

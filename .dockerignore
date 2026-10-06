@@ -1,0 +1,6 @@
+.git
+.env
+database/database.sqlite
+storage/docker
+storage/logs/*
+vendor

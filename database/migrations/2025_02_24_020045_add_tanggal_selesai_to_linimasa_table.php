@@ -18,6 +18,10 @@ return new class extends Migration
 
     public function down()
     {
+        if (! Schema::hasTable('linimasa')) {
+            return;
+        }
+
         Schema::table('linimasa', function (Blueprint $table) {
             $table->dropColumn('tanggal_selesai');
         });

@@ -137,7 +137,7 @@
                 </div>
 
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                    <input class="form-check-input" type="checkbox" id="rememberMe" name="remember" value="1">
                     <label class="form-check-label" for="rememberMe">
                         Ingat saya
                     </label>

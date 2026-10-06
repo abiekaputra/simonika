@@ -18,25 +18,8 @@
                 </div>
             </div>
 
-            <!-- Modal Footer -->
-            <div class="modal-footer d-flex justify-content-between">
-                <button class="btn btn-warning btn-sm btn-edit" data-id="{{ $pendataan->id }}"
-                    data-universitas="{{ $pendataan->universitas }}" data-jumlah_orang="{{ $pendataan->jumlah_orang }}"
-                    data-tanggal_masuk="{{ $pendataan->tanggal_masuk }}"
-                    data-tanggal_keluar="{{ $pendataan->tanggal_keluar }}" data-bs-toggle="modal"
-                    data-bs-target="#pendataanEditModal">
-                    <i class="bi bi-pencil-square"></i>
-                </button>
-
-                <button class="btn btn-danger btn-sm btn-delete" id="btnDeletePendataan">
-                    <i class="bi bi-trash"></i> Hapus
-                </button>
-
-                <!-- Form Delete -->
-                <form id="delete-form" action="" method="POST" style="display: none;">
-                    @csrf
-                    @method('DELETE')
-                </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>

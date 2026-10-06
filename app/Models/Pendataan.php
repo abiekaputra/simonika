@@ -10,11 +10,17 @@ class Pendataan extends Model
     use HasFactory;
 
     protected $table = 'pendataans';
-    
+
     protected $fillable = [
         'universitas',
         'jumlah_orang',
         'tanggal_masuk',
-        'tanggal_keluar'
+        'tanggal_keluar',
+    ];
+
+    protected $casts = [
+        'jumlah_orang' => 'integer',
+        'tanggal_masuk' => 'date',
+        'tanggal_keluar' => 'date',
     ];
 }

@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pegawai;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Models\Pegawai;
 
 class PegawaiController extends Controller
 {
     public function index()
     {
         $pegawai = Pegawai::paginate(20);
+
         return view('pegawai.index', compact('pegawai'));
     }
 
@@ -35,6 +36,7 @@ class PegawaiController extends Controller
     public function edit($id)
     {
         $pegawai = Pegawai::findOrFail($id);
+
         return view('pegawai.edit', compact('pegawai'));
     }
 

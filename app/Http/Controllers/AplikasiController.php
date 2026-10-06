@@ -2,421 +2,89 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAplikasiRequest;
+use App\Http\Requests\UpdateAplikasiRequest;
 use App\Models\Aplikasi;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Exports\AplikasiExport;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Log;
 use App\Models\AtributTambahan;
-use App\Models\LogAktivitas;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
+use App\Services\AplikasiService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class AplikasiController extends Controller
 {
-    public function __construct()
+    public function __construct(private readonly AplikasiService $service) {}
+
+    public function index(): View
     {
-        $this->middleware('auth');
-    }
-
-    public function index()
-    {
-        // ::all() is intentional — the view uses client-side JS filtering with
-        // ->pluck()->unique() for filter dropdowns and data-* attributes on each row.
-        // Server-side pagination would break the existing JS filter. Refactor in UI week.
-        $aplikasis = Aplikasi::all();
-        $atributs = AtributTambahan::all(); // for create/edit modal dropdowns
-        return view('aplikasi.index', compact('aplikasis', 'atributs'));
-    }
-
-    public function create()
-    {
-        $atributs = AtributTambahan::all();
-        return view('aplikasi.create', compact('atributs'));
-    }
-
-    public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'nama' => 'required|unique:aplikasis,nama',
-                'opd' => 'required',
-                'uraian' => 'nullable',
-                'tahun_pembuatan' => 'required|date',
-                'jenis' => 'required',
-                'basis_aplikasi' => 'required|in:Website,Desktop,Mobile',
-                'bahasa_framework' => 'required',
-                'database' => 'required',
-                'pengembang' => 'required',
-                'lokasi_server' => 'required',
-                'status_pemakaian' => 'required|in:Aktif,Tidak Aktif'
-            ]);
-
-            DB::beginTransaction();
-
-            $aplikasi = Aplikasi::create($validated);
-
-            if ($request->has('atribut')) {
-                foreach ($request->atribut as $id_atribut => $nilai) {
-                    if (!empty($nilai)) {
-                        $aplikasi->atributTambahans()->attach($id_atribut, ['nilai_atribut' => $nilai]);
-                    }
-                }
-            }
-
-            DB::commit();
-
-            LogAktivitas::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => 'Add Application',
-                'tipe_aktivitas' => 'create',
-                'modul' => 'Aplikasi',
-                'detail' => "Added application '{$aplikasi->nama}'"
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Application added successfully.'
-            ], 200);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to add application: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function show($id)
-    {
-        try {
-            $aplikasi = Aplikasi::with('atributTambahans')->findOrFail($id);
-
-            return response()->json([
-                'success' => true,
-                'aplikasi' => $aplikasi,
-                'atribut_tambahan' => $aplikasi->atributTambahans
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load application detail: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function edit($id)
-    {
-        try {
-            $aplikasi = Aplikasi::with(['atributTambahans' => function($query) {
-                $query->withPivot('nilai_atribut');
-            }])->findOrFail($id);
-
-            $atributs = AtributTambahan::all();
-
-            return response()->json([
-                'success' => true,
-                'aplikasi' => $aplikasi,
-                'atributs' => $atributs
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in edit method: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load application data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function update(Request $request, $id)
-    {
-        try {
-            DB::beginTransaction();
-
-            $aplikasi = Aplikasi::findOrFail($id);
-
-            $validated = $request->validate([
-                'nama' => ['required', Rule::unique('aplikasis')->ignore($aplikasi->id_aplikasi, 'id_aplikasi')],
-                'opd' => 'required',
-                'uraian' => 'nullable',
-                'tahun_pembuatan' => 'required|date',
-                'jenis' => 'required',
-                'basis_aplikasi' => 'required|in:Website,Desktop,Mobile',
-                'bahasa_framework' => 'required',
-                'database' => 'required',
-                'pengembang' => 'required',
-                'lokasi_server' => 'required',
-                'status_pemakaian' => 'required|in:Aktif,Tidak Aktif'
-            ]);
-
-            $aplikasi->update($validated);
-
-            if ($request->has('atribut')) {
-                $aplikasi->atributTambahans()->detach();
-
-                foreach ($request->atribut as $id_atribut => $nilai) {
-                    if (!empty($nilai)) {
-                        $aplikasi->atributTambahans()->attach($id_atribut, ['nilai_atribut' => $nilai]);
-                    }
-                }
-            }
-
-            DB::commit();
-
-            LogAktivitas::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => 'Update Application',
-                'tipe_aktivitas' => 'update',
-                'modul' => 'Aplikasi',
-                'detail' => "Updated application '{$aplikasi->nama}'"
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Application updated successfully.'
-            ]);
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error updating aplikasi: ' . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update application: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function destroy($id)
-    {
-        try {
-            DB::beginTransaction();
-
-            $aplikasi = Aplikasi::findOrFail($id);
-            $namaAplikasi = $aplikasi->nama;
-
-            $aplikasi->atributTambahans()->detach();
-            $aplikasi->delete();
-
-            DB::commit();
-
-            LogAktivitas::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => 'Delete Application',
-                'tipe_aktivitas' => 'delete',
-                'modul' => 'Aplikasi',
-                'detail' => "Deleted application '{$namaAplikasi}'"
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Application deleted successfully.'
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete application: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function destroyByNama($nama)
-    {
-        try {
-            $aplikasi = Aplikasi::where('nama', $nama)->firstOrFail();
-            $namaAplikasi = $aplikasi->nama;
-
-            $aplikasi->delete();
-
-            LogAktivitas::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => 'Delete Application',
-                'tipe_aktivitas' => 'delete',
-                'modul' => 'Aplikasi',
-                'detail' => "Deleted application '{$namaAplikasi}'"
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Application deleted successfully.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete application: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function export()
-    {
-        try {
-            return Excel::download(new AplikasiExport(), 'aplikasi.xlsx');
-        } catch (\Exception $e) {
-            return back()->with('error', 'An error occurred while exporting data: ' . $e->getMessage());
-        }
-    }
-
-    public function getChartData()
-    {
-        $statusData = Aplikasi::select('status_pemakaian', DB::raw('count(*) as total'))
-            ->groupBy('status_pemakaian')
-            ->get();
-
-        $jenisData = Aplikasi::select('jenis', DB::raw('count(*) as total'))
-            ->groupBy('jenis')
-            ->get();
-
-        $basisData = Aplikasi::select('basis_aplikasi', DB::raw('count(*) as total'))
-            ->groupBy('basis_aplikasi')
-            ->get();
-
-        $pengembangData = Aplikasi::select('pengembang', DB::raw('count(*) as total'))
-            ->groupBy('pengembang')
-            ->get();
-
-        return response()->json([
-            'statusData' => $statusData,
-            'jenisData' => $jenisData,
-            'basisData' => $basisData,
-            'pengembangData' => $pengembangData
+        return view('aplikasi.index', [
+            'aplikasis' => Aplikasi::query()->orderBy('nama')->get(),
+            'atributs' => AtributTambahan::query()->orderBy('nama_atribut')->get(),
         ]);
     }
 
-    public function editByNama($nama)
+    public function create(): View
     {
-        try {
-            $aplikasi = Aplikasi::where('nama', $nama)->firstOrFail();
-
-            $atributs = AtributTambahan::whereHas('aplikasis', function ($query) use ($aplikasi) {
-                $query->where('aplikasis.id_aplikasi', $aplikasi->id_aplikasi);
-            })->get();
-
-            $existingAtributs = $aplikasi->atributTambahans()
-                ->get()
-                ->pluck('pivot.nilai_atribut', 'id_atribut')
-                ->toArray();
-
-            return view('aplikasi.edit', compact('aplikasi', 'atributs', 'existingAtributs'));
-        } catch (\Exception $e) {
-            Log::error('Error in editByNama: ' . $e->getMessage());
-            return redirect()->route('aplikasi.index')
-                ->with('error', 'Failed to load application data.');
-        }
+        return view('aplikasi.create', [
+            'atributs' => AtributTambahan::query()->orderBy('nama_atribut')->get(),
+        ]);
     }
 
-    public function updateByNama(Request $request, $nama)
+    public function store(StoreAplikasiRequest $request): JsonResponse
     {
-        try {
-            $request->validate([
-                'status_pemakaian' => 'required|in:Aktif,Tidak Aktif',
-            ]);
+        $this->service->create($request->safe()->except('atribut'), $request->input('atribut', []));
 
-            $aplikasi = Aplikasi::where('nama', $nama)->firstOrFail();
-            $oldStatus = $aplikasi->status_pemakaian;
-
-            $aplikasi->update($request->only('status_pemakaian'));
-
-            LogAktivitas::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => 'Update Application',
-                'tipe_aktivitas' => 'update',
-                'modul' => 'Aplikasi',
-                'detail' => "Updated status of '{$nama}' from '{$oldStatus}' to '{$request->status_pemakaian}'"
-            ]);
-
-            return redirect()->route('aplikasi.index')
-                ->with('success', 'Application updated successfully.');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Failed to update application: ' . $e->getMessage());
-        }
-    }
-
-    public function detail($id)
-    {
-        try {
-            $aplikasi = Aplikasi::with('atributTambahans')->findOrFail($id);
-
-            return response()->json([
-                'success' => true,
-                'data' => $aplikasi,
-                'message' => 'Application detail loaded.'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in detail method: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load application detail: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function getAtribut($id)
-    {
-        $aplikasi = Aplikasi::with('atributTambahans')->findOrFail($id);
         return response()->json([
             'success' => true,
-            'atribut_tambahans' => $aplikasi->atributTambahans
+            'message' => 'Application added successfully.',
+        ], 201);
+    }
+
+    public function show(Aplikasi $aplikasi): JsonResponse
+    {
+        $aplikasi->load('atributTambahans');
+
+        return response()->json([
+            'success' => true,
+            'aplikasi' => $aplikasi,
+            'atribut_tambahan' => $aplikasi->atributTambahans,
         ]);
     }
 
-    public function updateAtribut(Request $request, $id)
+    public function detail(Aplikasi $aplikasi): JsonResponse
     {
-        try {
-            $aplikasi = Aplikasi::findOrFail($id);
-
-            foreach ($request->nilai_atribut as $atributId => $nilai) {
-                DB::table('aplikasi_atribut')
-                    ->where('id_aplikasi', $id)
-                    ->where('id_atribut', $atributId)
-                    ->update(['nilai_atribut' => $nilai]);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Attribute values updated successfully.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update attribute values: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'data' => $aplikasi->load('atributTambahans'),
+            'message' => 'Application detail loaded.',
+        ]);
     }
 
-    private function getFieldLabel($field)
+    public function edit(Aplikasi $aplikasi): JsonResponse
     {
-        $labels = [
-            'nama' => 'Name',
-            'opd' => 'OPD',
-            'uraian' => 'Description',
-            'tahun_pembuatan' => 'Year Built',
-            'jenis' => 'Type',
-            'basis_aplikasi' => 'Application Base',
-            'bahasa_framework' => 'Language/Framework',
-            'database' => 'Database',
-            'pengembang' => 'Developer',
-            'lokasi_server' => 'Server Location',
-            'status_pemakaian' => 'Usage Status'
-        ];
+        return response()->json([
+            'success' => true,
+            'aplikasi' => $aplikasi->load('atributTambahans'),
+            'atributs' => AtributTambahan::query()->orderBy('nama_atribut')->get(),
+        ]);
+    }
 
-        return $labels[$field] ?? $field;
+    public function update(UpdateAplikasiRequest $request, Aplikasi $aplikasi): JsonResponse
+    {
+        $this->service->update($aplikasi, $request->safe()->except('atribut'), $request->input('atribut', []));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Application updated successfully.',
+        ]);
+    }
+
+    public function destroy(Aplikasi $aplikasi): JsonResponse
+    {
+        $this->service->delete($aplikasi);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Application deleted successfully.',
+        ]);
     }
 }

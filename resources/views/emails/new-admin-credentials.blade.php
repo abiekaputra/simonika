@@ -139,7 +139,7 @@
             <p>Jika Anda mengalami kendala dalam mengakses sistem atau memiliki pertanyaan lebih lanjut, silakan menghubungi tim support kami melalui:</p>
             
             <div class="contact-info">
-                <p><strong>Email:</strong> simonikait@gmail.com<br>
+                <p><strong>Email:</strong> {{ config('mail.from.address') }}<br>
                 <strong>Telepon:</strong> (0821-3906-9782)</p>
             </div>
 

@@ -1,93 +1,109 @@
-# SiMonika — Application Monitoring System
+# SiMonika
 
-A Laravel-based web application for monitoring and tracking government agency (OPD) applications, covering employee management, project tracking, activity timelines, and intern data collection.
+SiMonika is an application inventory and project monitoring system for an operations team. It records deployed applications, flexible application metadata, employees, projects, timelines, internship participants, and administrative activity.
 
-## Features
+This repository is a sanitized portfolio edition of an internship project that originally stopped before it was ready for public evaluation. It contains no government database, production credentials, internal hostnames, or employee records.
 
-- **Dashboard** — overview of active/inactive application counts and last update log
-- **Application Management** — full CRUD for government applications with dynamic custom attributes and Excel export
-- **Employee Management** — data of employees involved in application development and management
-- **Project Management** — track development projects by category and status
-- **Timeline** — activity history log per application
-- **Intern Data Collection** — manage intern participant records
-- **Activity Log** — audit trail of user actions (Super Admin only)
-- **Authentication** — login, registration, forgot password, and profile management
-- **Data Export** — download application data as Excel
+## Problem and users
 
-## User Roles
+Operational application data often ends up spread across spreadsheets and disconnected notes. That makes it difficult to answer basic questions: which applications are active, who maintains a project, what technology is in use, and when a milestone is due.
 
-| Role | Access |
-|------|--------|
-| **Admin** | Dashboard, applications, employees, projects, timelines, intern data, profile |
-| **Super Admin** | All Admin features + user management, activity log, log export |
+SiMonika gives two user roles a single server rendered workspace:
 
-## Tech Stack
+- **Admin** maintains applications, attributes, employees, projects, timelines, and internship records.
+- **Super Admin** has the same operational access plus administrator and activity log management.
 
-- **Framework** — Laravel 11
-- **Frontend** — Blade, Tailwind CSS, Vite
-- **Database** — MySQL
-- **Language** — PHP 8.x
+## Implemented workflows
 
-## Installation
+- Secure login, logout, remember me, and password reset
+- Role protected administrator management
+- Application inventory with typed, reusable custom attributes
+- Formula safe streaming CSV export
+- Employee, category, project, and project timeline management
+- Internship participant records with date and headcount validation
+- Activity logs for authentication and critical mutations
+- Dashboard aggregation for application status, type, platform, and developer
 
-### Prerequisites
+## Engineering highlights
 
-- PHP >= 8.1
-- Composer
-- Node.js & npm
-- MySQL
+- Laravel Form Requests validate application and timeline commands.
+- Services keep application and dynamic attribute transactions outside HTTP controllers.
+- Typed attribute values are checked before persistence; incompatible definition changes are rejected.
+- Password reset tokens are hashed, expire after 60 minutes, and are single use.
+- CSV cells that could become spreadsheet formulas are neutralized before streaming.
+- Database migrations support both a clean install and a complete rollback.
+- CI enforces tests, formatting, and source file length limits.
 
-### Steps
+## Stack
+
+| Area | Technology | Reason |
+| --- | --- | --- |
+| Backend | PHP 8.2+, Laravel 12 | Mature validation, authentication, ORM, and server rendered workflows |
+| UI | Blade, Bootstrap 5, JavaScript modules | Small deployment surface without a frontend build step |
+| Data | SQLite locally; MySQL configuration available | Fast local reproduction with a path to managed relational storage |
+| Export | Native streamed CSV | Constant memory iteration and no spreadsheet parser dependency |
+| Quality | PHPUnit, Laravel Pint, GitHub Actions | Repeatable behavioral and style gates |
+| Runtime | Apache container or local PHP server | Reproducible evaluation and a simple local workflow |
+
+## Quick start
+
+Requirements: PHP 8.2 or newer with SQLite, plus Composer.
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/abiekaputra/simonika.git
 cd simonika
-
-# 2. Install PHP dependencies
 composer install
-
-# 3. Install frontend dependencies
-npm install && npm run build
-
-# 4. Copy environment configuration
 cp .env.example .env
-
-# 5. Generate application key
+touch database/database.sqlite
 php artisan key:generate
-
-# 6. Configure database in .env
-#    Set DB_DATABASE, DB_USERNAME, DB_PASSWORD
-
-# 7. Run migrations
 php artisan migrate
-
-# 8. (Optional) Run seeders
-php artisan db:seed
-
-# 9. Start development server
 php artisan serve
 ```
 
-Visit `http://localhost:8000` in your browser.
+Open `http://127.0.0.1:8000`.
 
-## Project Structure
+### Docker
 
+```bash
+docker compose up --build
 ```
-app/
-├── Http/Controllers/      # Module controllers
-├── Models/                # Eloquent models
-├── Exports/               # Excel export classes
-├── Imports/               # Data import classes
-├── Mail/                  # Mailable classes
-└── Traits/                # Reusable traits
-database/
-├── migrations/            # Database schema
-└── seeders/               # Seed data
-resources/views/           # Blade templates
-routes/web.php             # Route definitions
+
+Open `http://127.0.0.1:8080`. The entrypoint creates an application key, initializes a persistent SQLite file, and runs outstanding migrations.
+
+## Optional local account
+
+Demo seeding is disabled by default. Set local credentials in `.env`:
+
+```dotenv
+SIMONIKA_DEMO_SEED=true
+SIMONIKA_DEMO_ADMIN_EMAIL=admin@example.test
+SIMONIKA_DEMO_ADMIN_PASSWORD=choose-a-local-password
 ```
+
+Then run `php artisan db:seed`. Never enable the demo seeder in a public deployment.
+
+## Verification
+
+```bash
+composer quality
+composer audit --locked
+```
+
+`composer quality` checks the source file limits, executes the behavioral test suite against an in memory SQLite database, and verifies formatting. The current suite covers authentication, authorization, password reset, application and attribute transactions, typed values, CSV safety, project timelines, category constraints, employee uniqueness, operational dates, and guest access.
+
+## Design documentation
+
+- [Architecture](docs/architecture.md)
+- [Data model](docs/data-model.md)
+- [HTTP interface](docs/http-interface.md)
+- [Testing and failure handling](docs/testing-and-failures.md)
+- [Engineering decisions and tradeoffs](docs/engineering-decisions.md)
+- [Security policy](SECURITY.md)
+
+## Project status
+
+The portfolio hardening work has repaired the main application, attribute, authentication, timeline, migration, and export paths. The application is suitable for local evaluation with synthetic data. The next useful production steps are server side filtering for large inventories, asynchronous mail delivery, and browser level regression tests for every remaining administrative screen.
 
 ## License
 
-Built for academic purposes and portfolio development.
+[MIT](LICENSE)

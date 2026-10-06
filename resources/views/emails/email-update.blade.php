@@ -86,7 +86,7 @@
 
         <div class="footer">
             <p>Butuh bantuan? Hubungi kami di:</p>
-            <p><strong>Email:</strong> simonikait@gmail.com<br>
+            <p><strong>Email:</strong> {{ config('mail.from.address') }}<br>
             <strong>Telepon:</strong> (0821-3906-9782)</p>
             
             <p style="margin-top: 20px;">

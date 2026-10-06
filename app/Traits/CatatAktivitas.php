@@ -14,7 +14,7 @@ trait CatatAktivitas
             'aktivitas' => $aktivitas,
             'tipe_aktivitas' => $tipe,
             'modul' => $modul,
-            'detail' => $detail
+            'detail' => $detail,
         ]);
     }
 }

@@ -17,9 +17,4 @@ class Pegawai extends Model
     {
         return $this->hasMany(Linimasa::class);
     }
-
-    public function proyek()
-    {
-        return $this->belongsToMany(Proyek::class, 'pegawai_proyek');
-    }
 }

@@ -13,17 +13,15 @@ class LogAktivitas extends Model
         'aktivitas',
         'tipe_aktivitas',
         'modul',
-        'detail'
+        'detail',
     ];
 
     public const TIPE_AKTIVITAS = [
         'create',
-        'read',
         'update',
         'delete',
         'login',
         'logout',
-        'auth'
     ];
 
     protected static function boot()
@@ -31,8 +29,8 @@ class LogAktivitas extends Model
         parent::boot();
 
         static::saving(function ($model) {
-            if (!in_array($model->tipe_aktivitas, self::TIPE_AKTIVITAS)) {
-                throw new \Exception('Invalid activity type: ' . $model->tipe_aktivitas);
+            if (! in_array($model->tipe_aktivitas, self::TIPE_AKTIVITAS)) {
+                throw new \Exception('Invalid activity type: '.$model->tipe_aktivitas);
             }
         });
     }

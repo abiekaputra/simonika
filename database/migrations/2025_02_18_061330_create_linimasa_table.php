@@ -10,14 +10,14 @@ return new class extends Migration
      * Run the migrations.
      */
     /**
-     * membuat kolom database yang isi ya kemungnkinan 
-     * 1. primary key 
+     * membuat kolom database yang isi ya kemungnkinan
+     * 1. primary key
      * 2. kolom tanggal \
      * 3. kolom nama proyek
      * 4. kolom nama pengembang
-     * 5. kolom nama proyek yang dikerjakan 
-     * 6. kolom status proyek 
-     * 7. kolom untuk tenggat waktu 
+     * 5. kolom nama proyek yang dikerjakan
+     * 6. kolom status proyek
+     * 7. kolom untuk tenggat waktu
      */
     public function up(): void
     {

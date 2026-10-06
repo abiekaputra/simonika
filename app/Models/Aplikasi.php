@@ -10,6 +10,7 @@ class Aplikasi extends Model
     use HasFactory;
 
     protected $table = 'aplikasis';
+
     protected $primaryKey = 'id_aplikasi';
 
     protected $fillable = [
@@ -23,14 +24,14 @@ class Aplikasi extends Model
         'database',
         'pengembang',
         'lokasi_server',
-        'status_pemakaian'
+        'status_pemakaian',
     ];
 
     public function atributTambahans()
     {
         return $this->belongsToMany(AtributTambahan::class, 'aplikasi_atribut', 'id_aplikasi', 'id_atribut')
-                    ->withPivot('nilai_atribut')
-                    ->withTimestamps();
+            ->withPivot('nilai_atribut')
+            ->withTimestamps();
     }
 
     public function getNilaiAtribut($id_atribut)

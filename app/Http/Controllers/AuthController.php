@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Pengguna;
-use Illuminate\Validation\Rules\Password;
 use App\Models\LogAktivitas;
+use App\Models\Pengguna;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Validation\Rules\Password;
 
-class AuthController extends \Illuminate\Routing\Controller
+class AuthController extends Controller
 {
     public function showLoginForm()
     {
@@ -24,11 +24,11 @@ class AuthController extends \Illuminate\Routing\Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email', 'exists:penggunas'],
-            'password' => ['required', Password::min(8)],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt($credentials, $request->remember)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
             LogAktivitas::create([
@@ -36,7 +36,7 @@ class AuthController extends \Illuminate\Routing\Controller
                 'aktivitas' => 'Login',
                 'tipe_aktivitas' => 'login',
                 'modul' => 'Auth',
-                'detail' => 'User logged in.'
+                'detail' => 'User logged in.',
             ]);
 
             Auth::user()->update(['last_activity' => now()]);
@@ -44,6 +44,7 @@ class AuthController extends \Illuminate\Routing\Controller
             if (Auth::user()->isSuperAdmin()) {
                 return redirect()->route('super-admin.dashboard');
             }
+
             return redirect()->route('dashboard');
         }
 
@@ -59,7 +60,7 @@ class AuthController extends \Illuminate\Routing\Controller
             'aktivitas' => 'Logout',
             'tipe_aktivitas' => 'logout',
             'modul' => 'Auth',
-            'detail' => 'User logged out.'
+            'detail' => 'User logged out.',
         ]);
 
         Auth::user()->update(['last_activity' => null]);
@@ -77,27 +78,33 @@ class AuthController extends \Illuminate\Routing\Controller
 
     public function sendResetLink(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|exists:penggunas,email',
+        $validated = $request->validate([
+            'email' => ['required', 'email'],
         ], [
             'email.required' => 'Email is required.',
             'email.email' => 'Invalid email format.',
-            'email.exists' => 'Email is not registered.',
         ]);
 
-        $token = Str::random(64);
+        $user = Pengguna::where('email', $validated['email'])->first();
 
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            ['email' => $request->email, 'token' => $token, 'created_at' => Carbon::now()]
-        );
+        if ($user) {
+            $token = Str::random(64);
 
-        Mail::send('emails.reset-password', ['token' => $token], function ($message) use ($request) {
-            $message->to($request->email);
-            $message->subject('SiMonika — Password Reset');
-        });
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $validated['email']],
+                [
+                    'token' => Hash::make($token),
+                    'created_at' => now(),
+                ]
+            );
 
-        return back()->with('success', 'Password reset link has been sent to your email.');
+            Mail::send('emails.reset-password', ['token' => $token], function ($message) use ($validated) {
+                $message->to($validated['email']);
+                $message->subject('SiMonika — Password Reset');
+            });
+        }
+
+        return back()->with('success', 'If the email is registered, a password reset link has been sent.');
     }
 
     public function showResetPasswordForm($token)
@@ -109,12 +116,11 @@ class AuthController extends \Illuminate\Routing\Controller
     {
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email|exists:penggunas',
-            'password' => 'required|confirmed|min:8',
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', Password::min(8)],
         ], [
             'email.required' => 'Email is required.',
             'email.email' => 'Invalid email format.',
-            'email.exists' => 'Email is not registered.',
             'password.required' => 'New password is required.',
             'password.confirmed' => 'Password confirmation does not match.',
             'password.min' => 'Password must be at least 8 characters.',
@@ -122,19 +128,23 @@ class AuthController extends \Illuminate\Routing\Controller
 
         $resetToken = DB::table('password_reset_tokens')
             ->where('email', $request->email)
-            ->where('token', $request->token)
             ->first();
 
-        if (!$resetToken) {
+        if (! $resetToken || ! Hash::check($request->token, $resetToken->token)) {
             return back()->withErrors(['email' => 'Invalid password reset token.']);
         }
 
         if (Carbon::parse($resetToken->created_at)->addMinutes(60)->isPast()) {
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
             return back()->withErrors(['email' => 'Password reset token has expired.']);
         }
 
         $user = Pengguna::where('email', $request->email)->first();
+
+        if (! $user) {
+            return back()->withErrors(['email' => 'Invalid password reset token.']);
+        }
         $user->update(['password' => Hash::make($request->password)]);
 
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
@@ -144,7 +154,7 @@ class AuthController extends \Illuminate\Routing\Controller
             'aktivitas' => 'Reset Password',
             'tipe_aktivitas' => 'update',
             'modul' => 'auth',
-            'detail' => 'User reset their password.'
+            'detail' => 'User reset their password.',
         ]);
 
         return redirect()->route('login')->with('success', 'Password reset successfully. Please log in with your new password.');

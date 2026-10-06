@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('pegawai_id')->constrained('pegawais')->onDelete('cascade');
             $table->foreignId('proyek_id')->constrained('proyeks')->onDelete('cascade');
             $table->enum('status_proyek', [
-                'Selesai Lebih Cepat', 'Tepat Waktu', 'Terlambat', 'Revisi', 'Proses', 'To Do Next'
+                'Selesai Lebih Cepat', 'Tepat Waktu', 'Terlambat', 'Revisi', 'Proses', 'To Do Next',
             ])->default('Proses');
             $table->date('mulai')->nullable(); // Diubah menjadi nullable
             $table->date('tenggat')->nullable(); // Diubah menjadi nullable
@@ -30,8 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('linimasas', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('linimasas');
     }
 };

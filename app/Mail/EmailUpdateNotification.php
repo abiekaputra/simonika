@@ -11,7 +11,9 @@ class EmailUpdateNotification extends Mailable
     use Queueable, SerializesModels;
 
     public $nama;
+
     public $newEmail;
+
     public $oldEmail;
 
     public function __construct($nama, $newEmail, $oldEmail)

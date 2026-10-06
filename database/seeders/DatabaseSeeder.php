@@ -8,9 +8,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([
-            SuperAdminSeeder::class,
-            PenggunaSeeder::class
-        ]);
+        if (config('simonika.demo_seed.enabled')) {
+            $this->call(SuperAdminSeeder::class);
+        }
     }
 }

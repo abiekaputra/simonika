@@ -1,20 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AplikasiController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AplikasiAtributController;
+use App\Http\Controllers\AplikasiChartController;
+use App\Http\Controllers\AplikasiController;
+use App\Http\Controllers\AplikasiExportController;
 use App\Http\Controllers\AtributController;
-use App\Http\Controllers\AtributTambahanController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LinimasaController;
 use App\Http\Controllers\PegawaiController;
-use App\Http\Controllers\ProyekController;
-use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PendataanController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
 use App\Http\Controllers\SuperAdmin\LogAktivitasController;
+use App\Http\Middleware\CheckRole;
+use Illuminate\Support\Facades\Route;
 
 // ─── Guest ───────────────────────────────────────────────────────────────────
 Route::middleware(['guest', 'throttle:6,1'])->group(function () {
@@ -25,9 +28,13 @@ Route::middleware(['guest', 'throttle:6,1'])->group(function () {
 
 // ─── Password Reset ───────────────────────────────────────────────────────────
 Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
-Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])
+    ->middleware('throttle:5,1')
+    ->name('password.email');
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
-Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+    ->middleware('throttle:5,1')
+    ->name('password.update');
 
 // ─── Authenticated ────────────────────────────────────────────────────────────
 Route::middleware(['auth'])->group(function () {
@@ -36,36 +43,34 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/last-update', [DashboardController::class, 'getLastUpdate'])->name('last.update');
-    Route::get('/chart-data', [AplikasiController::class, 'getChartData']);
+    Route::get('/chart-data', AplikasiChartController::class);
 
     // Aplikasi
     Route::prefix('aplikasi')->group(function () {
         Route::get('/', [AplikasiController::class, 'index'])->name('aplikasi.index');
         Route::get('/create', [AplikasiController::class, 'create'])->name('aplikasi.create');
         Route::post('/', [AplikasiController::class, 'store'])->name('aplikasi.store');
-        Route::get('/export', [AplikasiController::class, 'export'])->name('aplikasi.export');
-        Route::get('/{id}', [AplikasiController::class, 'show'])->name('aplikasi.show');
-        Route::get('/{id}/detail', [AplikasiController::class, 'detail'])->name('aplikasi.detail');
-        Route::get('/{id}/edit', [AplikasiController::class, 'edit'])->name('aplikasi.edit');
-        Route::put('/{id}', [AplikasiController::class, 'update'])->name('aplikasi.update');
-        Route::delete('/{id}', [AplikasiController::class, 'destroy'])->name('aplikasi.destroy');
-        Route::get('/{id}/atribut', [AplikasiController::class, 'getAtribut']);
-        Route::put('/{id}/atribut', [AplikasiController::class, 'updateAtribut'])->name('aplikasi.updateAtribut');
-        Route::post('/{id}/atribut', [AtributTambahanController::class, 'updateAtributValues'])->name('aplikasi.atribut.update');
+        Route::get('/export', AplikasiExportController::class)->name('aplikasi.export');
+        Route::get('/{aplikasi}', [AplikasiController::class, 'show'])->name('aplikasi.show');
+        Route::get('/{aplikasi}/detail', [AplikasiController::class, 'detail'])->name('aplikasi.detail');
+        Route::get('/{aplikasi}/edit', [AplikasiController::class, 'edit'])->name('aplikasi.edit');
+        Route::put('/{aplikasi}', [AplikasiController::class, 'update'])->name('aplikasi.update');
+        Route::delete('/{aplikasi}', [AplikasiController::class, 'destroy'])->name('aplikasi.destroy');
+        Route::get('/{aplikasi}/atribut', [AplikasiAtributController::class, 'show']);
+        Route::match(['put', 'post'], '/{aplikasi}/atribut', [AplikasiAtributController::class, 'update'])
+            ->name('aplikasi.atribut.update');
     });
 
     // Atribut
     Route::prefix('atribut')->group(function () {
         Route::get('/', [AtributController::class, 'index'])->name('atribut.index');
-        Route::get('/create', fn() => redirect()->route('atribut.index'))->name('atribut.create'); // create is a modal on index
+        Route::get('/create', fn () => redirect()->route('atribut.index'))->name('atribut.create'); // create is a modal on index
         Route::post('/', [AtributController::class, 'store'])->name('atribut.store');
         Route::post('/check-duplicate', [AtributController::class, 'checkDuplicate'])->name('atribut.check-duplicate');
-        Route::get('/{id}/detail', [AtributController::class, 'detail'])->name('atribut.detail');
-        Route::get('/{id}/edit', [AtributController::class, 'edit'])->name('atribut.edit');
-        Route::put('/{id}', [AtributController::class, 'update'])->name('atribut.update');
-        Route::delete('/{id}', [AtributController::class, 'destroy'])->name('atribut.destroy');
-        Route::put('/{id_aplikasi}/nilai', [AtributController::class, 'updateNilai'])->name('atribut.updateNilai');
-        Route::delete('/{id_aplikasi}/{id_atribut}', [AtributController::class, 'removeFromApp'])->name('atribut.removeFromApp');
+        Route::get('/{atribut}/detail', [AtributController::class, 'detail'])->name('atribut.detail');
+        Route::get('/{atribut}/edit', [AtributController::class, 'edit'])->name('atribut.edit');
+        Route::put('/{atribut}', [AtributController::class, 'update'])->name('atribut.update');
+        Route::delete('/{atribut}', [AtributController::class, 'destroy'])->name('atribut.destroy');
     });
 
     // Linimasa
@@ -123,9 +128,10 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
     });
 
-    // Admin — super_admin only
-    Route::prefix('admin')->middleware(\App\Http\Middleware\CheckRole::class . ':super_admin')->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
+    // Admin management — super_admin only
+    Route::prefix('admin')->middleware(CheckRole::class.':super_admin')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.index');
         Route::get('/create', [AdminController::class, 'create'])->name('admin.create');
         Route::post('/', [AdminController::class, 'store'])->name('admin.store');
@@ -135,7 +141,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Super Admin
-    Route::prefix('super-admin')->middleware(\App\Http\Middleware\CheckRole::class . ':super_admin')->group(function () {
+    Route::prefix('super-admin')->middleware(CheckRole::class.':super_admin')->group(function () {
         Route::get('/dashboard', [SuperAdminDashboard::class, 'index'])->name('super-admin.dashboard');
         Route::get('/log/export', [LogAktivitasController::class, 'export'])->name('super-admin.log.export');
     });
