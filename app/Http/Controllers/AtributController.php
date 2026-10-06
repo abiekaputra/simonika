@@ -2,254 +2,84 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AtributTambahan;
+use App\Http\Requests\StoreAtributRequest;
+use App\Http\Requests\UpdateAtributRequest;
 use App\Models\Aplikasi;
-use App\Models\LogAktivitas;
+use App\Models\AtributTambahan;
+use App\Services\AtributService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class AtributController extends Controller
 {
-    public function index()
+    public function __construct(private readonly AtributService $service) {}
+
+    public function index(): View
     {
-        $atributs = AtributTambahan::with('aplikasis')->paginate(20);
-        $atributOptions = AtributTambahan::orderBy('nama_atribut')->get(['id_atribut', 'nama_atribut']); // for filter dropdown
-        $aplikasis = Aplikasi::all(); // for modal dropdown
-        return view('atribut.index', compact('atributs', 'atributOptions', 'aplikasis'));
+        return view('atribut.index', [
+            'atributs' => AtributTambahan::query()->with('aplikasis')->orderBy('nama_atribut')->paginate(20),
+            'atributOptions' => AtributTambahan::query()->orderBy('nama_atribut')->get(),
+            'aplikasis' => Aplikasi::query()->with('atributTambahans')->orderBy('nama')->get(),
+        ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreAtributRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $validated = $request->validate([
-                'id_aplikasi' => 'required|exists:aplikasis,id_aplikasi',
-                'nama_atribut' => [
-                    'required',
-                    'string',
-                    'max:100',
-                    Rule::unique('atribut_tambahans')
-                        ->where(function ($query) use ($request) {
-                            return $query->where('id_aplikasi', $request->id_aplikasi)
-                                ->where('nama_atribut', $request->nama_atribut);
-                        })
-                ],
-                'nilai_atribut' => 'nullable|string'
-            ]);
+        $attribute = $this->service->create($request->validated());
 
-            
-            $aplikasi = Aplikasi::findOrFail($validated['id_aplikasi']);
-            
-            
-            $atribut = AtributTambahan::create([
-                'id_aplikasi' => $validated['id_aplikasi'],
-                'nama_atribut' => $validated['nama_atribut'],
-                'nilai_atribut' => $validated['nilai_atribut'] ?? null
-            ]);
-
-            
-            LogAktivitas::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => 'Add Attribute',
-                'tipe_aktivitas' => 'create',
-                'modul' => 'Atribut',
-                'detail' => "Menambahkan atribut '{$atribut->nama_atribut}' to application {$aplikasi->nama}"
-            ]);
-
-            DB::commit();
-
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Attribute added successfully.',
-                    'data' => $atribut
-                ]);
-            }
-
-            return redirect()->route('atribut.index')
-                ->with('success', 'Attribute added successfully.');
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to add attribute: ' . $e->getMessage()
-                ], 422);
-            }
-
-            return redirect()->route('atribut.index')
-                ->with('error', 'Failed to add attribute: ' . $e->getMessage());
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Attribute added successfully.',
+            'data' => $attribute,
+        ], 201);
     }
 
-    public function edit($id)
+    public function edit(AtributTambahan $atribut): JsonResponse
     {
-        $atribut = AtributTambahan::with('aplikasis')->findOrFail($id);
-        return response()->json($atribut);
+        return response()->json(['success' => true, 'data' => $atribut]);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateAtributRequest $request, AtributTambahan $atribut): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $atribut = AtributTambahan::findOrFail($id);
+        $attribute = $this->service->update($atribut, $request->validated());
 
-            $validated = $request->validate([
-                'id_aplikasi' => 'required|exists:aplikasis,id_aplikasi',
-                'nama_atribut' => [
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('atribut_tambahans', 'nama_atribut')
-                        ->where('id_aplikasi', $request->id_aplikasi)
-                        ->ignore($id, 'id_atribut')
-                ],
-                'nilai_atribut' => 'nullable|string|max:255'
-            ]);
-
-            
-            $atribut->update([
-                'id_aplikasi' => $validated['id_aplikasi'],
-                'nama_atribut' => $validated['nama_atribut'],
-                'nilai_atribut' => $validated['nilai_atribut']
-            ]);
-
-            
-            LogAktivitas::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => 'Update Attribute',
-                'tipe_aktivitas' => 'update',
-                'modul' => 'Atribut',
-                'detail' => "Mengupdate atribut '{$atribut->nama_atribut}' to application {$atribut->aplikasi->nama}"
-            ]);
-
-            DB::commit();
-            
-            
-            
-            
-            return redirect()->back()->with('success', 'Attribute updated successfully.');
-        } catch (\Exception $e) {
-            DB::rollback();
-            return redirect()->back()
-                ->with('error', 'Failed to update attribute: ' . $e->getMessage());
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Attribute updated successfully.',
+            'data' => $attribute,
+        ]);
     }
 
-    public function destroy($id)
+    public function destroy(AtributTambahan $atribut): RedirectResponse
     {
-        try {
-            $atribut = AtributTambahan::findOrFail($id);
-            $namaAtribut = $atribut->nama_atribut;
-            $namaAplikasi = $atribut->aplikasi->nama;
+        $this->service->delete($atribut);
 
-            $atribut->delete();
-
-            
-            LogAktivitas::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => 'Delete Attribute',
-                'tipe_aktivitas' => 'delete',
-                'modul' => 'Atribut',
-                'detail' => "Menghapus atribut '{$namaAtribut}' from application {$namaAplikasi}"
-            ]);
-
-            return redirect()->route('atribut.index')
-                ->with('success', 'Attribute deleted successfully.');
-        } catch (\Exception $e) {
-            return redirect()->route('atribut.index')
-                ->with('error', 'Failed to delete attribute: ' . $e->getMessage());
-        }
+        return redirect()->route('atribut.index')->with('success', 'Attribute deleted successfully.');
     }
 
-    public function checkDuplicate(Request $request)
+    public function checkDuplicate(Request $request): JsonResponse
     {
-        $exists = AtributTambahan::where('id_aplikasi', $request->id_aplikasi)
-            ->where('nama_atribut', $request->nama_atribut)
-            ->when($request->current_id, function($query) use ($request) {
-                return $query->where('id_atribut', '!=', $request->current_id);
-            })
+        $request->validate([
+            'nama_atribut' => ['required', 'string', 'max:100'],
+            'current_id' => ['nullable', 'integer'],
+        ]);
+
+        $exists = AtributTambahan::query()
+            ->where('nama_atribut', $request->string('nama_atribut')->trim())
+            ->when($request->integer('current_id'), fn ($query, $id) => $query->whereKeyNot($id))
             ->exists();
 
         return response()->json(['exists' => $exists]);
     }
 
-    public function detail($id)
+    public function detail(AtributTambahan $atribut): JsonResponse
     {
-        try {
-            $atribut = AtributTambahan::with(['aplikasis' => function($query) {
-                $query->select('aplikasis.id_aplikasi', 'aplikasis.nama');
-            }])->findOrFail($id);
-
-            return response()->json([
-                'success' => true,
-                'atribut' => $atribut,
-                'aplikasis' => $atribut->aplikasis
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load attribute detail.'
-            ], 500);
-        }
-    }
-
-    public function updateNilai(Request $request, $id_aplikasi)
-    {
-        try {
-            
-            $request->validate([
-                'id_atribut' => 'required',
-                'nilai' => 'nullable'
-            ]);
-
-            $aplikasi = Aplikasi::findOrFail($id_aplikasi);
-            
-            
-            $existingValue = DB::table('aplikasi_atribut')
-                ->where('id_aplikasi', $id_aplikasi)
-                ->where('id_atribut', $request->id_atribut)
-                ->value('nilai_atribut');
-
-            
-            $newValue = $request->nilai ?: $existingValue;
-            
-            
-            DB::table('aplikasi_atribut')
-                ->where('id_aplikasi', $id_aplikasi)
-                ->where('id_atribut', $request->id_atribut)
-                ->update(['nilai_atribut' => $newValue]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Attribute value updated successfully.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update attribute value: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function removeFromApp($id_aplikasi, $id_atribut)
-    {
-        try {
-            $aplikasi = Aplikasi::findOrFail($id_aplikasi);
-            $aplikasi->atributTambahans()->detach($id_atribut);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Attribute removed from application successfully.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menghapus atribut from application'
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'atribut' => $atribut,
+            'aplikasis' => $atribut->aplikasis()->orderBy('nama')->get(),
+        ]);
     }
 }

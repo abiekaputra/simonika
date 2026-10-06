@@ -27,19 +27,18 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('id_aplikasi')
-                  ->references('id_aplikasi')
-                  ->on('aplikasis')
-                  ->onDelete('cascade');
+                ->references('id_aplikasi')
+                ->on('aplikasis')
+                ->onDelete('cascade');
 
             $table->foreign('id_atribut')
-                  ->references('id_atribut')
-                  ->on('atribut_tambahans')
-                  ->onDelete('cascade');
+                ->references('id_atribut')
+                ->on('atribut_tambahans')
+                ->onDelete('cascade');
 
             $table->primary(['id_aplikasi', 'id_atribut']);
         });
     }
-    
 
     /**
      * Reverse the migrations.

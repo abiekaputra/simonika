@@ -9,6 +9,15 @@ class Linimasa extends Model
 {
     use HasFactory;
 
+    public const STATUSES = [
+        'Selesai Lebih Cepat',
+        'Tepat Waktu',
+        'Terlambat',
+        'Revisi',
+        'Proses',
+        'To Do Next',
+    ];
+
     protected $fillable = [
         'pegawai_id',
         'proyek_id',
@@ -18,6 +27,12 @@ class Linimasa extends Model
         'tanggal_selesai',
         'deskripsi',
         'status_manual',
+    ];
+
+    protected $casts = [
+        'mulai' => 'date',
+        'tenggat' => 'date',
+        'tanggal_selesai' => 'date',
     ];
 
     public function pegawai()

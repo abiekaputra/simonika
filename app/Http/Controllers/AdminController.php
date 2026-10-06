@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailUpdateNotification;
+use App\Mail\NewAdminCredentials;
 use App\Models\Pengguna;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\NewAdminCredentials;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
-use App\Mail\EmailUpdateNotification;
 
 class AdminController extends Controller
 {
@@ -21,6 +24,7 @@ class AdminController extends Controller
     public function index()
     {
         $admins = Pengguna::where('role', 'admin')->paginate(20);
+
         return view('admin.index', compact('admins'));
     }
 
@@ -37,31 +41,34 @@ class AdminController extends Controller
                 'email' => 'required|email|unique:penggunas',
             ]);
 
-            $plainPassword = Str::random(8);
+            $plainPassword = Str::password(16, symbols: false);
             $validated['password'] = Hash::make($plainPassword);
             $validated['role'] = 'admin';
 
-            $admin = Pengguna::create($validated);
-
-            Mail::to($validated['email'])->send(new NewAdminCredentials(
-                $validated['nama'],
-                $validated['email'],
-                $plainPassword
-            ));
+            DB::transaction(function () use ($validated, $plainPassword) {
+                Pengguna::create($validated);
+                Mail::to($validated['email'])->send(new NewAdminCredentials(
+                    $validated['nama'],
+                    $validated['email'],
+                    $plainPassword
+                ));
+            });
 
             return response()->json([
                 'success' => true,
-                'message' => 'Admin added successfully.'
+                'message' => 'Admin added successfully.',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+            Log::error('Failed to create admin account.', ['exception' => $e]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred: ' . $e->getMessage()
+                'message' => 'Unable to create the admin account.',
             ], 500);
         }
     }
@@ -70,6 +77,7 @@ class AdminController extends Controller
     {
         try {
             $admin = Pengguna::findOrFail($id);
+
             return response()->json($admin);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Admin not found.'], 404);
@@ -84,8 +92,8 @@ class AdminController extends Controller
 
             $validated = $request->validate([
                 'nama' => 'required|string|max:100',
-                'email' => 'required|email|unique:penggunas,email,' . $id . ',id_user',
-                'password' => 'nullable|min:8'
+                'email' => 'required|email|unique:penggunas,email,'.$id.',id_user',
+                'password' => ['nullable', Password::min(8)],
             ]);
 
             if ($validated['email'] !== $oldEmail) {
@@ -108,17 +116,19 @@ class AdminController extends Controller
                 'success' => true,
                 'message' => $validated['email'] !== $oldEmail
                     ? 'Admin updated and notification sent to new email.'
-                    : 'Admin updated successfully.'
+                    : 'Admin updated successfully.',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+            Log::error('Failed to update admin account.', ['exception' => $e]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred: ' . $e->getMessage()
+                'message' => 'Unable to update the admin account.',
             ], 500);
         }
     }
@@ -132,6 +142,7 @@ class AdminController extends Controller
         }
 
         $admin->delete();
+
         return redirect()->route('admin.index')->with('success', 'Admin deleted successfully.');
     }
 }

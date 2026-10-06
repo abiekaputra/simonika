@@ -11,7 +11,9 @@ class NewAdminCredentials extends Mailable
     use Queueable, SerializesModels;
 
     public $nama;
+
     public $email;
+
     public $password;
 
     public function __construct($nama, $email, $password)
@@ -24,6 +26,6 @@ class NewAdminCredentials extends Mailable
     public function build()
     {
         return $this->subject('SiMonika — Admin Credentials')
-                    ->view('emails.new-admin-credentials');
+            ->view('emails.new-admin-credentials');
     }
 }

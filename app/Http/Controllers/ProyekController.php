@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Proyek;
 use App\Models\Kategori;
+use App\Models\Proyek;
+use Illuminate\Http\Request;
 
 class ProyekController extends Controller
 {
@@ -19,6 +19,7 @@ class ProyekController extends Controller
     public function create()
     {
         $kategori = Kategori::all();
+
         return view('proyek.create', compact('kategori'));
     }
 

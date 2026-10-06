@@ -41,12 +41,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("btnCreate").addEventListener("click", function () {
-            var myModal = new bootstrap.Modal(document.getElementById('proyekCreateModal'));
-            myModal.show();
-        });
-    });
-</script>

@@ -17,7 +17,7 @@ class Proyek extends Model
     {
         return $this->hasMany(Linimasa::class);
     }
-    
+
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'kategori_id');

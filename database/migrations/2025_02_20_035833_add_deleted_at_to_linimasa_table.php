@@ -22,9 +22,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Menghapus kolom deleted_at jika migrasi dibatalkan
+        if (! Schema::hasTable('linimasa')) {
+            return;
+        }
+
         Schema::table('linimasa', function (Blueprint $table) {
-            $table->dropSoftDeletes(); // Menghapus kolom deleted_at
+            $table->dropSoftDeletes();
         });
     }
 };

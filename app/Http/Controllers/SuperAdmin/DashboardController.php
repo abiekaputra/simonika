@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Aplikasi;
 use App\Models\LogAktivitas;
 use App\Models\Pengguna;
-use App\Models\Aplikasi;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -41,7 +39,7 @@ class DashboardController extends Controller
             $lastLogout = $adminLogs->where('aktivitas', 'Logout')->first();
             $lastActivity = $adminLogs->first();
 
-            $isOnline = $lastLogin && (!$lastLogout || $lastLogin->created_at > $lastLogout->created_at);
+            $isOnline = $lastLogin && (! $lastLogout || $lastLogin->created_at > $lastLogout->created_at);
 
             return [
                 'nama' => $admin->nama,
