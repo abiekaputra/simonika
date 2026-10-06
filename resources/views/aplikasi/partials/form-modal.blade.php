@@ -19,7 +19,7 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label" for="uraian">Uraian</label>
-                            <textarea class="form-control" id="uraian" name="uraian" rows="3"></textarea>
+                            <textarea class="form-control" id="uraian" name="uraian" rows="3" maxlength="10000"></textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="tahun_pembuatan">Tanggal pembuatan</label>

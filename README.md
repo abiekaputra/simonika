@@ -19,7 +19,7 @@ SiMonika gives two user roles a single server rendered workspace:
 - Role protected administrator management
 - Application inventory with typed, reusable custom attributes
 - Formula safe streaming CSV export
-- Employee, category, project, and project timeline management
+- Employee, category, project, and project timeline management linked to the application inventory
 - Internship participant records with date and headcount validation
 - Activity logs for authentication and critical mutations
 - Dashboard aggregation for application status, type, platform, and developer
@@ -32,6 +32,7 @@ SiMonika gives two user roles a single server rendered workspace:
 - Password reset tokens are hashed, expire after 60 minutes, and are single use.
 - CSV cells that could become spreadsheet formulas are neutralized before streaming.
 - Database migrations support both a clean install and a complete rollback.
+- An end-to-end feature test follows one record from typed inventory metadata through a linked project, owner, completed timeline, dashboard, detail view, and CSV export.
 - CI enforces tests, formatting, and source file length limits.
 
 ## Stack
@@ -94,7 +95,7 @@ composer quality
 composer audit --locked
 ```
 
-`composer quality` checks the source file limits, executes the behavioral test suite against an in memory SQLite database, and verifies formatting. The current suite contains 32 tests and 126 assertions covering authentication, authorization, password reset, transactional mutations, typed values, CSV safety, timeline consistency, audit retention, employee uniqueness, operational dates, screen rendering, and guest access.
+`composer quality` checks the source file limits, executes the behavioral test suite against an in memory SQLite database, and verifies formatting. The suite covers authentication, authorization, password reset, transactional mutations, typed values, CSV safety, linked project workflows, timeline consistency, audit retention, employee uniqueness, operational dates, screen rendering, and guest access.
 
 ## Design documentation
 
@@ -104,13 +105,14 @@ composer audit --locked
 - [Data model](docs/data-model.md)
 - [HTTP interface](docs/http-interface.md)
 - [Testing and failure handling](docs/testing-and-failures.md)
+- [End-to-end product flow](docs/end-to-end-flow.md)
 - [Browser validation](docs/browser-validation.md)
 - [Engineering decisions and tradeoffs](docs/engineering-decisions.md)
 - [Security policy](SECURITY.md)
 
 ## Project status
 
-Product definition, backend/domain hardening, and the responsive web product are complete for local portfolio evaluation. Both roles, every primary screen, narrow-screen behavior, domain invariants, and synthetic data setup have been validated. This repository makes no deployment or production-readiness claim. Known scale boundaries remain client-side inventory filtering and synchronous email delivery.
+Product definition, backend/domain hardening, responsive UI, and end-to-end local integration are complete for portfolio evaluation. Both roles, every primary screen, narrow-screen behavior, domain invariants, linked inventory and project workflows, and synthetic data setup have been validated. This repository makes no deployment or production-readiness claim. Known scale boundaries remain client-side inventory filtering and synchronous email delivery.
 
 ## License
 

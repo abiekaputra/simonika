@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Proyek extends Model
 {
@@ -11,7 +12,7 @@ class Proyek extends Model
 
     protected $table = 'proyeks';
 
-    protected $fillable = ['nama_proyek', 'kategori_id', 'deskripsi'];
+    protected $fillable = ['nama_proyek', 'kategori_id', 'aplikasi_id', 'deskripsi'];
 
     public function linimasa()
     {
@@ -21,5 +22,10 @@ class Proyek extends Model
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'kategori_id');
+    }
+
+    public function aplikasi(): BelongsTo
+    {
+        return $this->belongsTo(Aplikasi::class, 'aplikasi_id', 'id_aplikasi');
     }
 }

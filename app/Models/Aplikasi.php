@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Aplikasi extends Model
 {
     use HasFactory;
+
+    public const BASES = ['Website', 'Desktop', 'Mobile'];
+
+    public const STATUSES = ['Aktif', 'Tidak Aktif'];
 
     protected $table = 'aplikasis';
 
@@ -41,5 +46,10 @@ class Aplikasi extends Model
             ->first();
 
         return $atribut ? $atribut->pivot->nilai_atribut : null;
+    }
+
+    public function proyeks(): HasMany
+    {
+        return $this->hasMany(Proyek::class, 'aplikasi_id', 'id_aplikasi');
     }
 }

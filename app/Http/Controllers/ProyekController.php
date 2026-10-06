@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProyekRequest;
+use App\Models\Aplikasi;
 use App\Models\Kategori;
 use App\Models\Proyek;
 use App\Services\ProyekService;
@@ -16,8 +17,13 @@ class ProyekController extends Controller
     public function index(): View
     {
         return view('proyek.index', [
-            'proyek' => Proyek::query()->with('kategori')->withCount('linimasa')->orderBy('nama_proyek')->paginate(20),
+            'proyek' => Proyek::query()
+                ->with(['kategori', 'aplikasi'])
+                ->withCount('linimasa')
+                ->orderBy('nama_proyek')
+                ->paginate(20),
             'kategori' => Kategori::query()->withCount('proyek')->orderBy('nama_kategori')->get(),
+            'aplikasi' => Aplikasi::query()->orderBy('nama')->get(['id_aplikasi', 'nama']),
         ]);
     }
 

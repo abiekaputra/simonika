@@ -26,6 +26,12 @@ export function initializeApplicationActions(baseUrl, openEdit) {
                 ? attributes.map((attribute) => `<tr><td>${escapeHtml(attribute.nama_atribut)}</td>` +
                     `<td>${escapeHtml(attribute.pivot?.nilai_atribut || "-")}</td></tr>`).join("")
                 : '<tr><td colspan="2" class="text-muted">Belum ada atribut tambahan.</td></tr>';
+            const projects = application.proyeks || [];
+            document.querySelector("#applicationProjectDetails").innerHTML = projects.length
+                ? projects.map((project) => `<tr><td>${escapeHtml(project.nama_proyek)}</td>` +
+                    `<td>${escapeHtml(project.kategori?.nama_kategori || "-")}</td>` +
+                    `<td>${escapeHtml(project.linimasa_count || 0)}</td></tr>`).join("")
+                : '<tr><td colspan="3" class="text-muted">Belum ada proyek terkait.</td></tr>';
             detailModal.show();
         } catch (error) {
             notify("error", error.message);

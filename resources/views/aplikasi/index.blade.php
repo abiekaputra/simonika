@@ -60,6 +60,7 @@
                                 <th>OPD</th>
                                 <th>Basis</th>
                                 <th>Teknologi</th>
+                                <th>Proyek</th>
                                 <th>Status</th>
                                 <th class="text-end">Aksi</th>
                             </tr>
@@ -74,6 +75,7 @@
                                     <td>{{ $aplikasi->opd }}</td>
                                     <td>{{ $aplikasi->basis_aplikasi }}</td>
                                     <td>{{ $aplikasi->bahasa_framework }}</td>
+                                    <td>{{ $aplikasi->proyeks_count }}</td>
                                     <td>
                                         <span class="badge {{ $aplikasi->status_pemakaian === 'Aktif' ? 'text-bg-success' : 'text-bg-secondary' }}">
                                             {{ $aplikasi->status_pemakaian }}

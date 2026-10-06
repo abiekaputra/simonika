@@ -30,8 +30,9 @@
                 @else
                     <form action="{{ route('proyek.store') }}" method="POST" class="row g-2">
                         @csrf
-                        <div class="col-md-7"><label class="form-label">Nama proyek</label><input class="form-control" name="nama_proyek" required></div>
-                        <div class="col-md-5"><label class="form-label">Kategori</label><select class="form-select" name="kategori_id" required><option value="">Pilih kategori</option>@foreach ($kategori as $item)<option value="{{ $item->id }}">{{ $item->nama_kategori }}</option>@endforeach</select></div>
+                        <div class="col-md-4"><label class="form-label">Nama proyek</label><input class="form-control" name="nama_proyek" required></div>
+                        <div class="col-md-4"><label class="form-label">Kategori</label><select class="form-select" name="kategori_id" required><option value="">Pilih kategori</option>@foreach ($kategori as $item)<option value="{{ $item->id }}">{{ $item->nama_kategori }}</option>@endforeach</select></div>
+                        <div class="col-md-4"><label class="form-label">Aplikasi terkait</label><select class="form-select" name="aplikasi_id"><option value="">Tidak terkait aplikasi</option>@foreach ($aplikasi as $app)<option value="{{ $app->id_aplikasi }}">{{ $app->nama }}</option>@endforeach</select></div>
                         <div class="col-12"><label class="form-label">Deskripsi</label><textarea class="form-control" name="deskripsi" rows="2" required maxlength="5000"></textarea></div>
                         <div><button class="btn btn-primary">Simpan proyek</button></div>
                     </form>
@@ -46,6 +47,7 @@
             @forelse ($kategori as $item)
                 <div class="border rounded-3 p-2 d-flex align-items-center gap-2">
                     <span>{{ $item->nama_kategori }} <small class="text-muted">({{ $item->proyek_count }})</small></span>
+                    <button class="btn btn-link btn-sm p-0" data-bs-toggle="collapse" data-bs-target="#category-{{ $item->id }}" aria-label="Edit {{ $item->nama_kategori }}"><i class="bi bi-pencil"></i></button>
                     @if ($item->proyek_count === 0)
                         <form action="{{ route('kategori.destroy', $item) }}" method="POST" data-confirm="Kategori kosong ini akan dihapus.">
                             @csrf @method('DELETE')
@@ -53,6 +55,10 @@
                         </form>
                     @endif
                 </div>
+                <form id="category-{{ $item->id }}" class="collapse w-100 border rounded-3 p-2" action="{{ route('kategori.update', $item) }}" method="POST">
+                    @csrf @method('PUT')
+                    <div class="input-group input-group-sm"><input class="form-control" name="nama_kategori" value="{{ $item->nama_kategori }}" required maxlength="100"><button class="btn btn-primary">Simpan</button></div>
+                </form>
             @empty
                 <span class="text-muted">Belum ada kategori.</span>
             @endforelse
@@ -63,11 +69,12 @@
         <div class="panel-header"><h2 class="h5 mb-0">Daftar proyek</h2><span class="badge text-bg-light">{{ $proyek->total() }} proyek</span></div>
         <div class="table-responsive">
             <table class="table table-hover mb-0">
-                <thead><tr><th>Proyek</th><th>Kategori</th><th>Deskripsi</th><th>Linimasa</th><th class="text-end">Tindakan</th></tr></thead>
+                <thead><tr><th>Proyek</th><th>Aplikasi</th><th>Kategori</th><th>Deskripsi</th><th>Linimasa</th><th class="text-end">Tindakan</th></tr></thead>
                 <tbody>
                     @forelse ($proyek as $item)
                         <tr>
                             <td class="fw-semibold">{{ $item->nama_proyek }}</td>
+                            <td>{{ $item->aplikasi?->nama ?? '—' }}</td>
                             <td>{{ $item->kategori?->nama_kategori ?? 'Tanpa kategori' }}</td>
                             <td>{{ str($item->deskripsi)->limit(90) }}</td>
                             <td>{{ $item->linimasa_count }}</td>
@@ -80,18 +87,19 @@
                             </td>
                         </tr>
                         <tr class="collapse" id="project-{{ $item->id }}">
-                            <td colspan="5">
+                            <td colspan="6">
                                 <form action="{{ route('proyek.update', $item) }}" method="POST" class="row g-2 p-2">
                                     @csrf @method('PUT')
-                                    <div class="col-md-4"><label class="form-label">Nama</label><input class="form-control" name="nama_proyek" value="{{ $item->nama_proyek }}" required></div>
+                                    <div class="col-md-3"><label class="form-label">Nama</label><input class="form-control" name="nama_proyek" value="{{ $item->nama_proyek }}" required></div>
                                     <div class="col-md-3"><label class="form-label">Kategori</label><select class="form-select" name="kategori_id" required>@foreach ($kategori as $category)<option value="{{ $category->id }}" @selected($category->id === $item->kategori_id)>{{ $category->nama_kategori }}</option>@endforeach</select></div>
-                                    <div class="col-md-5"><label class="form-label">Deskripsi</label><textarea class="form-control" name="deskripsi" required>{{ $item->deskripsi }}</textarea></div>
+                                    <div class="col-md-3"><label class="form-label">Aplikasi terkait</label><select class="form-select" name="aplikasi_id"><option value="">Tidak terkait aplikasi</option>@foreach ($aplikasi as $app)<option value="{{ $app->id_aplikasi }}" @selected($app->id_aplikasi === $item->aplikasi_id)>{{ $app->nama }}</option>@endforeach</select></div>
+                                    <div class="col-md-3"><label class="form-label">Deskripsi</label><textarea class="form-control" name="deskripsi" required>{{ $item->deskripsi }}</textarea></div>
                                     <div><button class="btn btn-primary btn-sm">Simpan perubahan</button></div>
                                 </form>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5"><div class="empty-state"><i class="bi bi-kanban"></i>Belum ada proyek.</div></td></tr>
+                        <tr><td colspan="6"><div class="empty-state"><i class="bi bi-kanban"></i>Belum ada proyek.</div></td></tr>
                     @endforelse
                 </tbody>
             </table>

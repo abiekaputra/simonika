@@ -20,6 +20,10 @@ Custom attributes allow the inventory schema to evolve without adding a database
 
 The present catalogue is small, so loading application rows makes multi-field filtering immediate and keeps the HTTP interface simple. The boundary is documented: database filtering and pagination are required before using this design for a large inventory.
 
+## Optional application and project relation
+
+A delivery project can point to an inventory application, which connects planning records to the system being changed. The foreign key is nullable because some operational projects concern infrastructure or policy. Application deletion sets the reference to null so it cannot erase project timelines or their historical evidence.
+
 ## Synchronous mail
 
 Synchronous mail keeps local setup small and makes delivery failure visible immediately. It also increases request latency and couples account management to the mail provider. A queued, after commit delivery path with retry and monitoring is the preferred production improvement.

@@ -5,6 +5,7 @@ erDiagram
     PENGGUNAS ||--o{ LOG_AKTIVITAS : creates
     APLIKASIS ||--o{ APLIKASI_ATRIBUT : stores
     ATRIBUT_TAMBAHANS ||--o{ APLIKASI_ATRIBUT : defines
+    APLIKASIS o|--o{ PROYEKS : contextualizes
     PEGAWAIS ||--o{ LINIMASAS : owns
     PROYEKS ||--o{ LINIMASAS : contains
     KATEGORI ||--o{ PROYEKS : classifies
@@ -35,6 +36,12 @@ erDiagram
         date tenggat
         date tanggal_selesai
     }
+    PROYEKS {
+        bigint id PK
+        bigint kategori_id FK
+        bigint aplikasi_id FK
+        string nama_proyek
+    }
 ```
 
 ## Dynamic attributes
@@ -46,6 +53,8 @@ Changing an attribute definition is rejected when existing values would become i
 ## Timeline integrity
 
 Every timeline entry references one employee and one project. Deleting either parent cascades its timeline entries. A project may reference a category; category deletion is blocked by the application while projects still use it.
+
+A project may also reference an inventory application. The relation is optional because infrastructure or policy projects may not target one application. Deleting an inventory entry sets that reference to null and preserves the project's delivery and audit history.
 
 Completed statuses require a completion date. The status is validated against the deadline: earlier, on time, or late. Active statuses reject a completion date.
 

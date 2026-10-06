@@ -37,6 +37,7 @@ flowchart TD
     Dashboard --> Operations[Manage operational context]
     Operations --> Employees[Employees]
     Operations --> Projects[Categories and projects]
+    Inventory --> Projects
     Projects --> Timeline[Project timeline]
     Operations --> Internships[Internship records]
     Dashboard --> Profile[Update profile and password]
@@ -65,4 +66,4 @@ SiMonika is complete for this portfolio phase when:
 7. Automated tests cover the domain rules, authorization boundaries, and all main screen responses.
 8. A browser validation exercise completes the primary flows without console or server errors.
 9. Source files satisfy the project line limits and the CI workflow is green.
-
+10. One automated flow proves that inventory, project ownership, timelines, dashboards, details, exports, and audit records work together.
