@@ -17,7 +17,7 @@ class AplikasiController extends Controller
     public function index(): View
     {
         return view('aplikasi.index', [
-            'aplikasis' => Aplikasi::query()->orderBy('nama')->get(),
+            'aplikasis' => Aplikasi::query()->withCount('proyeks')->orderBy('nama')->get(),
             'atributs' => AtributTambahan::query()->orderBy('nama_atribut')->get(),
         ]);
     }
@@ -36,7 +36,13 @@ class AplikasiController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => $aplikasi->load('atributTambahans'),
+            'data' => $aplikasi->load([
+                'atributTambahans',
+                'proyeks' => fn ($query) => $query
+                    ->with('kategori')
+                    ->withCount('linimasa')
+                    ->orderBy('nama_proyek'),
+            ]),
             'message' => 'Application detail loaded.',
         ]);
     }

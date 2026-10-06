@@ -19,6 +19,8 @@
 
 - Employee names, emails, and phone numbers are unique.
 - A project belongs to an existing category and its timeline references existing employees.
+- A project can reference an inventory application and appears in that application's detail and CSV export.
+- Deleting an application unlinks its projects without deleting their delivery history.
 - Timeline start, deadline, completion date, and status must describe a consistent state.
 - A category in use cannot be removed.
 - Deleting an employee or project also removes timelines that cannot exist without it.
@@ -48,4 +50,4 @@
 - `composer quality` passes tests, formatting, and file-length checks.
 - CI executes the same quality command on every push and pull request.
 - Optional synthetic demo data can populate every product area without enabling itself in production.
-
+- An automated end-to-end test completes the inventory-to-project-to-timeline flow and verifies its user-visible outputs.

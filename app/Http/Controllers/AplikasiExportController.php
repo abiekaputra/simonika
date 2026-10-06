@@ -15,11 +15,12 @@ class AplikasiExportController extends Controller
         $headings = [
             'Nama', 'OPD', 'Uraian', 'Tahun Pembuatan', 'Jenis', 'Basis Aplikasi',
             'Bahasa/Framework', 'Database', 'Pengembang', 'Lokasi Server', 'Status Pemakaian',
+            'Jumlah Proyek', 'Proyek Terkait',
             ...$attributes->pluck('nama_atribut')->all(),
         ];
 
         return Csv::download('aplikasi.csv', $headings, function () use ($attributes) {
-            foreach (Aplikasi::with('atributTambahans')->lazyById(200, 'id_aplikasi') as $application) {
+            foreach (Aplikasi::with(['atributTambahans', 'proyeks'])->lazyById(200, 'id_aplikasi') as $application) {
                 $values = $application->atributTambahans->pluck('pivot.nilai_atribut', 'id_atribut');
 
                 yield [
@@ -27,6 +28,7 @@ class AplikasiExportController extends Controller
                     $application->tahun_pembuatan, $application->jenis, $application->basis_aplikasi,
                     $application->bahasa_framework, $application->database, $application->pengembang,
                     $application->lokasi_server, $application->status_pemakaian,
+                    $application->proyeks->count(), $application->proyeks->pluck('nama_proyek')->join('; '),
                     ...$attributes->map(fn ($attribute) => $values->get($attribute->id_atribut, '-'))->all(),
                 ];
             }

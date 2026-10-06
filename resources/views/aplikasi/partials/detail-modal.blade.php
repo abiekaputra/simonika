@@ -14,6 +14,13 @@
                         <tbody id="applicationAttributeDetails"></tbody>
                     </table>
                 </div>
+                <h3 class="fs-6 mt-4">Proyek terkait</h3>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead><tr><th>Proyek</th><th>Kategori</th><th>Linimasa</th></tr></thead>
+                        <tbody id="applicationProjectDetails"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

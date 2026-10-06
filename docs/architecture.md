@@ -54,6 +54,10 @@ sequenceDiagram
 
 Validation completes before the transaction mutates data. The application row, dynamic attribute values, and activity record either succeed together or roll back together.
 
+## Inventory and delivery integration
+
+Projects optionally reference an inventory application. Project screens expose the link during create and edit operations, while the inventory detail and CSV export expose related delivery work. A database foreign key validates the reference and clears it when an application is deleted, preserving the independent project timeline.
+
 ## Authorization
 
 Every operational route requires an authenticated session. Administrator management and activity log export additionally require the `super_admin` role. Authorization is enforced by middleware on the server; navigation visibility is only a presentation concern.

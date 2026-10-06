@@ -22,6 +22,7 @@ class ProyekRequest extends FormRequest
                 Rule::unique('proyeks', 'nama_proyek')->ignore($this->route('proyek')),
             ],
             'kategori_id' => ['required', 'integer', 'exists:kategori,id'],
+            'aplikasi_id' => ['nullable', 'integer', 'exists:aplikasis,id_aplikasi'],
             'deskripsi' => ['required', 'string', 'max:5000'],
         ];
     }

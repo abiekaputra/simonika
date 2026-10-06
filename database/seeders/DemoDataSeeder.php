@@ -46,9 +46,9 @@ class DemoDataSeeder extends Seeder
         );
 
         $applications = [
-            ['Portal Layanan', 'Dinas Pelayanan Digital', 'Portal permohonan layanan publik sintetis.', 'Web', 'Web', 'Laravel', 'PostgreSQL', 'Tim Internal', 'Private Cloud', 'Aktif'],
-            ['Arsip Terpadu', 'Sekretariat Daerah', 'Katalog arsip dan pencarian dokumen sintetis.', 'Web', 'Web', 'Laravel', 'SQLite', 'Tim Internal', 'On Premise', 'Aktif'],
-            ['Pantau Kota', 'Dinas Infrastruktur', 'Dashboard pemantauan indikator operasional sintetis.', 'Dashboard', 'Web', 'JavaScript', 'PostgreSQL', 'Mitra Teknis', 'Private Cloud', 'Pemeliharaan'],
+            ['Portal Layanan', 'Dinas Pelayanan Digital', 'Portal permohonan layanan publik sintetis.', 'Web', 'Website', 'Laravel', 'PostgreSQL', 'Tim Internal', 'Private Cloud', 'Aktif'],
+            ['Arsip Terpadu', 'Sekretariat Daerah', 'Katalog arsip dan pencarian dokumen sintetis.', 'Web', 'Website', 'Laravel', 'SQLite', 'Tim Internal', 'On Premise', 'Aktif'],
+            ['Pantau Kota', 'Dinas Infrastruktur', 'Dashboard pemantauan indikator operasional sintetis.', 'Dashboard', 'Website', 'JavaScript', 'PostgreSQL', 'Mitra Teknis', 'Private Cloud', 'Tidak Aktif'],
         ];
 
         foreach ($applications as $index => $data) {
@@ -78,9 +78,13 @@ class DemoDataSeeder extends Seeder
             ['email' => 'naya@example.test'],
             ['nama' => 'Naya Pratama', 'nomor_telepon' => '+628110000001']
         );
-        $project = Proyek::query()->firstOrCreate(
+        $project = Proyek::query()->updateOrCreate(
             ['nama_proyek' => 'Modernisasi Portal'],
-            ['kategori_id' => $category->id, 'deskripsi' => 'Penyederhanaan alur layanan dan peningkatan aksesibilitas.']
+            [
+                'kategori_id' => $category->id,
+                'aplikasi_id' => Aplikasi::query()->where('nama', 'Portal Layanan')->value('id_aplikasi'),
+                'deskripsi' => 'Penyederhanaan alur layanan dan peningkatan aksesibilitas.',
+            ]
         );
 
         Linimasa::query()->updateOrCreate(

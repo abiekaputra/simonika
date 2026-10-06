@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Aplikasi;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAplikasiRequest extends FormRequest
 {
@@ -16,15 +18,15 @@ class StoreAplikasiRequest extends FormRequest
         return [
             'nama' => ['required', 'string', 'max:255', 'unique:aplikasis,nama'],
             'opd' => ['required', 'string', 'max:255'],
-            'uraian' => ['nullable', 'string'],
-            'tahun_pembuatan' => ['required', 'date'],
+            'uraian' => ['nullable', 'string', 'max:10000'],
+            'tahun_pembuatan' => ['required', 'date', 'before_or_equal:today'],
             'jenis' => ['required', 'string', 'max:255'],
-            'basis_aplikasi' => ['required', 'in:Website,Desktop,Mobile'],
+            'basis_aplikasi' => ['required', Rule::in(Aplikasi::BASES)],
             'bahasa_framework' => ['required', 'string', 'max:255'],
             'database' => ['required', 'string', 'max:255'],
             'pengembang' => ['required', 'string', 'max:255'],
             'lokasi_server' => ['required', 'string', 'max:255'],
-            'status_pemakaian' => ['required', 'in:Aktif,Tidak Aktif'],
+            'status_pemakaian' => ['required', Rule::in(Aplikasi::STATUSES)],
             'atribut' => ['sometimes', 'array'],
         ];
     }
