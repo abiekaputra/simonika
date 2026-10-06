@@ -29,7 +29,7 @@ class AdminManagementTest extends TestCase
         ]);
 
         $response->assertInternalServerError()
-            ->assertJsonPath('message', 'Unable to create the admin account.');
+            ->assertJsonPath('message', 'Akun admin tidak dapat dibuat. Periksa konfigurasi email lalu coba kembali.');
         $this->assertDatabaseMissing('penggunas', ['email' => 'new-admin@example.test']);
     }
 

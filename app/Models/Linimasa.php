@@ -26,7 +26,6 @@ class Linimasa extends Model
         'tenggat',
         'tanggal_selesai',
         'deskripsi',
-        'status_manual',
     ];
 
     protected $casts = [

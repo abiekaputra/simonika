@@ -32,7 +32,7 @@ class ProjectWorkflowTest extends TestCase
     {
         [$employee, $project] = $this->employeeAndProject();
 
-        $response = $this->actingAs($this->user)->post('/linimasa/store', [
+        $response = $this->actingAs($this->user)->post('/linimasa', [
             'pegawai_id' => $employee->id,
             'proyek_id' => $project->id,
             'status_proyek' => 'Proses',
@@ -50,7 +50,7 @@ class ProjectWorkflowTest extends TestCase
     {
         [$employee, $project] = $this->employeeAndProject();
 
-        $response = $this->actingAs($this->user)->postJson('/linimasa/store', [
+        $response = $this->actingAs($this->user)->postJson('/linimasa', [
             'pegawai_id' => $employee->id,
             'proyek_id' => $project->id,
             'status_proyek' => 'Almost Done',
@@ -85,7 +85,7 @@ class ProjectWorkflowTest extends TestCase
 
         $response = $this->actingAs($this->user)->from('/proyek')->delete("/kategori/{$project->kategori_id}");
 
-        $response->assertRedirect('/proyek')->assertSessionHas('error');
+        $response->assertRedirect('/proyek')->assertSessionHasErrors('kategori');
         $this->assertDatabaseHas('kategori', ['id' => $project->kategori_id]);
     }
 

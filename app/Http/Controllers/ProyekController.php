@@ -2,75 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProyekRequest;
 use App\Models\Kategori;
 use App\Models\Proyek;
-use Illuminate\Http\Request;
+use App\Services\ProyekService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class ProyekController extends Controller
 {
-    public function index()
+    public function __construct(private readonly ProyekService $service) {}
+
+    public function index(): View
     {
-        $proyek = Proyek::with('kategori')->paginate(15);
-        $kategori = Kategori::all(); // full list needed for dropdown
-
-        return view('proyek.index', compact('proyek', 'kategori'));
-    }
-
-    public function create()
-    {
-        $kategori = Kategori::all();
-
-        return view('proyek.create', compact('kategori'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama_proyek' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'kategori_id' => 'required|exists:kategori,id',
+        return view('proyek.index', [
+            'proyek' => Proyek::query()->with('kategori')->withCount('linimasa')->orderBy('nama_proyek')->paginate(20),
+            'kategori' => Kategori::query()->withCount('proyek')->orderBy('nama_kategori')->get(),
         ]);
-
-        Proyek::create([
-            'nama_proyek' => $request->nama_proyek,
-            'deskripsi' => $request->deskripsi,
-            'kategori_id' => $request->kategori_id,
-        ]);
-
-        return redirect()->route('proyek.index')->with('success', 'Project added successfully.');
     }
 
-    public function edit($id)
+    public function store(ProyekRequest $request): RedirectResponse
     {
-        $proyek = Proyek::findOrFail($id);
-        $kategori = Kategori::all();
+        $this->service->create($request->validated());
 
-        return view('proyek.edit', compact('proyek', 'kategori'));
+        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil ditambahkan.');
     }
 
-    public function update(Request $request, $id)
+    public function update(ProyekRequest $request, Proyek $proyek): RedirectResponse
     {
-        $request->validate([
-            'nama_proyek' => 'required|string|max:255',
-            'kategori_id' => 'required|integer|exists:kategori,id',
-            'deskripsi' => 'required|string',
-        ]);
+        $this->service->update($proyek, $request->validated());
 
-        $proyek = Proyek::findOrFail($id);
-        $proyek->update([
-            'nama_proyek' => $request->nama_proyek,
-            'kategori_id' => (int) $request->kategori_id,
-            'deskripsi' => $request->deskripsi,
-        ]);
-
-        return redirect()->route('proyek.index')->with('success', 'Project updated successfully.');
+        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(Proyek $proyek): RedirectResponse
     {
-        $proyek = Proyek::findOrFail($id);
-        $proyek->delete();
+        $this->service->delete($proyek);
 
-        return redirect()->route('proyek.index')->with('success', 'Project deleted successfully.');
+        return redirect()->route('proyek.index')->with('success', 'Proyek dan linimasa terkait berhasil dihapus.');
     }
 }

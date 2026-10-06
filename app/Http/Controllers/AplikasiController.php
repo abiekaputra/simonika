@@ -22,13 +22,6 @@ class AplikasiController extends Controller
         ]);
     }
 
-    public function create(): View
-    {
-        return view('aplikasi.create', [
-            'atributs' => AtributTambahan::query()->orderBy('nama_atribut')->get(),
-        ]);
-    }
-
     public function store(StoreAplikasiRequest $request): JsonResponse
     {
         $this->service->create($request->safe()->except('atribut'), $request->input('atribut', []));
@@ -37,17 +30,6 @@ class AplikasiController extends Controller
             'success' => true,
             'message' => 'Application added successfully.',
         ], 201);
-    }
-
-    public function show(Aplikasi $aplikasi): JsonResponse
-    {
-        $aplikasi->load('atributTambahans');
-
-        return response()->json([
-            'success' => true,
-            'aplikasi' => $aplikasi,
-            'atribut_tambahan' => $aplikasi->atributTambahans,
-        ]);
     }
 
     public function detail(Aplikasi $aplikasi): JsonResponse

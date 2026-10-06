@@ -4,13 +4,14 @@ namespace App\Services;
 
 use App\Models\Aplikasi;
 use App\Models\AtributTambahan;
-use App\Models\LogAktivitas;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AplikasiService
 {
-    public function __construct(private readonly AttributeValueValidator $attributeValidator) {}
+    public function __construct(
+        private readonly AttributeValueValidator $attributeValidator,
+        private readonly ActivityLogger $logger,
+    ) {}
 
     public function create(array $data, array $attributeValues): Aplikasi
     {
@@ -19,7 +20,7 @@ class AplikasiService
         return DB::transaction(function () use ($data, $values) {
             $application = Aplikasi::create($data);
             $this->syncAttributes($application, $values);
-            $this->log('Add Application', 'create', "Added application '{$application->nama}'");
+            $this->logger->record('Aplikasi', 'Add Application', 'create', "Added application '{$application->nama}'");
 
             return $application;
         });
@@ -32,7 +33,7 @@ class AplikasiService
         return DB::transaction(function () use ($application, $data, $values) {
             $application->update($data);
             $this->syncAttributes($application, $values);
-            $this->log('Update Application', 'update', "Updated application '{$application->nama}'");
+            $this->logger->record('Aplikasi', 'Update Application', 'update', "Updated application '{$application->nama}'");
 
             return $application->refresh();
         });
@@ -43,7 +44,7 @@ class AplikasiService
         DB::transaction(function () use ($application) {
             $name = $application->nama;
             $application->delete();
-            $this->log('Delete Application', 'delete', "Deleted application '{$name}'");
+            $this->logger->record('Aplikasi', 'Delete Application', 'delete', "Deleted application '{$name}'");
         });
     }
 
@@ -55,16 +56,5 @@ class AplikasiService
             ->all();
 
         $application->atributTambahans()->sync($pivotData);
-    }
-
-    private function log(string $activity, string $type, string $detail): void
-    {
-        LogAktivitas::create([
-            'user_id' => Auth::id(),
-            'aktivitas' => $activity,
-            'tipe_aktivitas' => $type,
-            'modul' => 'Aplikasi',
-            'detail' => $detail,
-        ]);
     }
 }

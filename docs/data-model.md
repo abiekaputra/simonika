@@ -33,6 +33,7 @@ erDiagram
         string status_proyek
         date mulai
         date tenggat
+        date tanggal_selesai
     }
 ```
 
@@ -45,6 +46,10 @@ Changing an attribute definition is rejected when existing values would become i
 ## Timeline integrity
 
 Every timeline entry references one employee and one project. Deleting either parent cascades its timeline entries. A project may reference a category; category deletion is blocked by the application while projects still use it.
+
+Completed statuses require a completion date. The status is validated against the deadline: earlier, on time, or late. Active statuses reject a completion date.
+
+Activity logs keep a nullable actor reference. Deleting an administrator sets that reference to null so historical audit evidence remains available.
 
 ## Migration history
 

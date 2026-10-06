@@ -28,7 +28,7 @@ class OperationalDataTest extends TestCase
 
     public function test_internship_record_requires_exit_after_entry(): void
     {
-        $response = $this->actingAs($this->user)->postJson('/pendataan/store', [
+        $response = $this->actingAs($this->user)->postJson('/pendataan', [
             'universitas' => 'Universitas Contoh',
             'jumlah_orang' => 3,
             'tanggal_masuk' => '2026-05-10',
@@ -49,13 +49,13 @@ class OperationalDataTest extends TestCase
         ];
 
         $this->actingAs($this->user)
-            ->post('/pendataan/store', $payload)
+            ->post('/pendataan', $payload)
             ->assertRedirect(route('pendataan.index'));
 
         $record = Pendataan::firstOrFail();
 
         $this->actingAs($this->user)
-            ->put("/pendataan/update/{$record->id}", [
+            ->put("/pendataan/{$record->id}", [
                 ...$payload,
                 'jumlah_orang' => 4,
             ])
@@ -67,7 +67,7 @@ class OperationalDataTest extends TestCase
         ]);
 
         $this->actingAs($this->user)
-            ->delete("/pendataan/delete/{$record->id}")
+            ->delete("/pendataan/{$record->id}")
             ->assertRedirect(route('pendataan.index'));
 
         $this->assertDatabaseCount('pendataans', 0);

@@ -25,6 +25,19 @@ SiMonika exposes an authenticated browser interface rather than a public API. Mu
 | GET | `/aplikasi/{id}/atribut` | Read all definitions and current values |
 | PUT or POST | `/aplikasi/{id}/atribut` | Validate and update typed values |
 
+## Operational records
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET, POST | `/pegawai` | List or create employees |
+| PUT, DELETE | `/pegawai/{id}` | Update or delete an employee |
+| GET, POST | `/proyek` | List or create projects |
+| PUT, DELETE | `/proyek/{id}` | Update or delete a project |
+| GET, POST | `/linimasa` | List or create timeline entries |
+| PUT, DELETE | `/linimasa/{id}` | Update or delete a timeline entry |
+| GET, POST | `/pendataan` | List or create internship periods |
+| PUT, DELETE | `/pendataan/{id}` | Update or delete an internship period |
+
 ## Response behavior
 
 - Invalid JSON or modal form commands return HTTP `422` with a Laravel validation error map.

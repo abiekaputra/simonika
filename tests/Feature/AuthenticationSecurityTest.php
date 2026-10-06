@@ -72,12 +72,12 @@ class AuthenticationSecurityTest extends TestCase
         $response = $this->post('/reset-password', [
             'token' => $plainToken,
             'email' => $user->email,
-            'password' => 'new-secure-password',
-            'password_confirmation' => 'new-secure-password',
+            'password' => 'new-secure-password-2026',
+            'password_confirmation' => 'new-secure-password-2026',
         ]);
 
         $response->assertRedirect(route('login'));
-        $this->assertTrue(Hash::check('new-secure-password', $user->fresh()->password));
+        $this->assertTrue(Hash::check('new-secure-password-2026', $user->fresh()->password));
         $this->assertDatabaseMissing('password_reset_tokens', ['email' => $user->email]);
     }
 
