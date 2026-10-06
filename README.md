@@ -27,7 +27,7 @@ SiMonika gives two user roles a single server rendered workspace:
 ## Engineering highlights
 
 - Laravel Form Requests validate application and timeline commands.
-- Services keep application and dynamic attribute transactions outside HTTP controllers.
+- Focused services keep application, attribute, account, employee, project, timeline, and internship transactions outside HTTP controllers.
 - Typed attribute values are checked before persistence; incompatible definition changes are rejected.
 - Password reset tokens are hashed, expire after 60 minutes, and are single use.
 - CSV cells that could become spreadsheet formulas are neutralized before streaming.
@@ -80,7 +80,12 @@ SIMONIKA_DEMO_ADMIN_EMAIL=admin@example.test
 SIMONIKA_DEMO_ADMIN_PASSWORD=choose-a-local-password
 ```
 
-Then run `php artisan db:seed`. Never enable the demo seeder in a public deployment.
+Then run `php artisan db:seed`. This creates a synthetic catalogue plus two local roles:
+
+- the configured super-admin email;
+- `operator@example.test`, using the same configured password.
+
+Never enable the demo seeder in a public deployment.
 
 ## Verification
 
@@ -89,7 +94,7 @@ composer quality
 composer audit --locked
 ```
 
-`composer quality` checks the source file limits, executes the behavioral test suite against an in memory SQLite database, and verifies formatting. The current suite covers authentication, authorization, password reset, application and attribute transactions, typed values, CSV safety, project timelines, category constraints, employee uniqueness, operational dates, and guest access.
+`composer quality` checks the source file limits, executes the behavioral test suite against an in memory SQLite database, and verifies formatting. The current suite contains 32 tests and 126 assertions covering authentication, authorization, password reset, transactional mutations, typed values, CSV safety, timeline consistency, audit retention, employee uniqueness, operational dates, screen rendering, and guest access.
 
 ## Design documentation
 
@@ -99,12 +104,13 @@ composer audit --locked
 - [Data model](docs/data-model.md)
 - [HTTP interface](docs/http-interface.md)
 - [Testing and failure handling](docs/testing-and-failures.md)
+- [Browser validation](docs/browser-validation.md)
 - [Engineering decisions and tradeoffs](docs/engineering-decisions.md)
 - [Security policy](SECURITY.md)
 
 ## Project status
 
-The portfolio hardening work has repaired the main application, attribute, authentication, timeline, migration, and export paths. The application is suitable for local evaluation with synthetic data. The next useful production steps are server side filtering for large inventories, asynchronous mail delivery, and browser level regression tests for every remaining administrative screen.
+Product definition, backend/domain hardening, and the responsive web product are complete for local portfolio evaluation. Both roles, every primary screen, narrow-screen behavior, domain invariants, and synthetic data setup have been validated. This repository makes no deployment or production-readiness claim. Known scale boundaries remain client-side inventory filtering and synchronous email delivery.
 
 ## License
 

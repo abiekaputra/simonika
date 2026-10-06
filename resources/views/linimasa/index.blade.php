@@ -1,158 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.authenticated')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Linimasa Proyek - siMonika</title>
+@section('title', 'Linimasa — SiMonika')
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
-        rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@push('styles')
+    <link href="https://unpkg.com/vis-timeline@7.4.6/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
+@endpush
 
-    <!-- Toastr & SweetAlert2 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@section('content')
+    <header class="page-heading d-flex justify-content-between align-items-end">
+        <div><h1 class="mb-0">Linimasa proyek</h1><p>Hubungkan pegawai, proyek, status, dan target penyelesaian.</p></div>
+        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#createTimeline"><i class="bi bi-plus-lg me-1"></i>Tambah linimasa</button>
+    </header>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://unpkg.com/vis-timeline@7.4.6/standalone/umd/vis-timeline-graph2d.min.js"></script>
-
-    <!-- Vis.js -->
-    <link href="https://unpkg.com/vis-timeline@7.4.6/styles/vis-timeline-graph2d.min.css"
-        rel="stylesheet">
-
-    <style>
-        .zoom-controls {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .zoom-btn {
-            width: 30px;
-            height: 30px;
-            font-size: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-    </style>
-</head>
-
-<body>
-    @include('templates.sidebar')
-
-    <div class="main-content p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h2 class="mb-0">Linimasa Proyek</h2>
-                <p class="text-muted">Menampilkan timeline proyek yang dikerjakan oleh pegawai</p>
-            </div>
-            <div class="button-action">
-                @if ($linimasa->isNotEmpty())
-                    <button id="toggleView" class="btn btn-secondary">Tampilkan Tabel</button>
-                @endif
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#linimasaCreateModal">
-                    <i class="bi bi-plus-lg"></i> Tambah Linimasa
-                </button>
-            </div>
+    <section id="createTimeline" class="collapse mb-4">
+        <div class="panel panel-body">
+            <h2 class="h5 mb-3">Penugasan baru</h2>
+            @if ($pegawai->isEmpty() || $proyek->isEmpty())
+                <div class="alert alert-warning mb-0">Tambahkan pegawai dan proyek sebelum membuat linimasa.</div>
+            @else
+                <form action="{{ route('linimasa.store') }}" method="POST" class="row g-3">
+                    @csrf
+                    <div class="col-md-6"><label class="form-label">Pegawai</label><select class="form-select" name="pegawai_id" required><option value="">Pilih pegawai</option>@foreach ($pegawai as $item)<option value="{{ $item->id }}">{{ $item->nama }}</option>@endforeach</select></div>
+                    <div class="col-md-6"><label class="form-label">Proyek</label><select class="form-select" name="proyek_id" required><option value="">Pilih proyek</option>@foreach ($proyek as $item)<option value="{{ $item->id }}">{{ $item->nama_proyek }}</option>@endforeach</select></div>
+                    <div class="col-md-4"><label class="form-label">Status</label><select class="form-select" name="status_proyek" data-completion-toggle="completion-create" required>@foreach ($statuses as $status)<option value="{{ $status }}">{{ $status }}</option>@endforeach</select></div>
+                    <div class="col-md-4"><label class="form-label">Mulai</label><input class="form-control" name="mulai" type="date" required></div>
+                    <div class="col-md-4"><label class="form-label">Tenggat</label><input class="form-control" name="tenggat" type="date" required></div>
+                    <div class="col-md-4"><label class="form-label">Tanggal selesai</label><input class="form-control" id="completion-create" name="tanggal_selesai" type="date"><div class="form-hint">Wajib untuk status selesai.</div></div>
+                    <div class="col-md-8"><label class="form-label">Catatan</label><textarea class="form-control" name="deskripsi" rows="2" maxlength="5000"></textarea></div>
+                    <div><button class="btn btn-primary">Simpan linimasa</button></div>
+                </form>
+            @endif
         </div>
+    </section>
 
-        @if ($linimasa->isEmpty())
-            <div class="alert alert-warning text-center">
-                <i class="alert alert-warning text-center"></i> Belum ada linimasa terdaftar.
-            </div>
-        @else
-            <div id="timelineContainer" style="position: relative;">
-                <div id="timeline"></div>
-                <div class="zoom-controls">
-                    <button id="zoomIn" class="btn btn-info zoom-btn"><i class="bi bi-plus-lg"></i></button>
-                    <button id="zoomOut" class="btn btn-info zoom-btn"><i class="bi bi-dash-lg"></i></button>
-                </div>
-            </div>
+    @if ($timelineRecords->isNotEmpty())
+        <section class="panel mb-4">
+            <div class="panel-header"><div><h2 class="h5 mb-1">Peta waktu</h2><small class="text-muted">Geser dan zoom untuk meninjau jadwal</small></div></div>
+            <div class="panel-body"><div id="timeline" class="timeline-board"></div></div>
+        </section>
+    @endif
 
-            <div id="tableContainer" class="d-none">
-                <table class="table table-hover">
-                    <thead>
+    <section class="panel">
+        <div class="panel-header"><h2 class="h5 mb-0">Daftar linimasa</h2><span class="badge text-bg-light">{{ $linimasa->total() }} penugasan</span></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Pegawai / proyek</th><th>Status</th><th>Periode</th><th>Selesai</th><th class="text-end">Tindakan</th></tr></thead>
+                <tbody>
+                    @forelse ($linimasa as $item)
                         <tr>
-                            <th>Pegawai</th>
-                            <th>Proyek</th>
-                            <th>Status</th>
-                            <th>Mulai</th>
-                            <th>Tenggat</th>
-                            <th>Aksi</th>
+                            <td><strong>{{ $item->pegawai->nama }}</strong><br><small class="text-muted">{{ $item->proyek->nama_proyek }}</small></td>
+                            <td><span class="badge text-bg-{{ in_array($item->status_proyek, ['Selesai Lebih Cepat', 'Tepat Waktu']) ? 'success' : ($item->status_proyek === 'Terlambat' ? 'danger' : 'primary') }}">{{ $item->status_proyek }}</span></td>
+                            <td>{{ $item->mulai->format('d M Y') }}<br><small class="text-muted">hingga {{ $item->tenggat->format('d M Y') }}</small></td>
+                            <td>{{ $item->tanggal_selesai?->format('d M Y') ?? '—' }}</td>
+                            <td class="text-end">
+                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#timeline-{{ $item->id }}">Edit</button>
+                                <form class="d-inline" action="{{ route('linimasa.destroy', $item) }}" method="POST" data-confirm="Entri linimasa ini akan dihapus.">@csrf @method('DELETE')<button class="btn btn-outline-danger btn-sm">Hapus</button></form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($linimasa as $item)
-                            @php
-                                $statusClass = match ($item->status_proyek) {
-                                    'Selesai Lebih Cepat' => 'text-bg-success',
-                                    'Tepat Waktu' => 'bg-success-subtle text-success-emphasis',
-                                    'Terlambat' => 'text-bg-danger',
-                                    'Revisi' => 'text-bg-warning',
-                                    'Proses' => 'text-bg-primary',
-                                    'To Do Next' => 'text-bg-secondary',
-                                    default => 'text-bg-light',
-                                };
-                            @endphp
-                            <tr>
-                                <td>{{ $item->pegawai->nama }}</td>
-                                <td>{{ $item->proyek->nama_proyek }}</td>
-                                <td><span class="badge {{ $statusClass }}">{{ $item->status_proyek }}</span></td>
-                                <td>{{ $item->mulai }}</td>
-                                <td>{{ $item->tenggat }}</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm btn-edit" data-id="{{ $item->id }}"
-                                        data-pegawai="{{ $item->pegawai->id }}" data-proyek="{{ $item->proyek->id }}"
-                                        data-status="{{ $item->status_proyek }}" data-mulai="{{ $item->mulai }}"
-                                        data-tenggat="{{ $item->tenggat }}" data-deskripsi="{{ $item->deskripsi ?? '' }}"
-                                        data-bs-toggle="modal" data-bs-target="#linimasaEditModal">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+                        <tr class="collapse" id="timeline-{{ $item->id }}">
+                            <td colspan="5">
+                                <form action="{{ route('linimasa.update', $item) }}" method="POST" class="row g-2 p-2">
+                                    @csrf @method('PUT')
+                                    <div class="col-md-4"><label class="form-label">Pegawai</label><select class="form-select" name="pegawai_id" required>@foreach ($pegawai as $employee)<option value="{{ $employee->id }}" @selected($employee->id === $item->pegawai_id)>{{ $employee->nama }}</option>@endforeach</select></div>
+                                    <div class="col-md-4"><label class="form-label">Proyek</label><select class="form-select" name="proyek_id" required>@foreach ($proyek as $project)<option value="{{ $project->id }}" @selected($project->id === $item->proyek_id)>{{ $project->nama_proyek }}</option>@endforeach</select></div>
+                                    <div class="col-md-4"><label class="form-label">Status</label><select class="form-select" name="status_proyek" data-completion-toggle="completion-{{ $item->id }}">@foreach ($statuses as $status)<option value="{{ $status }}" @selected($status === $item->status_proyek)>{{ $status }}</option>@endforeach</select></div>
+                                    <div class="col-md-4"><label class="form-label">Mulai</label><input class="form-control" name="mulai" type="date" value="{{ $item->mulai->format('Y-m-d') }}" required></div>
+                                    <div class="col-md-4"><label class="form-label">Tenggat</label><input class="form-control" name="tenggat" type="date" value="{{ $item->tenggat->format('Y-m-d') }}" required></div>
+                                    <div class="col-md-4"><label class="form-label">Selesai</label><input class="form-control" id="completion-{{ $item->id }}" name="tanggal_selesai" type="date" value="{{ $item->tanggal_selesai?->format('Y-m-d') }}"></div>
+                                    <div class="col-12"><label class="form-label">Catatan</label><textarea class="form-control" name="deskripsi">{{ $item->deskripsi }}</textarea></div>
+                                    <div><button class="btn btn-primary btn-sm">Simpan perubahan</button></div>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5"><div class="empty-state"><i class="bi bi-calendar3"></i>Belum ada linimasa.</div></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if ($linimasa->hasPages()) <div class="panel-body border-top">{{ $linimasa->links('pagination::bootstrap-5') }}</div> @endif
+    </section>
 
-                                    <button class="btn btn-danger btn-delete" data-id="{{ $item->id }}">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+    <script type="application/json" id="timeline-data">@json($timelineData)</script>
+@endsection
 
-                                    <form id="delete-form-{{ $item->id }}" action="{{ route('linimasa.destroy', $item->id) }}"
-                                        method="POST" style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="mt-3">
-                    {{ $linimasa->links('pagination::bootstrap-5') }}
-                </div>
-            </div>
-        @endif
-    </div>
-
-    @include('linimasa/create')
-    @include('linimasa/edit')
-    @include('linimasa/info')
-
-    @include('linimasa.partials.page-script')
-
-</body>
-
-</html>
+@push('scripts')
+    <script src="https://unpkg.com/vis-timeline@7.4.6/standalone/umd/vis-timeline-graph2d.min.js"></script>
+    <script type="module" src="{{ asset('js/linimasa/index.js') }}"></script>
+@endpush

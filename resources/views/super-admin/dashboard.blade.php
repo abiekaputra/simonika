@@ -1,145 +1,61 @@
-@extends('layouts.app')
+@extends('layouts.authenticated')
+
+@section('title', 'Audit Sistem — SiMonika')
 
 @section('content')
-    <div class="container-fluid">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="mb-0">Dashboard Super Admin</h2>
-                <p class="text-muted">Monitoring aktivitas sistem</p>
-            </div>
-        </div>
+    <header class="page-heading d-flex justify-content-between align-items-end">
+        <div><h1 class="mb-0">Audit sistem</h1><p>Pantau akses operator dan perubahan penting dalam produk.</p></div>
+        <a href="{{ route('super-admin.log.export') }}" class="btn btn-outline-primary"><i class="bi bi-download me-1"></i>Ekspor CSV</a>
+    </header>
 
-        <!-- Statistik Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card bg-primary text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Admin</h5>
-                        <h2 class="mb-0">{{ $total_admin }}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-success text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Aplikasi</h5>
-                        <h2 class="mb-0">{{ $total_aplikasi }}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-info text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Aplikasi Aktif</h5>
-                        <h2 class="mb-0">{{ $aplikasi_aktif }}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-warning text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Aplikasi Tidak Aktif</h5>
-                        <h2 class="mb-0">{{ $aplikasi_tidak_aktif }}</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <section class="row g-3 mb-4" aria-label="Statistik tata kelola">
+        <div class="col-6 col-lg-3"><div class="metric-card"><div class="metric-label">Admin</div><div class="metric-value">{{ $total_admin }}</div></div></div>
+        <div class="col-6 col-lg-3"><div class="metric-card"><div class="metric-label">Aplikasi</div><div class="metric-value">{{ $total_aplikasi }}</div></div></div>
+        <div class="col-6 col-lg-3"><div class="metric-card"><div class="metric-label">Aktif</div><div class="metric-value text-success">{{ $aplikasi_aktif }}</div></div></div>
+        <div class="col-6 col-lg-3"><div class="metric-card"><div class="metric-label">Perlu perhatian</div><div class="metric-value text-warning">{{ $aplikasi_tidak_aktif }}</div></div></div>
+    </section>
 
-        <!-- Log Aktivitas -->
-        <div class="card">
-            <div class="card-header bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Log Aktivitas Admin</h5>
-                    <div>
-                        <form action="{{ route('super-admin.log.export') }}" method="GET" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-download"></i> Export Log
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Waktu</th>
-                                <th>Admin</th>
-                                <th>Aktivitas</th>
-                                <th>Modul</th>
-                                <th>Detail</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($log_aktivitas as $log)
-                                <tr>
-                                    <td>{{ $log->created_at->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</td>
-                                    <td>{{ $log->user->nama }}</td>
-                                    <td>
-                                        <span
-                                            class="badge bg-{{ $log->tipe_aktivitas === 'create' ? 'success' : ($log->tipe_aktivitas === 'update' ? 'warning' : 'danger') }}">
-                                            {{ $log->aktivitas }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $log->modul }}</td>
-                                    <td>{{ $log->detail }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">Belum ada aktivitas</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                {{ $log_aktivitas->links() }}
-            </div>
+    <section class="panel mb-4">
+        <div class="panel-header"><h2 class="h5 mb-0">Status operator</h2></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Admin</th><th>Status</th><th>Aktivitas terakhir</th><th>Aksi terakhir</th></tr></thead>
+                <tbody>
+                    @forelse ($admin_aktif as $admin)
+                        <tr>
+                            <td><strong>{{ $admin['nama'] }}</strong><br><small class="text-muted">{{ $admin['email'] }}</small></td>
+                            <td><span class="badge {{ $admin['status'] === 'Online' ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $admin['status'] }}</span></td>
+                            <td>{{ $admin['last_activity']?->diffForHumans() ?? 'Belum ada' }}</td>
+                            <td>{{ $admin['last_action'] }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4"><div class="empty-state">Belum ada akun admin.</div></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+    </section>
 
-        <!-- Admin Aktif -->
-        <div class="card mb-4">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">Admin Aktif</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Nama Admin</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Aktivitas Terakhir</th>
-                                <th>Aksi Terakhir</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($admin_aktif as $admin)
-                                <tr>
-                                    <td>{{ $admin['nama'] }}</td>
-                                    <td>{{ $admin['email'] }}</td>
-                                    <td>
-                                        @if ($admin['status'] === 'Online')
-                                            <span class="badge bg-success">Online</span>
-                                        @else
-                                            <span class="badge bg-secondary">Offline</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ \Carbon\Carbon::parse($admin['last_activity'])->diffForHumans() }}</td>
-                                    <td>{{ $admin['last_action'] }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">Tidak ada admin yang aktif</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <section class="panel">
+        <div class="panel-header"><h2 class="h5 mb-0">Log aktivitas</h2><small class="text-muted">Riwayat tetap tersedia setelah akun dihapus</small></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Waktu</th><th>Pelaku</th><th>Aktivitas</th><th>Modul</th><th>Detail</th></tr></thead>
+                <tbody>
+                    @forelse ($log_aktivitas as $log)
+                        <tr>
+                            <td class="text-nowrap">{{ $log->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}</td>
+                            <td>{{ $log->user?->nama ?? 'Akun dihapus' }}</td>
+                            <td><span class="badge text-bg-{{ $log->tipe_aktivitas === 'create' ? 'success' : ($log->tipe_aktivitas === 'delete' ? 'danger' : 'secondary') }}">{{ $log->aktivitas }}</span></td>
+                            <td>{{ $log->modul }}</td>
+                            <td>{{ $log->detail }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5"><div class="empty-state"><i class="bi bi-journal-text"></i>Belum ada aktivitas.</div></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </div>
+        @if ($log_aktivitas->hasPages()) <div class="panel-body border-top">{{ $log_aktivitas->links('pagination::bootstrap-5') }}</div> @endif
+    </section>
 @endsection

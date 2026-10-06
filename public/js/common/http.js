@@ -48,7 +48,17 @@ export function showValidationErrors(container, error) {
 }
 
 export function notify(type, message) {
-    if (window.toastr?.[type]) window.toastr[type](message);
+    if (!window.Swal) return;
+
+    window.Swal.fire({
+        icon: type === "error" ? "error" : "success",
+        text: message,
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2800,
+        timerProgressBar: true,
+    });
 }
 
 export function showFlashMessage() {

@@ -1,165 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.authenticated')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Daftar Proyek - siMonika</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
-        rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- Toastr CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-    <!-- SweetAlert2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <!-- Toastr & SweetAlert2 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-</head>
+@section('title', 'Proyek — SiMonika')
 
-<body>
-    <!-- Sidebar -->
-    @include('templates.sidebar')
-
-    <!-- Main Content -->
-    <div class="main-content p-4">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h2 class="mb-0">Kelola Proyek</h2>
-                <p class="text-muted">Manajemen data proyek dan informasinya</p>
-            </div>
-            <div class="button-action">
-                <!-- Button Tambah Proyek -->
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#proyekCreateModal">
-                    <i class="bi bi-plus-lg"></i> Tambah Proyek
-                </button>
-                <!-- Button Tambah Kategori -->
-                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#kategoriCreateModal">
-                    <i class="bi bi-plus-lg"></i> Tambah Kategori
-                </button>
-                <!-- Button Lihat Kategori -->
-                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#kategoriViewModal">
-                    <i class="bi bi-list"></i> Lihat Kategori
-                </button>
-            </div>
+@section('content')
+    <header class="page-heading d-flex justify-content-between align-items-end">
+        <div><h1 class="mb-0">Proyek</h1><p>Susun portofolio pekerjaan, kategori, dan kaitannya dengan linimasa.</p></div>
+        <div class="page-actions">
+            <button class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#createCategory">Tambah kategori</button>
+            <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#createProject">Tambah proyek</button>
         </div>
+    </header>
 
-        @if ($proyek->isEmpty())
-            <div class="alert alert-warning text-center">Belum ada proyek terdaftar.</div>
-        @else
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Nama proyek</th>
-                            <th>Kategori</th>
-                            <th>Deskripsi</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($proyek as $p)
-                            <tr>
-                                <td>{{ $p->nama_proyek }}</td>
-                                <td>{{ $p->kategori ? $p->kategori->nama_kategori : '-' }}</td>
-                                <td>{{ $p->deskripsi }}</td>
-                                <td>
-                                    <button class="btn btn-warning btn-edit" data-id="{{ $p->id }}"
-                                        data-nama-proyek="{{ $p->nama_proyek }}" data-kategori-id="{{ $p->kategori_id }}"
-                                        data-deskripsi="{{ $p->deskripsi }}" data-bs-toggle="modal"
-                                        data-bs-target="#proyekEditModal">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-
-                                    @if (!$p->linimasa()->exists())
-                                        <button class="btn btn-danger btn-delete" data-id="{{ $p->id }}">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    @endif
-
-                                    <form id="delete-form-{{ $p->id }}" action="{{ route('proyek.destroy', $p->id) }}"
-                                        method="POST" style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="mt-3">
-                    {{ $proyek->links('pagination::bootstrap-5') }}
-                </div>
+    <div class="row g-3 mb-4">
+        <section class="col-lg-5 collapse" id="createCategory">
+            <div class="panel panel-body h-100">
+                <h2 class="h5">Kategori baru</h2>
+                <form action="{{ route('kategori.store') }}" method="POST" class="d-flex gap-2">
+                    @csrf
+                    <input class="form-control" name="nama_kategori" placeholder="Contoh: Layanan Digital" maxlength="100" required>
+                    <button class="btn btn-primary">Simpan</button>
+                </form>
             </div>
-        @endif
+        </section>
+        <section class="col-lg-7 collapse" id="createProject">
+            <div class="panel panel-body h-100">
+                <h2 class="h5">Proyek baru</h2>
+                @if ($kategori->isEmpty())
+                    <p class="alert alert-warning mb-0">Tambahkan kategori sebelum membuat proyek.</p>
+                @else
+                    <form action="{{ route('proyek.store') }}" method="POST" class="row g-2">
+                        @csrf
+                        <div class="col-md-7"><label class="form-label">Nama proyek</label><input class="form-control" name="nama_proyek" required></div>
+                        <div class="col-md-5"><label class="form-label">Kategori</label><select class="form-select" name="kategori_id" required><option value="">Pilih kategori</option>@foreach ($kategori as $item)<option value="{{ $item->id }}">{{ $item->nama_kategori }}</option>@endforeach</select></div>
+                        <div class="col-12"><label class="form-label">Deskripsi</label><textarea class="form-control" name="deskripsi" rows="2" required maxlength="5000"></textarea></div>
+                        <div><button class="btn btn-primary">Simpan proyek</button></div>
+                    </form>
+                @endif
+            </div>
+        </section>
     </div>
 
-    <!-- Modal Tambah Proyek -->
-    @include('proyek/create', ['kategori' => $kategori])
+    <section class="panel mb-4">
+        <div class="panel-header"><h2 class="h5 mb-0">Kategori</h2><span class="badge text-bg-light">{{ $kategori->count() }} kategori</span></div>
+        <div class="panel-body d-flex gap-2 flex-wrap">
+            @forelse ($kategori as $item)
+                <div class="border rounded-3 p-2 d-flex align-items-center gap-2">
+                    <span>{{ $item->nama_kategori }} <small class="text-muted">({{ $item->proyek_count }})</small></span>
+                    @if ($item->proyek_count === 0)
+                        <form action="{{ route('kategori.destroy', $item) }}" method="POST" data-confirm="Kategori kosong ini akan dihapus.">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-link text-danger btn-sm p-0" aria-label="Hapus {{ $item->nama_kategori }}"><i class="bi bi-x-lg"></i></button>
+                        </form>
+                    @endif
+                </div>
+            @empty
+                <span class="text-muted">Belum ada kategori.</span>
+            @endforelse
+        </div>
+    </section>
 
-    <!-- Modal Edit Proyek -->
-    @include('proyek/edit')
-
-    @include('proyek/kategori')
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Menampilkan Pop Up Error jika ada validasi yang gagal
-            @if ($errors->any())
-                Swal.fire({
-                    title: "Terjadi Kesalahan!",
-                    text: "{{ implode('\n', $errors->all()) }}",
-                    icon: "error",
-                    confirmButtonText: "Mengerti"
-                });
-            @endif
-
-            // Menampilkan Pop Up Sukses jika ada session success
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sukses!',
-                    text: "{{ session('success') }}",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    position: 'center'
-                });
-            @endif
-
-            // Pop Up Konfirmasi Hapus
-            document.querySelectorAll(".btn-delete").forEach(button => {
-                button.addEventListener("click", function () {
-                    let id = this.getAttribute("data-id");
-
-                    Swal.fire({
-                        title: "Apakah Anda yakin?",
-                        text: "Data proyek akan dihapus secara permanen!",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#d33",
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonText: "Ya, Hapus!",
-                        cancelButtonText: "Batal"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            document.getElementById(`delete-form-${id}`).submit();
-                        }
-                    });
-                });
-            });
-        });
-    </script>
-
-</body>
-
-</html>
+    <section class="panel">
+        <div class="panel-header"><h2 class="h5 mb-0">Daftar proyek</h2><span class="badge text-bg-light">{{ $proyek->total() }} proyek</span></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Proyek</th><th>Kategori</th><th>Deskripsi</th><th>Linimasa</th><th class="text-end">Tindakan</th></tr></thead>
+                <tbody>
+                    @forelse ($proyek as $item)
+                        <tr>
+                            <td class="fw-semibold">{{ $item->nama_proyek }}</td>
+                            <td>{{ $item->kategori?->nama_kategori ?? 'Tanpa kategori' }}</td>
+                            <td>{{ str($item->deskripsi)->limit(90) }}</td>
+                            <td>{{ $item->linimasa_count }}</td>
+                            <td class="text-end">
+                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#project-{{ $item->id }}">Edit</button>
+                                <form action="{{ route('proyek.destroy', $item) }}" method="POST" class="d-inline" data-confirm="Proyek dan seluruh linimasa terkait akan dihapus.">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-outline-danger btn-sm">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="project-{{ $item->id }}">
+                            <td colspan="5">
+                                <form action="{{ route('proyek.update', $item) }}" method="POST" class="row g-2 p-2">
+                                    @csrf @method('PUT')
+                                    <div class="col-md-4"><label class="form-label">Nama</label><input class="form-control" name="nama_proyek" value="{{ $item->nama_proyek }}" required></div>
+                                    <div class="col-md-3"><label class="form-label">Kategori</label><select class="form-select" name="kategori_id" required>@foreach ($kategori as $category)<option value="{{ $category->id }}" @selected($category->id === $item->kategori_id)>{{ $category->nama_kategori }}</option>@endforeach</select></div>
+                                    <div class="col-md-5"><label class="form-label">Deskripsi</label><textarea class="form-control" name="deskripsi" required>{{ $item->deskripsi }}</textarea></div>
+                                    <div><button class="btn btn-primary btn-sm">Simpan perubahan</button></div>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5"><div class="empty-state"><i class="bi bi-kanban"></i>Belum ada proyek.</div></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if ($proyek->hasPages()) <div class="panel-body border-top">{{ $proyek->links('pagination::bootstrap-5') }}</div> @endif
+    </section>
+@endsection
