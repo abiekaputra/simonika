@@ -93,6 +93,8 @@ composer audit --locked
 
 ## Design documentation
 
+- [Product scope](docs/product-scope.md)
+- [Acceptance criteria](docs/acceptance-criteria.md)
 - [Architecture](docs/architecture.md)
 - [Data model](docs/data-model.md)
 - [HTTP interface](docs/http-interface.md)
