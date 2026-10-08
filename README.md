@@ -46,6 +46,18 @@ SiMonika gives two user roles a single server rendered workspace:
 | Quality | PHPUnit, Laravel Pint, GitHub Actions | Repeatable behavioral and style gates |
 | Runtime | Apache container or local PHP server | Reproducible evaluation and a simple local workflow |
 
+## Product preview
+
+The screenshots below use the opt-in synthetic catalogue. They contain no government or production data.
+
+| Inventory overview | Linked application detail |
+| --- | --- |
+| ![Inventory dashboard with application totals and status charts](docs/images/dashboard.jpg) | ![Application detail for the synthetic Portal Layanan record](docs/images/application-detail.jpg) |
+
+| Project timeline | Responsive dashboard |
+| --- | --- |
+| ![Project timeline linked to an application and employee](docs/images/project-timeline.jpg) | ![Inventory dashboard at a narrow browser width](docs/images/responsive-dashboard.jpg) |
+
 ## Quick start
 
 Requirements: PHP 8.2 or newer with SQLite, plus Composer.
