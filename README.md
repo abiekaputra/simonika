@@ -37,25 +37,25 @@ SiMonika gives two user roles a single server rendered workspace:
 
 ## Stack
 
-| Area | Technology | Reason |
-| --- | --- | --- |
-| Backend | PHP 8.2+, Laravel 12 | Mature validation, authentication, ORM, and server rendered workflows |
-| UI | Blade, Bootstrap 5, JavaScript modules | Small deployment surface without a frontend build step |
-| Data | SQLite locally; MySQL configuration available | Fast local reproduction with a path to managed relational storage |
-| Export | Native streamed CSV | Constant memory iteration and no spreadsheet parser dependency |
-| Quality | PHPUnit, Laravel Pint, GitHub Actions | Repeatable behavioral and style gates |
-| Runtime | Apache container or local PHP server | Reproducible evaluation and a simple local workflow |
+| Area    | Technology                                    | Reason                                                                |
+| ------- | --------------------------------------------- | --------------------------------------------------------------------- |
+| Backend | PHP 8.2+, Laravel 12                          | Mature validation, authentication, ORM, and server rendered workflows |
+| UI      | Blade, Bootstrap 5, JavaScript modules        | Small deployment surface without a frontend build step                |
+| Data    | SQLite locally; MySQL configuration available | Fast local reproduction with a path to managed relational storage     |
+| Export  | Native streamed CSV                           | Constant memory iteration and no spreadsheet parser dependency        |
+| Quality | PHPUnit, Laravel Pint, GitHub Actions         | Repeatable behavioral and style gates                                 |
+| Runtime | Apache container or local PHP server          | Reproducible evaluation and a simple local workflow                   |
 
 ## Product preview
 
 The screenshots below use the opt-in synthetic catalogue. They contain no government or production data.
 
-| Inventory overview | Linked application detail |
-| --- | --- |
+| Inventory overview                                                                          | Linked application detail                                                                         |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | ![Inventory dashboard with application totals and status charts](docs/images/dashboard.jpg) | ![Application detail for the synthetic Portal Layanan record](docs/images/application-detail.jpg) |
 
-| Project timeline | Responsive dashboard |
-| --- | --- |
+| Project timeline                                                                            | Responsive dashboard                                                                   |
+| ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | ![Project timeline linked to an application and employee](docs/images/project-timeline.jpg) | ![Inventory dashboard at a narrow browser width](docs/images/responsive-dashboard.jpg) |
 
 ## Quick start
@@ -66,6 +66,7 @@ Requirements: PHP 8.2 or newer with SQLite, plus Composer.
 git clone https://github.com/abiekaputra/simonika.git
 cd simonika
 composer install
+npm ci
 cp .env.example .env
 touch database/database.sqlite
 php artisan key:generate
@@ -103,11 +104,12 @@ Never enable the demo seeder in a public deployment.
 ## Verification
 
 ```bash
+npm run format
 composer quality
 composer audit --locked
 ```
 
-`composer quality` checks the source file limits, executes the behavioral test suite against an in memory SQLite database, and verifies formatting. The suite covers authentication, authorization, password reset, transactional mutations, typed values, CSV safety, linked project workflows, timeline consistency, audit retention, employee uniqueness, operational dates, screen rendering, and guest access.
+`npm run format` applies Prettier to Blade, JavaScript, CSS, JSON, YAML, and Markdown. Laravel Pint remains the deterministic PHP formatter. `composer quality` checks the source file limits, executes the behavioral test suite against an in memory SQLite database, and verifies both formatting systems. The suite covers authentication, authorization, password reset, transactional mutations, typed values, CSV safety, linked project workflows, timeline consistency, audit retention, employee uniqueness, operational dates, screen rendering, and guest access.
 
 ## Design documentation
 

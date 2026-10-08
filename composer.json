@@ -3,7 +3,10 @@
     "name": "abiekaputra/simonika",
     "type": "project",
     "description": "SiMonika — Application Monitoring System",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
@@ -54,7 +57,8 @@
         "quality": [
             "@php scripts/check-file-lengths.php",
             "@php artisan test",
-            "vendor/bin/pint --test"
+            "vendor/bin/pint --test",
+            "npm run format:check"
         ]
     },
     "extra": {

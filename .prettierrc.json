@@ -1,0 +1,14 @@
+{
+    "plugins": ["prettier-plugin-blade"],
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "overrides": [
+        {
+            "files": "*.blade.php",
+            "options": {
+                "parser": "blade"
+            }
+        }
+    ]
+}

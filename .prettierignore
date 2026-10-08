@@ -1,0 +1,12 @@
+.env
+.phpunit.result.cache
+**/*.php
+!**/*.blade.php
+bootstrap/cache/
+composer.lock
+database/database.sqlite
+node_modules/
+package-lock.json
+public/build/
+storage/
+vendor/

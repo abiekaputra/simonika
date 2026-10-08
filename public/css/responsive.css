@@ -104,31 +104,38 @@
         display: none;
     }
 
-    h1, .h1 {
+    h1,
+    .h1 {
         font-size: 1.5rem;
     }
 
-    h2, .h2 {
+    h2,
+    .h2 {
         font-size: 1.3rem;
     }
 
-    h3, .h3 {
+    h3,
+    .h3 {
         font-size: 1.1rem;
     }
 
-    h4, .h4 {
+    h4,
+    .h4 {
         font-size: 1rem;
     }
 
-    h5, .h5 {
+    h5,
+    .h5 {
         font-size: 0.9rem;
     }
 
-    h6, .h6 {
+    h6,
+    .h6 {
         font-size: 0.8rem;
     }
 
-    p, .p {
+    p,
+    .p {
         font-size: 0.85rem;
     }
 
@@ -197,7 +204,8 @@
         padding: 0.3rem 0.5rem;
     }
 
-    .form-control, .form-select {
+    .form-control,
+    .form-select {
         font-size: 0.8rem;
         padding: 0.3rem 0.5rem;
     }
