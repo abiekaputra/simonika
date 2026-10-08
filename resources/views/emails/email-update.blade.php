@@ -2,7 +2,7 @@
 <html>
 <head>
     <style>
-        body { 
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #2d3748;
@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
         }
-        .container { 
+        .container {
             padding: 40px;
             max-width: 600px;
             margin: auto;
@@ -18,15 +18,15 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
         }
-        .header { 
+        .header {
             color: #2b6cb0;
             margin-bottom: 30px;
             text-align: center;
             padding-bottom: 20px;
             border-bottom: 2px solid #e2e8f0;
         }
-        .email-update-box { 
-            background: #ebf8ff; 
+        .email-update-box {
+            background: #ebf8ff;
             padding: 25px;
             margin: 25px 0;
             border-radius: 10px;
@@ -38,7 +38,7 @@
             font-size: 0.9em;
             margin-top: 15px;
         }
-        .footer { 
+        .footer {
             margin-top: 35px;
             padding-top: 25px;
             border-top: 2px solid #e2e8f0;
@@ -62,14 +62,16 @@
     <div class="container">
         <div class="header">
             <h2>Pemberitahuan Perubahan Email</h2>
-            <p style="margin-top: 10px; color: #4a5568;">SIMONIKA - Sistem Informasi Monitoring Aplikasi</p>
+            <p
+                style="margin-top: 10px; color: #4a5568"
+            >SIMONIKA - Sistem Informasi Monitoring Aplikasi</p>
         </div>
 
         <p>Dengan hormat,</p>
         <p>Kepada Bapak/Ibu <strong>{{ $nama }}</strong>,</p>
 
         <p>Kami informasikan bahwa telah terjadi perubahan alamat email pada akun SIMONIKA Anda.</p>
-        
+
         <div class="email-update-box">
             <p><strong>Email Lama:</strong> {{ $oldEmail }}</p>
             <p><strong>Email Baru:</strong> {{ $newEmail }}</p>
@@ -78,7 +80,7 @@
 
         <p>Password akun Anda tidak mengalami perubahan dan tetap dapat digunakan seperti biasa.</p>
 
-        <div style="text-align: center;">
+        <div style="text-align: center">
             <a href="{{ url('/login') }}" class="button">Akses SIMONIKA</a>
         </div>
 
@@ -86,14 +88,12 @@
 
         <div class="footer">
             <p>Butuh bantuan? Hubungi kami di:</p>
-            <p><strong>Email:</strong> {{ config('mail.from.address') }}<br>
+            <p><strong>Email:</strong> {{ config('mail.from.address') }}<br />
             <strong>Telepon:</strong> (0821-3906-9782)</p>
-            
-            <p style="margin-top: 20px;">
-                Hormat kami,<br>
-                <strong>Tim SIMONIKA</strong><br>
-                Sistem Informasi Monitoring Aplikasi
-            </p>
+
+            <p style="margin-top: 20px">Hormat kami,<br />
+            <strong>Tim SIMONIKA</strong><br />
+            Sistem Informasi Monitoring Aplikasi</p>
         </div>
     </div>
 </body>

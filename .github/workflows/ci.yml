@@ -17,5 +17,11 @@ jobs:
           extensions: mbstring, pdo_sqlite, zip
           coverage: none
 
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+
       - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: npm ci
       - run: composer quality

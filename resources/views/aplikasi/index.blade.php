@@ -1,8 +1,8 @@
-@extends('layouts.authenticated')
+@extends ('layouts.authenticated')
 
-@section('title', 'Aplikasi - SiMonika')
+@section ('title', 'Aplikasi - SiMonika')
 
-@section('content')
+@section ('content')
     <section id="applicationPage" data-base-url="{{ url('/aplikasi') }}">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
             <div>
@@ -26,7 +26,11 @@
                         <label class="form-label" for="applicationSearch">Cari</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input class="form-control" id="applicationSearch" placeholder="Nama, OPD, atau teknologi">
+                            <input
+                                class="form-control"
+                                id="applicationSearch"
+                                placeholder="Nama, OPD, atau teknologi"
+                            />
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -67,45 +71,65 @@
                         </thead>
                         <tbody id="applicationRows">
                             @foreach ($aplikasis as $aplikasi)
-                                <tr data-application-row
+                                <tr
+                                    data-application-row
                                     data-search="{{ strtolower($aplikasi->nama.' '.$aplikasi->opd.' '.$aplikasi->bahasa_framework) }}"
                                     data-status="{{ $aplikasi->status_pemakaian }}"
-                                    data-basis="{{ $aplikasi->basis_aplikasi }}">
+                                    data-basis="{{ $aplikasi->basis_aplikasi }}"
+                                >
                                     <td class="fw-semibold">{{ $aplikasi->nama }}</td>
                                     <td>{{ $aplikasi->opd }}</td>
                                     <td>{{ $aplikasi->basis_aplikasi }}</td>
                                     <td>{{ $aplikasi->bahasa_framework }}</td>
                                     <td>{{ $aplikasi->proyeks_count }}</td>
                                     <td>
-                                        <span class="badge {{ $aplikasi->status_pemakaian === 'Aktif' ? 'text-bg-success' : 'text-bg-secondary' }}">
+                                        <span
+                                            class="badge {{ $aplikasi->status_pemakaian === 'Aktif' ? 'text-bg-success' : 'text-bg-secondary' }}"
+                                        >
                                             {{ $aplikasi->status_pemakaian }}
                                         </span>
                                     </td>
                                     <td class="text-end text-nowrap">
-                                        <button class="btn btn-sm btn-outline-primary" type="button"
-                                            data-action="detail" data-id="{{ $aplikasi->id_aplikasi }}">Detail</button>
-                                        <button class="btn btn-sm btn-outline-secondary" type="button"
-                                            data-action="edit" data-id="{{ $aplikasi->id_aplikasi }}">Edit</button>
-                                        <button class="btn btn-sm btn-outline-danger" type="button"
-                                            data-action="delete" data-id="{{ $aplikasi->id_aplikasi }}"
-                                            data-name="{{ $aplikasi->nama }}">Hapus</button>
+                                        <button
+                                            class="btn btn-sm btn-outline-primary"
+                                            type="button"
+                                            data-action="detail"
+                                            data-id="{{ $aplikasi->id_aplikasi }}"
+                                        >
+                                            Detail
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-outline-secondary"
+                                            type="button"
+                                            data-action="edit"
+                                            data-id="{{ $aplikasi->id_aplikasi }}"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-outline-danger"
+                                            type="button"
+                                            data-action="delete"
+                                            data-id="{{ $aplikasi->id_aplikasi }}"
+                                            data-name="{{ $aplikasi->nama }}"
+                                        >
+                                            Hapus
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                <p class="text-center text-muted p-4 mb-0 d-none" id="applicationEmptyState">
-                    Tidak ada aplikasi yang cocok dengan filter.
-                </p>
+                <p class="text-center text-muted p-4 mb-0 d-none" id="applicationEmptyState">Tidak ada aplikasi yang cocok dengan filter.</p>
             </div>
         </div>
     </section>
 
-    @include('aplikasi.partials.form-modal')
-    @include('aplikasi.partials.detail-modal')
+    @include ('aplikasi.partials.form-modal')
+    @include ('aplikasi.partials.detail-modal')
 @endsection
 
-@push('scripts')
+@push ('scripts')
     <script type="module" src="{{ asset('js/aplikasi/index.js') }}"></script>
 @endpush

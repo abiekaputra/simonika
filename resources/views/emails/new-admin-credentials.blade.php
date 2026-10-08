@@ -2,7 +2,7 @@
 <html>
 <head>
     <style>
-        body { 
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #2d3748;
@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
         }
-        .container { 
+        .container {
             padding: 40px;
             max-width: 600px;
             margin: auto;
@@ -18,15 +18,15 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
         }
-        .credentials { 
-            background: #ebf8ff; 
+        .credentials {
+            background: #ebf8ff;
             padding: 25px;
             margin: 25px 0;
             border-radius: 10px;
             border-left: 5px solid #4299e1;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-        .header { 
+        .header {
             color: #2b6cb0;
             margin-bottom: 30px;
             text-align: center;
@@ -38,14 +38,15 @@
             font-size: 24px;
             font-weight: 600;
         }
-        .footer { 
+        .footer {
             margin-top: 35px;
             padding-top: 25px;
             border-top: 2px solid #e2e8f0;
             color: #4a5568;
             font-size: 0.95em;
         }
-        ol, ul {
+        ol,
+        ul {
             padding-left: 25px;
         }
         li {
@@ -102,16 +103,16 @@
     <div class="container">
         <div class="header">
             <h2>Selamat Datang di SIMONIKA</h2>
-            <p style="margin-top: 10px; color: #4a5568;">Sistem Informasi Monitoring Aplikasi</p>
+            <p style="margin-top: 10px; color: #4a5568">Sistem Informasi Monitoring Aplikasi</p>
         </div>
 
         <p>Dengan hormat,</p>
         <p>Kepada Bapak/Ibu <strong>{{ $nama }}</strong>,</p>
 
         <p>Kami informasikan bahwa akun administrator SIMONIKA telah berhasil dibuat untuk Anda. Sistem ini merupakan platform terpadu untuk monitoring dan evaluasi aplikasi yang digunakan di lingkungan Dinas Komunikasi dan Informatika.</p>
-        
+
         <p>Berikut adalah informasi kredensial akun Anda:</p>
-        
+
         <div class="credentials">
             <p><strong>Email Administrator:</strong> {{ $email }}</p>
             <p><strong>Kata Sandi Sementara:</strong> {{ $password }}</p>
@@ -129,7 +130,10 @@
         <p><strong>Beberapa hal yang perlu diperhatikan:</strong></p>
         <ul>
             <li>Jaga kerahasiaan kredensial akun Anda</li>
-            <li>Gunakan kata sandi yang kuat (minimal 8 karakter, kombinasi huruf, angka, dan simbol)</li>
+            <li>
+                Gunakan kata sandi yang kuat (minimal 8 karakter, kombinasi huruf, angka, dan
+                simbol)
+            </li>
             <li>Lakukan logout setelah selesai menggunakan sistem</li>
         </ul>
 
@@ -137,15 +141,15 @@
 
         <div class="footer">
             <p>Jika Anda mengalami kendala dalam mengakses sistem atau memiliki pertanyaan lebih lanjut, silakan menghubungi tim support kami melalui:</p>
-            
+
             <div class="contact-info">
-                <p><strong>Email:</strong> {{ config('mail.from.address') }}<br>
+                <p><strong>Email:</strong> {{ config('mail.from.address') }}<br />
                 <strong>Telepon:</strong> (0821-3906-9782)</p>
             </div>
 
             <div class="signature">
-                <p>Hormat kami,<br>
-                <strong>Tim SIMONIKA</strong><br>
+                <p>Hormat kami,<br />
+                <strong>Tim SIMONIKA</strong><br />
                 Sistem Informasi Monitoring Aplikasi</p>
             </div>
         </div>

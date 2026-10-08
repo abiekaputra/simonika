@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reset Password - SiMonika</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+        rel="stylesheet"
+    />
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    />
     <style>
         body {
             min-height: 100vh;
@@ -76,9 +82,7 @@
 
         <div class="reset-password-body">
             @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
+                <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
             @if ($errors->any())
@@ -93,28 +97,53 @@
 
             <form action="{{ route('password.update') }}" method="POST">
                 @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
-                
+                <input type="hidden" name="token" value="{{ $token }}" />
+
                 <div class="form-floating">
-                    <input type="email" class="form-control" id="email" name="email" 
-                           placeholder="name@example.com" value="{{ old('email') }}" required>
+                    <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        placeholder="name@example.com"
+                        value="{{ old('email') }}"
+                        required
+                    />
                     <label for="email">Email</label>
                 </div>
 
                 <div class="form-floating position-relative">
-                    <input type="password" class="form-control" id="password" 
-                           name="password" placeholder="Password Baru" required>
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        placeholder="Password Baru"
+                        required
+                    />
                     <label for="password">Password Baru</label>
-                    <i class="bi bi-eye-slash password-toggle" id="passwordToggle" 
-                       onclick="togglePassword('password', 'passwordToggle')"></i>
+                    <i
+                        class="bi bi-eye-slash password-toggle"
+                        id="passwordToggle"
+                        onclick="togglePassword('password', 'passwordToggle')"
+                    ></i>
                 </div>
 
                 <div class="form-floating position-relative">
-                    <input type="password" class="form-control" id="password_confirmation" 
-                           name="password_confirmation" placeholder="Konfirmasi Password" required>
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="password_confirmation"
+                        name="password_confirmation"
+                        placeholder="Konfirmasi Password"
+                        required
+                    />
                     <label for="password_confirmation">Konfirmasi Password</label>
-                    <i class="bi bi-eye-slash password-toggle" id="confirmToggle" 
-                       onclick="togglePassword('password_confirmation', 'confirmToggle')"></i>
+                    <i
+                        class="bi bi-eye-slash password-toggle"
+                        id="confirmToggle"
+                        onclick="togglePassword('password_confirmation', 'confirmToggle')"
+                    ></i>
                 </div>
 
                 <button type="submit" class="btn btn-reset btn-primary">
@@ -128,7 +157,7 @@
         function togglePassword(inputId, toggleId) {
             const input = document.getElementById(inputId);
             const toggle = document.getElementById(toggleId);
-            
+
             if (input.type === 'password') {
                 input.type = 'text';
                 toggle.classList.replace('bi-eye-slash', 'bi-eye');
@@ -139,4 +168,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
