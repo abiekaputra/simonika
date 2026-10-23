@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - SiMonika</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/brand/simonika-mark-32.png') }}" />
     <link
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
         rel="stylesheet"
@@ -38,8 +39,20 @@
         }
 
         .login-header .logo {
-            font-size: 2rem;
+            align-items: center;
+            display: flex;
+            justify-content: center;
             margin-bottom: 10px;
+        }
+
+        .login-header .logo img {
+            background: #ffffff;
+            border-radius: 18px;
+            box-sizing: content-box;
+            height: 64px;
+            object-fit: contain;
+            padding: 8px;
+            width: 64px;
         }
 
         .login-body {
@@ -107,7 +120,10 @@
     <div class="login-container">
         <div class="login-header">
             <div class="logo">
-                <i class="bi bi-display"></i>
+                <img
+                    src="{{ asset('images/brand/simonika-mark-64.png') }}"
+                    alt="SiMonika application monitoring mark"
+                />
             </div>
             <h4 class="mb-0">SiMonika</h4>
             <small>Sistem Monitoring Aplikasi</small>

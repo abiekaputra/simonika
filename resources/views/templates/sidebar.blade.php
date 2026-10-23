@@ -6,9 +6,16 @@
 <div class="sidebar-overlay"></div>
 <aside class="sidebar">
     <div class="sidebar-header px-3 pt-3">
-        <div class="app-title text-start">
-            <h3 class="mb-0">SiMonika</h3>
-            <small>Monitoring aplikasi dan pekerjaan</small>
+        <div class="app-brand">
+            <img
+                class="app-brand-mark"
+                src="{{ asset('images/brand/simonika-mark-64.png') }}"
+                alt=""
+            />
+            <div class="app-title text-start">
+                <h3 class="mb-0">SiMonika</h3>
+                <small>Monitoring aplikasi dan pekerjaan</small>
+            </div>
         </div>
     </div>
 

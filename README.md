@@ -1,8 +1,14 @@
+<p align="center">
+  <img src="docs/brand/simonika-lockup.png" alt="SiMonika application monitoring identity" width="520" />
+</p>
+
 # SiMonika
 
 SiMonika is an application inventory and project monitoring system for an operations team. It records deployed applications, flexible application metadata, employees, projects, timelines, internship participants, and administrative activity.
 
 This repository is a sanitized portfolio edition of an internship project that originally stopped before it was ready for public evaluation. It contains no government database, production credentials, internal hostnames, or employee records.
+
+The continuous S-shaped mark represents operational records moving through one monitored workflow. Its blue status node reflects the active state that turns an inventory into a working control surface.
 
 ## Problem and users
 
